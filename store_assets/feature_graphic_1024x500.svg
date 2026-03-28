@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <radialGradient id="g1" cx="20%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#6C63FF" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#050510" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="80%" cy="70%" r="45%">
+      <stop offset="0%" stop-color="#00D4AA" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#050510" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g3" cx="55%" cy="50%" r="30%">
+      <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#050510" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C63FF"/>
+      <stop offset="100%" stop-color="#00D4AA"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1024" height="500" fill="#050510"/>
+  <rect width="1024" height="500" fill="url(#g1)"/>
+  <rect width="1024" height="500" fill="url(#g2)"/>
+  <rect width="1024" height="500" fill="url(#g3)"/>
+  <!-- Shield icon -->
+  <g transform="translate(200, 100) scale(12.5)">
+    <path d="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5L12,1zM12,11.99h7c-0.53,4.12 -3.28,7.79 -7,8.94V12H5V6.3l7,-3.11v8.8z" 
+          fill="url(#sg)" opacity="0.9"/>
+  </g>
+  <!-- Text -->
+  <text x="520" y="210" font-family="sans-serif" font-weight="600" font-size="72" fill="#FFFFFF" letter-spacing="-2">Firewall</text>
+  <text x="520" y="270" font-family="sans-serif" font-weight="300" font-size="28" fill="#99FFFFFF" opacity="0.6">Control your internet. Block everything.</text>
+  <text x="520" y="320" font-family="sans-serif" font-weight="300" font-size="20" fill="#00D4AA" opacity="0.7">No root · No ads · No tracking</text>
+  <!-- Subtle line accent -->
+  <rect x="520" y="340" width="120" height="2" rx="1" fill="url(#sg)" opacity="0.4"/>
+</svg>
