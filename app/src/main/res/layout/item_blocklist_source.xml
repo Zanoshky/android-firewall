@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_glass_card"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_marginVertical="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtSourceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/txtSourceDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp" />
+
+            <TextView
+                android:id="@+id/txtSourceStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/text_hint"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnSourceAction"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="Download"
+            android:textColor="@color/accent_blue"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="12dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+</LinearLayout>

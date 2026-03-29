@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <!-- Global traffic card -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Global Traffic"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginEnd="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="↓ Download"
+                    android:textColor="@color/chart_download"
+                    android:textSize="11sp" />
+                <TextView
+                    android:id="@+id/txtGlobalDownload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 B"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginStart="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="↑ Upload"
+                    android:textColor="@color/chart_upload"
+                    android:textSize="11sp" />
+                <TextView
+                    android:id="@+id/txtGlobalUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 B"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Global pie chart: blocked vs allowed -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blocked vs Allowed"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="20dp" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chartBlockedAllowed"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Top apps by traffic bar chart -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Top Apps by Traffic"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="20dp" />
+
+        <com.github.mikephil.charting.charts.HorizontalBarChart
+            android:id="@+id/chartTopApps"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Per-app traffic list -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Per-App Traffic"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="20dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerAppTraffic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false" />
+
+    </LinearLayout>
+</ScrollView>

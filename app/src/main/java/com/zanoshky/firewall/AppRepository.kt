@@ -12,7 +12,9 @@ data class AppInfo(
     val isSystem: Boolean,
     val uid: Int,
     var allowWifi: Boolean = false,
-    var allowMobile: Boolean = false
+    var allowMobile: Boolean = false,
+    var blockedRequests: Long = 0,
+    var allowedRequests: Long = 0
 )
 
 object AppRepository {
@@ -20,7 +22,7 @@ object AppRepository {
     fun getInstalledApps(context: Context): List<AppInfo> {
         val pm = context.packageManager
         return pm.getInstalledApplications(PackageManager.GET_META_DATA)
-            .filter { it.uid > 1000 } // skip core Android kernel UIDs
+            .filter { it.uid > 1000 }
             .map { info ->
                 AppInfo(
                     name = info.loadLabel(pm).toString(),

@@ -1,11 +1,8 @@
 package com.zanoshky.firewall
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -21,35 +18,34 @@ class AppAdapter(
     private var apps: List<AppInfo> = emptyList()
 
     fun submitList(list: List<AppInfo>) {
+        val oldList = apps
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize() = apps.size
+            override fun getOldListSize() = oldList.size
             override fun getNewListSize() = list.size
             override fun areItemsTheSame(old: Int, new: Int) =
-                apps[old].packageName == list[new].packageName
+                oldList[old].packageName == list[new].packageName
             override fun areContentsTheSame(old: Int, new: Int) =
-                apps[old].allowWifi == list[new].allowWifi &&
-                apps[old].allowMobile == list[new].allowMobile
+                oldList[old].allowWifi == list[new].allowWifi &&
+                oldList[old].allowMobile == list[new].allowMobile &&
+                oldList[old].blockedRequests == list[new].blockedRequests
         })
         apps = list
         diff.dispatchUpdatesTo(this)
     }
 
     override fun getItemCount() = apps.size
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_app, parent, false)
         return ViewHolder(view)
     }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(apps[position])
-    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(apps[position])
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val imgIcon: ImageView = view.findViewById(R.id.imgIcon)
         private val txtName: TextView = view.findViewById(R.id.txtName)
         private val txtPackage: TextView = view.findViewById(R.id.txtPackage)
         private val txtSystemBadge: TextView = view.findViewById(R.id.txtSystemBadge)
+        private val txtAppStats: TextView = view.findViewById(R.id.txtAppStats)
         private val btnWifi: FrameLayout = view.findViewById(R.id.btnWifi)
         private val txtWifi: TextView = view.findViewById(R.id.txtWifi)
         private val btnMobile: FrameLayout = view.findViewById(R.id.btnMobile)
@@ -58,7 +54,6 @@ class AppAdapter(
         private val ctx = view.context
         private val colorOn = ContextCompat.getColor(ctx, R.color.toggle_on)
         private val colorOff = ContextCompat.getColor(ctx, R.color.text_secondary)
-        private val pulseAnim = AnimationUtils.loadAnimation(ctx, R.anim.scale_pulse)
 
         fun bind(app: AppInfo) {
             imgIcon.setImageDrawable(app.icon)
@@ -66,39 +61,38 @@ class AppAdapter(
             txtPackage.text = app.packageName
             txtSystemBadge.visibility = if (app.isSystem) View.VISIBLE else View.GONE
 
-            updateToggleState(btnWifi, txtWifi, app.allowWifi, false)
-            updateToggleState(btnMobile, txtMobile, app.allowMobile, false)
+            val totalReqs = app.blockedRequests + app.allowedRequests
+            if (totalReqs > 0) {
+                txtAppStats.visibility = View.VISIBLE
+                txtAppStats.text = "${formatCount(app.blockedRequests)} blocked · ${formatCount(app.allowedRequests)} allowed"
+            } else {
+                txtAppStats.visibility = View.GONE
+            }
+
+            updateToggle(btnWifi, txtWifi, app.allowWifi)
+            updateToggle(btnMobile, txtMobile, app.allowMobile)
 
             btnWifi.setOnClickListener {
                 app.allowWifi = !app.allowWifi
-                updateToggleState(btnWifi, txtWifi, app.allowWifi, true)
-                it.startAnimation(pulseAnim)
+                updateToggle(btnWifi, txtWifi, app.allowWifi)
                 onToggleWifi(app)
             }
             btnMobile.setOnClickListener {
                 app.allowMobile = !app.allowMobile
-                updateToggleState(btnMobile, txtMobile, app.allowMobile, true)
-                it.startAnimation(pulseAnim)
+                updateToggle(btnMobile, txtMobile, app.allowMobile)
                 onToggleMobile(app)
             }
         }
 
-        private fun updateToggleState(btn: FrameLayout, txt: TextView, allowed: Boolean, animate: Boolean) {
-            val bgRes = if (allowed) R.drawable.bg_toggle_on else R.drawable.bg_toggle_off
-            btn.setBackgroundResource(bgRes)
+        private fun formatCount(n: Long): String = when {
+            n >= 1_000_000 -> String.format("%.1fM", n / 1_000_000.0)
+            n >= 1_000 -> String.format("%.1fK", n / 1_000.0)
+            else -> n.toString()
+        }
 
-            if (animate) {
-                val from = if (allowed) colorOff else colorOn
-                val to = if (allowed) colorOn else colorOff
-                ValueAnimator.ofObject(ArgbEvaluator(), from, to).apply {
-                    duration = 250
-                    addUpdateListener { txt.setTextColor(it.animatedValue as Int) }
-                    start()
-                }
-            } else {
-                txt.setTextColor(if (allowed) colorOn else colorOff)
-            }
-
+        private fun updateToggle(btn: FrameLayout, txt: TextView, allowed: Boolean) {
+            btn.setBackgroundResource(if (allowed) R.drawable.bg_toggle_on else R.drawable.bg_toggle_off)
+            txt.setTextColor(if (allowed) colorOn else colorOff)
             btn.contentDescription = if (allowed) "Allowed – tap to block" else "Blocked – tap to allow"
         }
     }

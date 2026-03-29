@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Tab filter -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        app:tabIndicator="@drawable/bg_tab_indicator"
+        app:tabIndicatorColor="@color/accent_blue"
+        app:tabTextColor="@color/text_secondary"
+        app:tabSelectedTextColor="@color/text_primary"
+        app:tabMode="fixed"
+        app:tabGravity="fill">
+
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" />
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="User" />
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="System" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- Search -->
+    <EditText
+        android:id="@+id/editSearch"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/text_hint"
+        android:hint="Search apps..."
+        android:textColorHint="@color/text_hint"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp"
+        android:inputType="text"
+        android:paddingHorizontal="16dp"
+        android:importantForAutofill="no" />
+
+    <!-- App list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerApps"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp" />
+
+</LinearLayout>

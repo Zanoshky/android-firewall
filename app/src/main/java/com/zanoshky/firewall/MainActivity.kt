@@ -1,8 +1,6 @@
 package com.zanoshky.firewall
 
 import android.Manifest
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -10,61 +8,61 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.view.animation.DecelerateInterpolator
-import android.widget.EditText
+import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.materialswitch.MaterialSwitch
-import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var adapter: AppAdapter
-    private lateinit var dao: RuleDao
-    private var allApps: List<AppInfo> = emptyList()
-    private var currentFilter = Filter.ALL
-    private var searchQuery = ""
 
     private lateinit var txtStatus: TextView
     private lateinit var txtSubtitle: TextView
     private lateinit var txtBlockedCount: TextView
     private lateinit var txtAllowedCount: TextView
+    private lateinit var txtTotalDropped: TextView
+    private lateinit var txtTotalApps: TextView
+    private lateinit var txtUptime: TextView
+    private lateinit var txtTotalTraffic: TextView
 
+    private val handler = Handler(Looper.getMainLooper())
+    private var uptimeRunnable: Runnable? = null
     private val VPN_REQUEST_CODE = 100
-
-    private enum class Filter { ALL, USER, SYSTEM }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        dao = RuleDatabase.get(this).ruleDao()
-
         txtStatus = findViewById(R.id.txtStatus)
         txtSubtitle = findViewById(R.id.txtSubtitle)
         txtBlockedCount = findViewById(R.id.txtBlockedCount)
         txtAllowedCount = findViewById(R.id.txtAllowedCount)
+        txtTotalDropped = findViewById(R.id.txtTotalDropped)
+        txtTotalApps = findViewById(R.id.txtTotalApps)
+        txtUptime = findViewById(R.id.txtUptime)
+        txtTotalTraffic = findViewById(R.id.txtTotalTraffic)
 
-        adapter = AppAdapter(
-            onToggleWifi = { app -> saveRule(app) },
-            onToggleMobile = { app -> saveRule(app) }
-        )
+        // ViewPager + BottomNav
+        val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+        viewPager.adapter = MainPagerAdapter(this)
+        viewPager.isUserInputEnabled = false // disable swipe, use bottom nav
 
-        val recycler = findViewById<RecyclerView>(R.id.recyclerApps)
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = adapter
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_apps -> viewPager.currentItem = 0
+                R.id.nav_logs -> viewPager.currentItem = 1
+                R.id.nav_stats -> viewPager.currentItem = 2
+                R.id.nav_blocklist -> viewPager.currentItem = 3
+            }
+            true
+        }
 
+        // Firewall toggle
         val switchFirewall = findViewById<MaterialSwitch>(R.id.switchFirewall)
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         switchFirewall.isChecked = prefs.getBoolean("enabled", false)
@@ -76,34 +74,6 @@ class MainActivity : AppCompatActivity() {
             if (isChecked) startFirewall() else stopFirewall()
         }
 
-        // Animate ambient orbs
-        animateOrbs()
-
-        // Tab filter
-        findViewById<TabLayout>(R.id.tabFilter).addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                currentFilter = when (tab.position) {
-                    1 -> Filter.USER
-                    2 -> Filter.SYSTEM
-                    else -> Filter.ALL
-                }
-                applyFilter()
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
-
-        // Search
-        findViewById<EditText>(R.id.editSearch).addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchQuery = s?.toString()?.lowercase() ?: ""
-                applyFilter()
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        // Request notification permission for Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -111,122 +81,67 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        loadApps()
+        startLiveUpdates()
+        BlocklistManager.init(this)
+        DohResolver.init(this)
     }
 
-    private fun animateOrbs() {
-        val orbPurple = findViewById<View>(R.id.orbPurple)
-        val orbCyan = findViewById<View>(R.id.orbCyan)
+    override fun onDestroy() {
+        uptimeRunnable?.let { handler.removeCallbacks(it) }
+        super.onDestroy()
+    }
 
-        // Purple orb: slow diagonal drift
-        ObjectAnimator.ofFloat(orbPurple, "translationY", 0f, 50f, 0f).apply {
-            duration = 8000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = DecelerateInterpolator()
-            start()
+    private fun startLiveUpdates() {
+        uptimeRunnable = object : Runnable {
+            override fun run() {
+                updateLiveStats()
+                handler.postDelayed(this, 2000)
+            }
         }
-        ObjectAnimator.ofFloat(orbPurple, "translationX", 0f, 30f, 0f).apply {
-            duration = 10000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+        handler.post(uptimeRunnable!!)
+    }
 
-        // Cyan orb: slow vertical float
-        ObjectAnimator.ofFloat(orbCyan, "translationY", 0f, -40f, 0f).apply {
-            duration = 7000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = DecelerateInterpolator()
-            start()
+    private fun updateLiveStats() {
+        val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
+        val isActive = prefs.getBoolean("enabled", false)
+
+        val historical = prefs.getLong("total_blocked", 0)
+        val session = FirewallVpnService.totalBlockedSession.get()
+        txtTotalDropped.text = formatCount(historical + session)
+
+        val totalIn = prefs.getLong("total_bytes_in", 0) + FirewallVpnService.sessionBytesIn.get()
+        val totalOut = prefs.getLong("total_bytes_out", 0) + FirewallVpnService.sessionBytesOut.get()
+        txtTotalTraffic.text = "↓ ${formatBytes(totalIn)}  ↑ ${formatBytes(totalOut)}"
+
+        if (isActive && FirewallVpnService.sessionStartTime > 0) {
+            val elapsed = System.currentTimeMillis() - FirewallVpnService.sessionStartTime
+            txtUptime.text = "⏱ ${formatDuration(elapsed)}"
+        } else {
+            txtUptime.text = ""
         }
-        ObjectAnimator.ofFloat(orbCyan, "translationX", 0f, -25f, 0f).apply {
-            duration = 9000
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+    }
+
+    fun updateCounts(allApps: List<AppInfo>) {
+        val allowed = allApps.count { it.allowWifi || it.allowMobile }
+        val blocked = allApps.size - allowed
+        txtBlockedCount.text = blocked.toString()
+        txtAllowedCount.text = allowed.toString()
+        txtTotalApps.text = allApps.size.toString()
     }
 
     private fun updateStatusUI(active: Boolean) {
         if (active) {
             txtStatus.text = "● Protected"
             txtStatus.setTextColor(ContextCompat.getColor(this, R.color.status_active))
-            txtStatus.setBackgroundResource(R.drawable.bg_status_badge)
-            txtSubtitle.text = "Firewall is active"
+            txtSubtitle.text = "Firewall active"
         } else {
-            txtStatus.text = "● Unprotected"
+            txtStatus.text = "● Inactive"
             txtStatus.setTextColor(ContextCompat.getColor(this, R.color.status_inactive))
-            txtStatus.setBackgroundResource(R.drawable.bg_toggle_off)
-            txtSubtitle.text = "All traffic blocked"
+            txtSubtitle.text = "Firewall off"
         }
     }
 
-    private fun updateCounts() {
-        val allowed = allApps.count { it.allowWifi || it.allowMobile }
-        val blocked = allApps.size - allowed
-        animateCounter(txtBlockedCount, blocked)
-        animateCounter(txtAllowedCount, allowed)
-    }
-
-    private fun animateCounter(view: TextView, target: Int) {
-        val current = view.text.toString().toIntOrNull() ?: 0
-        ValueAnimator.ofInt(current, target).apply {
-            duration = 400
-            interpolator = DecelerateInterpolator()
-            addUpdateListener { view.text = (it.animatedValue as Int).toString() }
-            start()
-        }
-    }
-
-    private fun loadApps() {
-        lifecycleScope.launch {
-            val apps = withContext(Dispatchers.IO) { AppRepository.getInstalledApps(this@MainActivity) }
-            val rules = withContext(Dispatchers.IO) { dao.getAll() }
-            val ruleMap = rules.associateBy { it.packageName }
-
-            apps.forEach { app ->
-                ruleMap[app.packageName]?.let { rule ->
-                    app.allowWifi = rule.allowWifi
-                    app.allowMobile = rule.allowMobile
-                }
-            }
-
-            allApps = apps
-            applyFilter()
-            updateCounts()
-
-            // Replay layout animation
-            findViewById<RecyclerView>(R.id.recyclerApps).scheduleLayoutAnimation()
-        }
-    }
-
-    private fun applyFilter() {
-        val filtered = allApps.filter { app ->
-            val matchesTab = when (currentFilter) {
-                Filter.ALL -> true
-                Filter.USER -> !app.isSystem
-                Filter.SYSTEM -> app.isSystem
-            }
-            val matchesSearch = searchQuery.isEmpty() ||
-                app.name.lowercase().contains(searchQuery) ||
-                app.packageName.lowercase().contains(searchQuery)
-            matchesTab && matchesSearch
-        }
-        adapter.submitList(filtered)
-    }
-
-    private fun saveRule(app: AppInfo) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            dao.upsert(AppRule(app.packageName, app.allowWifi, app.allowMobile))
-        }
-        updateCounts()
-        val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
-        if (prefs.getBoolean("enabled", false)) {
-            startFirewall()
-        }
-    }
-
-    private fun startFirewall() {
+    fun startFirewall() {
         val vpnIntent = VpnService.prepare(this)
         if (vpnIntent != null) {
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE)
@@ -259,5 +174,31 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             launchVpnService()
         }
+    }
+
+    private fun formatDuration(ms: Long): String {
+        val secs = ms / 1000
+        val mins = secs / 60
+        val hours = mins / 60
+        val days = hours / 24
+        return when {
+            days > 0 -> "${days}d ${hours % 24}h"
+            hours > 0 -> "${hours}h ${mins % 60}m"
+            mins > 0 -> "${mins}m ${secs % 60}s"
+            else -> "${secs}s"
+        }
+    }
+
+    private fun formatCount(n: Long): String = when {
+        n >= 1_000_000 -> String.format("%.1fM", n / 1_000_000.0)
+        n >= 1_000 -> String.format("%.1fK", n / 1_000.0)
+        else -> n.toString()
+    }
+
+    private fun formatBytes(bytes: Long): String = when {
+        bytes >= 1_073_741_824 -> String.format("%.1f GB", bytes / 1_073_741_824.0)
+        bytes >= 1_048_576 -> String.format("%.1f MB", bytes / 1_048_576.0)
+        bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
+        else -> "$bytes B"
     }
 }

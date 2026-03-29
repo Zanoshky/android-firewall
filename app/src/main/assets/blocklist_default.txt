@@ -1,0 +1,145 @@
+# Default tracker blocklist - bundled offline
+# Sources: Steven Black, Disconnect.me, EasyPrivacy (curated subset)
+# Categories: Analytics, Ads, Tracking, Fingerprinting, Telemetry
+#
+# ANALYTICS & TELEMETRY
+analytics.google.com
+www.google-analytics.com
+ssl.google-analytics.com
+google-analytics.com
+googletagmanager.com
+www.googletagmanager.com
+tagmanager.google.com
+firebase-settings.crashlytics.com
+app-measurement.com
+firebaselogging-pa.googleapis.com
+firebaseinstallations.googleapis.com
+settings.crashlytics.com
+e.crashlytics.com
+reports.crashlytics.com
+# FACEBOOK / META
+graph.facebook.com
+pixel.facebook.com
+www.facebook.com
+connect.facebook.net
+staticxx.facebook.com
+an.facebook.com
+ads.facebook.com
+web.facebook.com
+# ADVERTISING NETWORKS
+pagead2.googlesyndication.com
+adservice.google.com
+ads.google.com
+doubleclick.net
+ad.doubleclick.net
+googleads.g.doubleclick.net
+www.googleadservices.com
+googleadservices.com
+media.net
+adnxs.com
+ib.adnxs.com
+acdn.adnxs.com
+nym1-ib.adnxs.com
+ads.yahoo.com
+advertising.com
+pixel.advertising.com
+ad.turn.com
+adsymptotic.com
+adform.net
+track.adform.net
+serving-sys.com
+bs.serving-sys.com
+contextweb.com
+# TRACKING & FINGERPRINTING
+cdn.mxpnl.com
+api.mixpanel.com
+decide.mixpanel.com
+api.segment.io
+cdn.segment.com
+api.amplitude.com
+cdn.amplitude.com
+heapanalytics.com
+cdn.heapanalytics.com
+t.co
+analytics.twitter.com
+static.ads-twitter.com
+ads-api.twitter.com
+bat.bing.com
+c.bing.com
+clarity.ms
+www.clarity.ms
+browser.sentry-cdn.com
+sentry.io
+o0.ingest.sentry.io
+cdn.branch.io
+api2.branch.io
+app.link
+bnc.lt
+api.braze.com
+sdk.fra-01.braze.eu
+device-api.urbanairship.com
+combine.urbanairship.com
+web-sdk.appsflyer.com
+launches.appsflyer.com
+t.appsflyer.com
+conversions.appsflyer.com
+app.adjust.com
+s2s.adjust.com
+view.adjust.com
+# FINGERPRINTING SERVICES
+cdn.jsdelivr.net/npm/@aspect-build
+fpjs.io
+api.fpjs.io
+cdn.fpjs.io
+fingerprint.com
+api.fingerprint.com
+fpnpmcdn.net
+# DATA BROKERS / OSINT
+api.spokeo.com
+www.beenverified.com
+api.whitepages.com
+pipl.com
+api.pipl.com
+www.intelius.com
+# MICROSOFT TELEMETRY
+vortex.data.microsoft.com
+settings-win.data.microsoft.com
+watson.telemetry.microsoft.com
+watson.microsoft.com
+telemetry.microsoft.com
+oca.telemetry.microsoft.com
+# AMAZON ADS
+aax-us-east.amazon-adsystem.com
+aax-us-iad.amazon-adsystem.com
+mads.amazon-adsystem.com
+fls-na.amazon-adsystem.com
+# TIKTOK
+analytics.tiktok.com
+log.tiktokv.com
+mon.tiktokv.com
+# SNAPCHAT
+sc-analytics.appspot.com
+app-analytics.snapchat.com
+# MISC TRACKERS
+pixel.quantserve.com
+secure.quantserve.com
+scorecardresearch.com
+sb.scorecardresearch.com
+b.scorecardresearch.com
+beacon.krxd.net
+cdn.krxd.net
+usabilla.com
+hotjar.com
+script.hotjar.com
+static.hotjar.com
+vars.hotjar.com
+in.hotjar.com
+mouseflow.com
+cdn.mouseflow.com
+luckyorange.com
+cdn.luckyorange.com
+crazyegg.com
+script.crazyegg.com
+newrelic.com
+js-agent.newrelic.com
+bam.nr-data.net
