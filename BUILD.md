@@ -1,4 +1,4 @@
-# Build & Release Guide — Firewall
+# Build & Release Guide - Firewall
 
 ## Prerequisites
 

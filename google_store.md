@@ -1,9 +1,9 @@
-# Google Play Store Listing — Firewall by Zanoshky
+# Google Play Store Listing - Firewall by Zanoshky
 
 ## App Details
 
 - **Package name:** com.zanoshky.firewall
-- **App name:** Firewall — Block Internet & Trackers
+- **App name:** Firewall - Block Internet & Trackers
 - **Developer name:** Marko Zanoški
 - **Category:** Tools
 - **Content rating:** Everyone
@@ -19,19 +19,19 @@ Block internet per app. Block trackers. DNS over HTTPS. No root needed.
 
 ## Full Description (4000 chars max)
 
-Firewall gives you full control over which apps can access the internet — and blocks trackers, ads, and fingerprinting services across your entire device. No root required.
+Firewall gives you full control over which apps can access the internet - and blocks trackers, ads, and fingerprinting services across your entire device. No root required.
 
 Every app is blocked by default. You decide which ones get Wi-Fi access, mobile data access, or both. This includes system apps and manufacturer services from Xiaomi, Samsung, Huawei, and others.
 
 HOW IT WORKS
-Firewall creates a local VPN on your device. All network traffic passes through this VPN. Apps you haven't allowed are blocked — their traffic goes nowhere. Apps you allow bypass the VPN and connect normally. No data is collected, no traffic leaves your device, no external servers involved.
+Firewall creates a local VPN on your device. All network traffic passes through this VPN. Apps you haven't allowed are blocked - their traffic goes nowhere. Apps you allow bypass the VPN and connect normally. No data is collected, no traffic leaves your device, no external servers involved.
 
 PER-APP FIREWALL
-• Block all apps by default — whitelist only what you trust
+• Block all apps by default - whitelist only what you trust
 • Separate Wi-Fi and mobile data toggles per app
 • Block system apps and OEM bloatware (MIUI analytics, Samsung services, etc.)
 • Filter apps by User / System with search
-• Auto-start on boot — stays active after reboot
+• Auto-start on boot - stays active after reboot
 
 TRACKER & AD BLOCKING
 • Blocks 130+ known tracker, ad, and fingerprinting domains out of the box
@@ -43,7 +43,7 @@ TRACKER & AD BLOCKING
 DNS OVER HTTPS
 • Encrypt your DNS queries so your ISP can't see what sites you visit
 • Choose your provider: Cloudflare, Google, or Quad9
-• Blocked tracker domains get instant NXDOMAIN — never reach the internet
+• Blocked tracker domains get instant NXDOMAIN - never reach the internet
 • Toggle DoH on/off independently
 
 CONNECTION LOGS
@@ -152,7 +152,7 @@ Recommended screenshots:
 
 ## Store Listing Checklist
 
-- [ ] Google Play Developer account ($25) — play.google.com/console
+- [ ] Google Play Developer account ($25) - play.google.com/console
 - [ ] Signed release AAB (`./gradlew bundleRelease`)
 - [ ] App icon 512x512 PNG
 - [ ] Feature graphic 1024x500 PNG

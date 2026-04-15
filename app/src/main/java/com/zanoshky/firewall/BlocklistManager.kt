@@ -27,7 +27,7 @@ object BlocklistManager {
     private const val KEY_WHITELISTED = "whitelisted_domains"
     private const val DOWNLOADED_DIR = "blocklists"
 
-    // Thread-safe domain set — swapped atomically, read by VPN thread
+    // Thread-safe domain set - swapped atomically, read by VPN thread
     @Volatile
     private var activeDomains: Set<String> = emptySet()
 
@@ -44,7 +44,7 @@ object BlocklistManager {
 
     fun init(context: Context) {
         isEnabled = prefs(context).getBoolean(KEY_ENABLED, false)
-        // Don't load on main thread — will be loaded on first VPN start or via suspend
+        // Don't load on main thread - will be loaded on first VPN start or via suspend
     }
 
     /** Call from coroutine only */
@@ -70,7 +70,7 @@ object BlocklistManager {
         return false
     }
 
-    /** Async loading — safe to call from any coroutine */
+    /** Async loading - safe to call from any coroutine */
     suspend fun loadAllDomainsAsync(context: Context) = withContext(Dispatchers.IO) {
         isLoading = true
         try {
@@ -96,7 +96,7 @@ object BlocklistManager {
             getCustomDomains(context).forEach { domains.add(it.lowercase()) }
             getWhitelistedDomains(context).forEach { domains.remove(it.lowercase()) }
 
-            // Atomic swap — VPN thread sees either old or new set, never empty
+            // Atomic swap - VPN thread sees either old or new set, never empty
             activeDomains = domains
         } finally {
             isLoading = false
@@ -228,9 +228,11 @@ object BlocklistManager {
         withContext(Dispatchers.IO) {
             try {
                 val conn = URL(source.url).openConnection() as HttpURLConnection
+                conn.instanceFollowRedirects = true
                 conn.connectTimeout = 15000
-                conn.readTimeout = 60000
+                conn.readTimeout = 120000
                 conn.requestMethod = "GET"
+                conn.setRequestProperty("User-Agent", "Firewall/1.4 Android")
 
                 if (conn.responseCode != 200) {
                     conn.disconnect()
@@ -293,9 +295,19 @@ object BlocklistManager {
     private fun parseAdblockLine(line: String): String? {
         val trimmed = line.trim()
         if (trimmed.startsWith('!') || trimmed.startsWith('[') || trimmed.isEmpty()) return null
-        if (trimmed.startsWith("||") && trimmed.endsWith("^")) {
-            val domain = trimmed.removePrefix("||").removeSuffix("^").lowercase()
-            return if (domain.contains('.') && !domain.contains('/') && !domain.contains('*')) domain else null
+        if (trimmed.startsWith("||")) {
+            // Strip || prefix, then take everything before ^ or $ (modifiers)
+            val raw = trimmed.removePrefix("||")
+            val caretIdx = raw.indexOf('^')
+            val dollarIdx = raw.indexOf('$')
+            val endIdx = when {
+                caretIdx >= 0 && dollarIdx >= 0 -> minOf(caretIdx, dollarIdx)
+                caretIdx >= 0 -> caretIdx
+                dollarIdx >= 0 -> dollarIdx
+                else -> raw.length
+            }
+            val domain = raw.substring(0, endIdx).lowercase()
+            return if (domain.contains('.') && !domain.contains('/') && !domain.contains('*') && domain.isNotEmpty()) domain else null
         }
         return null
     }

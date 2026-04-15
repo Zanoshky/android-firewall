@@ -1,37 +1,37 @@
 [
   {
-    "id": "steven_black",
-    "name": "Steven Black Unified",
-    "description": "Merged hosts from multiple curated sources. ~170k domains.",
-    "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
+    "id": "hagezi_light",
+    "name": "HaGeZi Light",
+    "description": "Curated list blocking ads, tracking and metrics. Low false positives. ~140K domains.",
+    "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt",
     "format": "hosts"
   },
   {
-    "id": "energized_basic",
-    "name": "Energized Basic",
-    "description": "Lightweight protection against ads and trackers.",
-    "url": "https://block.energized.pro/basic/formats/hosts.txt",
+    "id": "oisd_small",
+    "name": "OISD Small",
+    "description": "Block. Don't break. Minimal false positives, updated hourly. ~57K domains.",
+    "url": "https://small.oisd.nl/domainswild2",
+    "format": "domains"
+  },
+  {
+    "id": "1hosts_lite",
+    "name": "1Hosts Lite",
+    "description": "Lightweight tier of a well-maintained multi-source blocklist. ~195K domains.",
+    "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/hosts.txt",
+    "format": "hosts"
+  },
+  {
+    "id": "steven_black",
+    "name": "Steven Black Unified",
+    "description": "The classic merged hosts file from multiple curated sources. ~170K domains.",
+    "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
     "format": "hosts"
   },
   {
     "id": "adguard_dns",
     "name": "AdGuard DNS Filter",
-    "description": "AdGuard's curated DNS blocklist for trackers and ads.",
-    "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/filter.txt",
+    "description": "Used by AdGuard public DNS. Conservative, well-tested. ~166K domains.",
+    "url": "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt",
     "format": "adblock"
-  },
-  {
-    "id": "oisd_small",
-    "name": "OISD Small",
-    "description": "Curated list with minimal false positives.",
-    "url": "https://small.oisd.nl/domainswild",
-    "format": "domains"
-  },
-  {
-    "id": "disconnect_tracking",
-    "name": "Disconnect Tracking",
-    "description": "Used by Firefox tracking protection.",
-    "url": "https://raw.githubusercontent.com/nickspaargaren/no-google/master/pihole-google.txt",
-    "format": "domains"
   }
 ]

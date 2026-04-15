@@ -50,7 +50,7 @@ class BlocklistFragment : Fragment() {
         btnGoogle = view.findViewById(R.id.btnProviderGoogle)
         btnQuad9 = view.findViewById(R.id.btnProviderQuad9)
 
-        // Tracker blocking toggle — async load
+        // Tracker blocking toggle - async load
         val switchBlocklist = view.findViewById<MaterialSwitch>(R.id.switchBlocklist)
         switchBlocklist.isChecked = BlocklistManager.isEnabled
         switchBlocklist.setOnCheckedChangeListener { _, isChecked ->

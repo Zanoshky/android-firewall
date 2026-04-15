@@ -1,4 +1,4 @@
-# Privacy Policy — Firewall by Zanoshky
+# Privacy Policy - Firewall by Zanoshky
 
 **Last updated:** March 2026
 
