@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -67,6 +68,9 @@ class AppsFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        view.findViewById<TextView>(R.id.btnBlockAll).setOnClickListener { bulkSetAll(false) }
+        view.findViewById<TextView>(R.id.btnAllowAll).setOnClickListener { bulkSetAll(true) }
+
         loadApps()
     }
 
@@ -97,10 +101,37 @@ class AppsFragment : Fragment() {
         }
     }
 
-    private fun applyFilter() {
-        if (!isAdded) return
-        val snapshot = allApps // local ref for thread safety
-        val filtered = snapshot.filter { app ->
+    /**
+     * Set all currently visible (filtered) apps to allowed or blocked.
+     * When [allow] is true, sets both WiFi and mobile to allowed.
+     * When false, sets both to blocked (not allowed).
+     */
+    private fun bulkSetAll(allow: Boolean) {
+        val visible = getFilteredApps()
+        if (visible.isEmpty()) return
+
+        // Update in-memory state
+        for (app in visible) {
+            app.allowWifi = allow
+            app.allowMobile = allow
+        }
+
+        // Persist all rules in one batch
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            for (app in visible) {
+                dao.upsert(AppRule(app.packageName, app.allowWifi, app.allowMobile))
+            }
+        }
+
+        // Refresh UI
+        applyFilter()
+        (activity as? MainActivity)?.updateCounts(allApps)
+        scheduleVpnRestart()
+    }
+
+    private fun getFilteredApps(): List<AppInfo> {
+        val snapshot = allApps
+        return snapshot.filter { app ->
             val matchesTab = when (currentFilter) {
                 1 -> !app.isSystem
                 2 -> app.isSystem
@@ -111,7 +142,11 @@ class AppsFragment : Fragment() {
                 app.packageName.lowercase().contains(searchQuery)
             matchesTab && matchesSearch
         }
-        adapter.submitList(filtered)
+    }
+
+    private fun applyFilter() {
+        if (!isAdded) return
+        adapter.submitList(getFilteredApps())
     }
 
     private fun saveRule(app: AppInfo) {
@@ -119,8 +154,10 @@ class AppsFragment : Fragment() {
             dao.upsert(AppRule(app.packageName, app.allowWifi, app.allowMobile))
         }
         (activity as? MainActivity)?.updateCounts(allApps)
+        scheduleVpnRestart()
+    }
 
-        // Debounce VPN restart — wait 500ms so rapid toggles don't cause overlapping restarts
+    private fun scheduleVpnRestart() {
         restartPending?.let { restartHandler.removeCallbacks(it) }
         restartPending = Runnable {
             (activity as? MainActivity)?.let {

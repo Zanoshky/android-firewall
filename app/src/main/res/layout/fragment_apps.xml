@@ -3,44 +3,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/bg_dark">
 
-    <!-- Tab filter -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabFilter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/surface"
-        app:tabIndicator="@drawable/bg_tab_indicator"
-        app:tabIndicatorColor="@color/accent_blue"
-        app:tabTextColor="@color/text_secondary"
-        app:tabSelectedTextColor="@color/text_primary"
-        app:tabMode="fixed"
-        app:tabGravity="fill">
-
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" />
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="User" />
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="System" />
-    </com.google.android.material.tabs.TabLayout>
-
-    <!-- Search -->
+    <!-- Search bar -->
     <EditText
         android:id="@+id/editSearch"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="44dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/bg_search"
         android:drawableStart="@android:drawable/ic_menu_search"
-        android:drawablePadding="8dp"
+        android:drawablePadding="10dp"
         android:drawableTint="@color/text_hint"
         android:hint="Search apps..."
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
-        android:textSize="13sp"
+        android:textSize="14sp"
         android:inputType="text"
         android:paddingHorizontal="16dp"
         android:importantForAutofill="no" />
+
+    <!-- Tab filter + bulk actions row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            app:tabIndicator="@drawable/bg_tab_indicator"
+            app:tabIndicatorColor="@color/accent_blue"
+            app:tabTextColor="@color/text_hint"
+            app:tabSelectedTextColor="@color/accent_blue"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabRippleColor="@android:color/transparent">
+
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" />
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="User" />
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="System" />
+        </com.google.android.material.tabs.TabLayout>
+
+        <TextView
+            android:id="@+id/btnBlockAll"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:text="Block all"
+            android:textColor="@color/accent_pink"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="10dp"
+            android:background="@drawable/bg_toggle_off"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/btnAllowAll"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:text="Allow all"
+            android:textColor="@color/accent_cyan"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="10dp"
+            android:background="@drawable/bg_toggle_off"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="16dp" />
+    </LinearLayout>
 
     <!-- App list -->
     <androidx.recyclerview.widget.RecyclerView
@@ -48,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:clipToPadding="false"
         android:paddingBottom="8dp" />
 

@@ -53,7 +53,7 @@ class AppAdapter(
 
         private val ctx = view.context
         private val colorOn = ContextCompat.getColor(ctx, R.color.toggle_on)
-        private val colorOff = ContextCompat.getColor(ctx, R.color.text_secondary)
+        private val colorOff = ContextCompat.getColor(ctx, R.color.text_hint)
 
         fun bind(app: AppInfo) {
             imgIcon.setImageDrawable(app.icon)
@@ -64,7 +64,7 @@ class AppAdapter(
             val totalReqs = app.blockedRequests + app.allowedRequests
             if (totalReqs > 0) {
                 txtAppStats.visibility = View.VISIBLE
-                txtAppStats.text = "${formatCount(app.blockedRequests)} blocked · ${formatCount(app.allowedRequests)} allowed"
+                txtAppStats.text = "${formatCount(app.blockedRequests)} blocked - ${formatCount(app.allowedRequests)} allowed"
             } else {
                 txtAppStats.visibility = View.GONE
             }

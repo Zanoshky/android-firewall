@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -20,6 +21,7 @@ import com.google.android.material.materialswitch.MaterialSwitch
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var heroCard: LinearLayout
     private lateinit var txtStatus: TextView
     private lateinit var txtSubtitle: TextView
     private lateinit var txtBlockedCount: TextView
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        heroCard = findViewById(R.id.heroCard)
         txtStatus = findViewById(R.id.txtStatus)
         txtSubtitle = findViewById(R.id.txtSubtitle)
         txtBlockedCount = findViewById(R.id.txtBlockedCount)
@@ -50,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         viewPager.adapter = MainPagerAdapter(this)
-        viewPager.isUserInputEnabled = false // disable swipe, use bottom nav
+        viewPager.isUserInputEnabled = false
 
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -105,19 +108,25 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         val isActive = prefs.getBoolean("enabled", false)
 
-        val historical = prefs.getLong("total_blocked", 0)
-        val session = FirewallVpnService.totalBlockedSession.get()
-        txtTotalDropped.text = formatCount(historical + session)
+        val blockedHist = prefs.getLong("total_blocked", 0)
+        val blockedSess = FirewallVpnService.totalBlockedSession.get()
+        val allowedHist = prefs.getLong("total_allowed", 0)
+        val allowedSess = FirewallVpnService.totalAllowedSession.get()
+
+        val totalBlocked = blockedHist + blockedSess
+        val totalAllowed = allowedHist + allowedSess
+        txtTotalDropped.text = formatCount(totalBlocked + totalAllowed)
 
         val totalIn = prefs.getLong("total_bytes_in", 0) + FirewallVpnService.sessionBytesIn.get()
         val totalOut = prefs.getLong("total_bytes_out", 0) + FirewallVpnService.sessionBytesOut.get()
-        txtTotalTraffic.text = "↓ ${formatBytes(totalIn)}  ↑ ${formatBytes(totalOut)}"
+        txtTotalTraffic.text = "D ${formatBytes(totalIn)}  U ${formatBytes(totalOut)}"
 
         if (isActive && FirewallVpnService.sessionStartTime > 0) {
             val elapsed = System.currentTimeMillis() - FirewallVpnService.sessionStartTime
-            txtUptime.text = "⏱ ${formatDuration(elapsed)}"
+            txtUptime.text = formatDuration(elapsed)
         } else {
             txtUptime.text = ""
+            txtTotalTraffic.text = ""
         }
     }
 
@@ -131,13 +140,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStatusUI(active: Boolean) {
         if (active) {
-            txtStatus.text = "● Protected"
-            txtStatus.setTextColor(ContextCompat.getColor(this, R.color.status_active))
-            txtSubtitle.text = "Firewall active"
+            heroCard.setBackgroundResource(R.drawable.bg_hero_card)
+            txtStatus.text = "Protected"
+            txtSubtitle.text = "Firewall is active"
         } else {
-            txtStatus.text = "● Inactive"
-            txtStatus.setTextColor(ContextCompat.getColor(this, R.color.status_inactive))
-            txtSubtitle.text = "Firewall off"
+            heroCard.setBackgroundResource(R.drawable.bg_hero_card_inactive)
+            txtStatus.text = "Inactive"
+            txtSubtitle.text = "Tap toggle to start"
         }
     }
 

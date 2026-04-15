@@ -42,8 +42,8 @@ class AppTrafficAdapter : RecyclerView.Adapter<AppTrafficAdapter.ViewHolder>() {
         fun bind(item: AppTrafficInfo) {
             item.icon?.let { imgIcon.setImageDrawable(it) }
             txtName.text = item.appName
-            txtDown.text = "↓ ${formatBytes(item.bytesIn)}"
-            txtUp.text = "↑ ${formatBytes(item.bytesOut)}"
+            txtDown.text = "D ${formatBytes(item.bytesIn)}"
+            txtUp.text = "U ${formatBytes(item.bytesOut)}"
             txtTotal.text = formatBytes(item.bytesIn + item.bytesOut)
         }
 

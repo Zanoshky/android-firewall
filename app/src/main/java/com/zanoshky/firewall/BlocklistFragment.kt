@@ -194,7 +194,7 @@ class BlocklistFragment : Fragment() {
         if (!isAdded) return
         val c = ctx ?: return
         val providerName = DohResolver.provider.replaceFirstChar { it.uppercase() }
-        txtDohStatus.text = if (DohResolver.isEnabled) "Active · $providerName" else "Off · $providerName"
+        txtDohStatus.text = if (DohResolver.isEnabled) "Active - $providerName" else "Off - $providerName"
 
         val prefs = c.getSharedPreferences("firewall_prefs", 0)
         val total = prefs.getLong("doh_queries", 0) + FirewallVpnService.dohQueriesSession.get()
@@ -209,8 +209,8 @@ class BlocklistFragment : Fragment() {
         val loading = BlocklistManager.isLoading
         txtStatus.text = when {
             loading -> "Loading domains..."
-            enabled -> "Active · $count domains loaded"
-            else -> "Off · $count domains loaded"
+            enabled -> "Active - $count domains loaded"
+            else -> "Off - $count domains loaded"
         }
         txtDomainsLoaded.text = count.toString()
 

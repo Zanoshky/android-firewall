@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,7 +11,7 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
 
-        <!-- Master toggle -->
+        <!-- Tracker blocking toggle -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,9 +37,9 @@
                     android:id="@+id/txtBlocklistStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Off · 0 domains loaded"
+                    android:text="Off"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:layout_marginTop="2dp" />
             </LinearLayout>
 
@@ -56,7 +57,7 @@
             android:background="@drawable/bg_glass_card"
             android:padding="16dp"
             android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -76,9 +77,9 @@
                     android:id="@+id/txtDohStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Off · Cloudflare"
+                    android:text="Off"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:layout_marginTop="2dp" />
             </LinearLayout>
 
@@ -95,17 +96,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:visibility="gone">
 
             <TextView
                 android:id="@+id/btnProviderCloudflare"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Cloudflare"
-                android:textSize="12sp"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
                 android:background="@drawable/bg_toggle_on"
                 android:textColor="@color/accent_blue"
                 android:layout_marginEnd="4dp"
@@ -115,13 +117,14 @@
             <TextView
                 android:id="@+id/btnProviderGoogle"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Google"
-                android:textSize="12sp"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
                 android:background="@drawable/bg_toggle_off"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_hint"
                 android:layout_marginHorizontal="4dp"
                 android:clickable="true"
                 android:focusable="true" />
@@ -129,33 +132,34 @@
             <TextView
                 android:id="@+id/btnProviderQuad9"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Quad9"
-                android:textSize="12sp"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
                 android:background="@drawable/bg_toggle_off"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_hint"
                 android:layout_marginStart="4dp"
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>
 
-        <!-- Tracker stats -->
+        <!-- Stats row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="14dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/bg_glass_card"
+                android:background="@drawable/bg_stat_card"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="12dp"
+                android:padding="14dp"
                 android:layout_marginEnd="4dp">
 
                 <TextView
@@ -164,12 +168,12 @@
                     android:layout_height="wrap_content"
                     android:text="0"
                     android:textColor="@color/accent_pink"
-                    android:textSize="20sp"
+                    android:textSize="22sp"
                     android:fontFamily="sans-serif-medium" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Trackers blocked"
+                    android:text="Trackers"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -178,24 +182,24 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/bg_glass_card"
+                android:background="@drawable/bg_stat_card"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="12dp"
-                android:layout_marginStart="4dp">
+                android:padding="14dp"
+                android:layout_marginHorizontal="4dp">
 
                 <TextView
                     android:id="@+id/txtDohQueries"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textColor="@color/accent_cyan"
-                    android:textSize="20sp"
+                    android:textColor="@color/accent_blue"
+                    android:textSize="22sp"
                     android:fontFamily="sans-serif-medium" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="DoH queries"
+                    android:text="DoH"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -204,10 +208,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/bg_glass_card"
+                android:background="@drawable/bg_stat_card"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="12dp"
+                android:padding="14dp"
                 android:layout_marginStart="4dp">
 
                 <TextView
@@ -215,8 +219,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textColor="@color/accent_blue"
-                    android:textSize="20sp"
+                    android:textColor="@color/accent_cyan"
+                    android:textSize="22sp"
                     android:fontFamily="sans-serif-medium" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -227,66 +231,66 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Download sources section -->
+        <!-- Online sources -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Online Sources"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Download community-maintained blocklists for more coverage."
+            android:text="Download community-maintained blocklists."
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp" />
+            android:textSize="13sp"
+            android:layout_marginTop="4dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerSources"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:nestedScrollingEnabled="false" />
 
-        <!-- Custom domains section -->
+        <!-- Custom domains -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Custom Blocked Domains"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="24dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_vertical">
 
             <EditText
                 android:id="@+id/editAddDomain"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_search"
                 android:hint="e.g. tracker.example.com"
                 android:textColorHint="@color/text_hint"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:inputType="textUri"
-                android:paddingHorizontal="14dp"
+                android:paddingHorizontal="16dp"
                 android:importantForAutofill="no" />
 
             <TextView
                 android:id="@+id/btnAddDomain"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="44dp"
                 android:gravity="center"
                 android:text="Add"
                 android:textColor="@color/accent_blue"
@@ -304,49 +308,49 @@
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false" />
 
-        <!-- Whitelist section -->
+        <!-- Whitelist -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Whitelisted Domains"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Domains here will never be blocked, even if in a blocklist."
+            android:text="These domains will never be blocked."
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp" />
+            android:textSize="13sp"
+            android:layout_marginTop="4dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_vertical">
 
             <EditText
                 android:id="@+id/editAddWhitelist"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_search"
                 android:hint="e.g. safe.example.com"
                 android:textColorHint="@color/text_hint"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:inputType="textUri"
-                android:paddingHorizontal="14dp"
+                android:paddingHorizontal="16dp"
                 android:importantForAutofill="no" />
 
             <TextView
                 android:id="@+id/btnAddWhitelist"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="44dp"
                 android:gravity="center"
                 android:text="Add"
                 android:textColor="@color/accent_cyan"

@@ -14,6 +14,6 @@
         android:title="Stats" />
     <item
         android:id="@+id/nav_blocklist"
-        android:icon="@android:drawable/ic_delete"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="Trackers" />
 </menu>

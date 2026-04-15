@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,121 +11,184 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
 
-        <!-- Global traffic card -->
+        <!-- Global traffic -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Global Traffic"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/bg_glass_card"
+                android:background="@drawable/bg_stat_card"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginEnd="4dp">
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="↓ Download"
+                    android:text="Download"
                     android:textColor="@color/chart_download"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txtGlobalDownload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 B"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:fontFamily="sans-serif-medium"
-                    android:layout_marginTop="2dp" />
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/bg_glass_card"
+                android:background="@drawable/bg_stat_card"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginStart="4dp">
+                android:padding="14dp"
+                android:layout_marginStart="6dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="↑ Upload"
+                    android:text="Upload"
                     android:textColor="@color/chart_upload"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txtGlobalUpload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 B"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:fontFamily="sans-serif-medium"
-                    android:layout_marginTop="2dp" />
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Global pie chart: blocked vs allowed -->
+        <!-- Blocked vs Allowed counters -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Blocked vs Allowed"
+            android:text="Connections"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="24dp" />
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/chartBlockedAllowed"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp" />
-
-        <!-- Top apps by traffic bar chart -->
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Top Apps by Traffic"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium"
-            android:layout_marginTop="20dp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
 
-        <com.github.mikephil.charting.charts.HorizontalBarChart
-            android:id="@+id/chartTopApps"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_marginTop="8dp" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_card"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="14dp"
+                android:layout_marginEnd="4dp">
 
-        <!-- Per-app traffic list -->
+                <TextView
+                    android:id="@+id/txtStatsBlocked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/accent_pink"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-medium" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Blocked"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_card"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="14dp"
+                android:layout_marginHorizontal="4dp">
+
+                <TextView
+                    android:id="@+id/txtStatsAllowed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/accent_cyan"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-medium" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Allowed"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_card"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="14dp"
+                android:layout_marginStart="4dp">
+
+                <TextView
+                    android:id="@+id/txtStatsTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/accent_blue"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-medium" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Per-app traffic -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Per-App Traffic"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="24dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerAppTraffic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:nestedScrollingEnabled="false" />
 
     </LinearLayout>

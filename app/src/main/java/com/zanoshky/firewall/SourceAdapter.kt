@@ -39,7 +39,7 @@ class SourceAdapter(
 
             if (downloaded) {
                 val count = domainCounts[source.id] ?: 0
-                txtStatus.text = "✓ Downloaded · $count domains"
+                txtStatus.text = "Downloaded - $count domains"
                 txtStatus.setTextColor(itemView.context.getColor(R.color.status_active))
                 btnAction.text = "Remove"
                 btnAction.setTextColor(itemView.context.getColor(R.color.accent_pink))

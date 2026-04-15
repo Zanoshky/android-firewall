@@ -8,13 +8,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.os.PowerManager
+import android.util.Log
 import kotlinx.coroutines.*
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
 class FirewallVpnService : VpnService() {
@@ -22,14 +28,19 @@ class FirewallVpnService : VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var readJob: Job? = null
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private val isRebuilding = AtomicBoolean(false)
 
     companion object {
         const val ACTION_START = "com.zanoshky.firewall.START"
         const val ACTION_STOP = "com.zanoshky.firewall.STOP"
         private const val CHANNEL_ID = "firewall_channel"
         private const val NOTIFICATION_ID = 1
+        private const val TAG = "FirewallVPN"
 
         val totalBlockedSession = AtomicLong(0)
+        val totalAllowedSession = AtomicLong(0)
         val trackersBlockedSession = AtomicLong(0)
         val dohQueriesSession = AtomicLong(0)
         val sessionBytesIn = AtomicLong(0)
@@ -42,6 +53,7 @@ class FirewallVpnService : VpnService() {
         createNotificationChannel()
         BlocklistManager.init(this)
         DohResolver.init(this)
+        acquireWakeLock()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -53,23 +65,69 @@ class FirewallVpnService : VpnService() {
             }
             else -> {
                 startForeground(NOTIFICATION_ID, buildNotification())
-                // Close existing VPN fd (unblocks read loop), cancel job, don't persist stats
-                // since we're restarting immediately — stats carry over in the AtomicLongs
-                try { vpnInterface?.close() } catch (_: Exception) {}
-                vpnInterface = null
-                readJob?.cancel()
-                readJob = null
-                readJob = scope.launch { runVpn() }
+                rebuildTunnel()
                 START_STICKY
             }
         }
     }
 
-    /**
-     * Main VPN loop. Runs entirely on IO dispatcher.
-     * Closing vpnInterface from stopVpn() will cause input.read() to throw,
-     * breaking the loop cleanly.
-     */
+    private fun rebuildTunnel() {
+        if (!isRebuilding.compareAndSet(false, true)) return
+        try {
+            try { vpnInterface?.close() } catch (_: Exception) {}
+            vpnInterface = null
+            readJob?.cancel()
+            readJob = null
+            readJob = scope.launch {
+                try { runVpn() } finally { isRebuilding.set(false) }
+            }
+        } catch (e: Exception) {
+            isRebuilding.set(false)
+            Log.e(TAG, "rebuildTunnel failed", e)
+        }
+    }
+
+    private fun registerNetworkCallback() {
+        unregisterNetworkCallback()
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        val cb = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) { rebuildTunnel() }
+            override fun onLost(network: Network) { /* rebuild when available */ }
+            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                rebuildTunnel()
+            }
+        }
+        networkCallback = cb
+        cm.registerNetworkCallback(request, cb)
+    }
+
+    private fun unregisterNetworkCallback() {
+        networkCallback?.let {
+            try {
+                (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+                    .unregisterNetworkCallback(it)
+            } catch (_: Exception) {}
+        }
+        networkCallback = null
+    }
+
+    private fun acquireWakeLock() {
+        if (wakeLock == null) {
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            wakeLock = pm.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK, "Firewall::VpnWakeLock"
+            ).apply { acquire() }
+        }
+    }
+
+    private fun releaseWakeLock() {
+        wakeLock?.let { if (it.isHeld) it.release() }
+        wakeLock = null
+    }
+
     private suspend fun runVpn() {
         val db = RuleDatabase.get(this)
         val dao = db.ruleDao()
@@ -113,121 +171,178 @@ class FirewallVpnService : VpnService() {
         val fd = builder.establish() ?: return
         vpnInterface = fd
 
-        sessionStartTime = System.currentTimeMillis()
-        // Don't reset counters — they accumulate across VPN restarts within same service lifecycle
-        // They only get persisted + reset in stopVpn() when the service actually stops
+        if (sessionStartTime == 0L) {
+            sessionStartTime = System.currentTimeMillis()
+        }
+
+        registerNetworkCallback()
 
         val input = FileInputStream(fd.fileDescriptor)
         val output = FileOutputStream(fd.fileDescriptor)
         val outputLock = Object()
         val buffer = ByteBuffer.allocate(32767)
         val logBatch = ArrayList<ConnectionLog>(32)
+        var lastFlush = System.currentTimeMillis()
 
         try {
             while (true) {
                 val length = input.read(buffer.array())
                 if (length <= 0) continue
 
-                totalBlockedSession.incrementAndGet()
                 sessionBytesIn.addAndGet(length.toLong())
-
                 buffer.limit(length)
                 buffer.position(0)
 
-                if (PacketFilter.ipVersion(buffer) == 4 && length >= 20) {
-                    val proto = PacketFilter.protocol(buffer)
-                    val protoName = when (proto) {
-                        6 -> "TCP"; 17 -> "UDP"; else -> "IP/$proto"
-                    }
-
-                    try {
-                        val destIp = PacketFilter.destinationIp(buffer).hostAddress ?: "?"
-                        val destPort = if ((proto == 6 || proto == 17) && length >= 24)
-                            PacketFilter.destinationPort(buffer) else 0
-
-                        var domain = ""
-                        var isTrackerBlocked = false
-                        var handledByDoh = false
-
-                        if (proto == 17 && destPort == 53) {
-                            val queryDomain = PacketFilter.extractDnsQueryDomain(buffer, length)
-                            if (queryDomain != null) {
-                                domain = queryDomain
-
-                                val ipHeaderLen = (buffer.get(0).toInt() and 0xF) * 4
-                                val dnsStart = ipHeaderLen + 8
-                                if (dnsStart < length) {
-                                    val dnsQuery = ByteArray(length - dnsStart)
-                                    buffer.position(dnsStart)
-                                    buffer.get(dnsQuery)
-                                    buffer.position(0)
-
-                                    if (BlocklistManager.isDomainBlocked(queryDomain)) {
-                                        isTrackerBlocked = true
-                                        trackersBlockedSession.incrementAndGet()
-
-                                        val nxResponse = DohResolver.buildBlockedResponse(dnsQuery)
-                                        val responsePacket = DohResolver.wrapDnsResponse(buffer, length, nxResponse)
-                                        try {
-                                            synchronized(outputLock) { output.write(responsePacket) }
-                                            sessionBytesOut.addAndGet(responsePacket.size.toLong())
-                                        } catch (_: Exception) {}
-                                        handledByDoh = true
-
-                                    } else if (DohResolver.isEnabled) {
-                                        val packetCopy = ByteArray(length)
-                                        buffer.position(0)
-                                        buffer.get(packetCopy)
-                                        buffer.position(0)
-
-                                        scope.launch {
-                                            try {
-                                                val dnsResponse = DohResolver.resolve(dnsQuery)
-                                                if (dnsResponse != null) {
-                                                    val wrapped = DohResolver.wrapDnsResponse(
-                                                        ByteBuffer.wrap(packetCopy), length, dnsResponse
-                                                    )
-                                                    synchronized(outputLock) { output.write(wrapped) }
-                                                    sessionBytesOut.addAndGet(wrapped.size.toLong())
-                                                    dohQueriesSession.incrementAndGet()
-                                                }
-                                            } catch (_: Exception) {}
-                                        }
-                                        handledByDoh = true
-                                    }
-                                }
-                            }
-                        }
-
-                        logBatch.add(ConnectionLog(
-                            packageName = "blocked",
-                            appName = when {
-                                isTrackerBlocked -> "Tracker: $domain"
-                                handledByDoh && !isTrackerBlocked -> "DoH: $domain"
-                                else -> "Blocked packet"
-                            },
-                            destIp = destIp,
-                            destPort = destPort,
-                            protocol = if (handledByDoh && !isTrackerBlocked) "DoH" else protoName,
-                            allowed = handledByDoh && !isTrackerBlocked,
-                            bytes = length.toLong(),
-                            timestamp = System.currentTimeMillis(),
-                            domain = domain,
-                            blockedByTracker = isTrackerBlocked
-                        ))
-                    } catch (_: Exception) {}
+                if (PacketFilter.ipVersion(buffer) != 4 || length < 20) {
+                    // Non-IPv4 or too short - count as blocked, skip
+                    totalBlockedSession.incrementAndGet()
+                    buffer.clear()
+                    continue
                 }
 
-                if (logBatch.size >= 20) {
+                val proto = PacketFilter.protocol(buffer)
+                val protoName = when (proto) {
+                    6 -> "TCP"; 17 -> "UDP"; else -> "IP/$proto"
+                }
+
+                try {
+                    val destIp = PacketFilter.destinationIp(buffer).hostAddress ?: "?"
+                    val destPort = if ((proto == 6 || proto == 17) && length >= 24)
+                        PacketFilter.destinationPort(buffer) else 0
+
+                    // --- DNS on UDP port 53 ---
+                    if (proto == 17 && destPort == 53) {
+                        val queryDomain = PacketFilter.extractDnsQueryDomain(buffer, length)
+                        if (queryDomain != null) {
+                            val ipHeaderLen = (buffer.get(0).toInt() and 0xF) * 4
+                            val dnsStart = ipHeaderLen + 8
+                            if (dnsStart < length) {
+                                val dnsQuery = ByteArray(length - dnsStart)
+                                buffer.position(dnsStart)
+                                buffer.get(dnsQuery)
+                                buffer.position(0)
+
+                                if (BlocklistManager.isDomainBlocked(queryDomain)) {
+                                    // Tracker blocked - send NXDOMAIN back
+                                    trackersBlockedSession.incrementAndGet()
+                                    totalBlockedSession.incrementAndGet()
+
+                                    val nxResponse = DohResolver.buildBlockedResponse(dnsQuery)
+                                    val responsePacket = DohResolver.wrapDnsResponse(buffer, length, nxResponse)
+                                    try {
+                                        synchronized(outputLock) { output.write(responsePacket) }
+                                        sessionBytesOut.addAndGet(responsePacket.size.toLong())
+                                    } catch (_: Exception) {}
+
+                                    logBatch.add(ConnectionLog(
+                                        packageName = "system",
+                                        appName = "Tracker: $queryDomain",
+                                        destIp = destIp,
+                                        destPort = destPort,
+                                        protocol = "DNS",
+                                        allowed = false,
+                                        bytes = length.toLong(),
+                                        timestamp = System.currentTimeMillis(),
+                                        domain = queryDomain,
+                                        blockedByTracker = true
+                                    ))
+
+                                } else if (DohResolver.isEnabled) {
+                                    // DoH resolve - allowed
+                                    totalAllowedSession.incrementAndGet()
+
+                                    val packetCopy = ByteArray(length)
+                                    buffer.position(0)
+                                    buffer.get(packetCopy)
+                                    buffer.position(0)
+
+                                    scope.launch {
+                                        try {
+                                            val dnsResponse = DohResolver.resolve(dnsQuery)
+                                            if (dnsResponse != null) {
+                                                val wrapped = DohResolver.wrapDnsResponse(
+                                                    ByteBuffer.wrap(packetCopy), length, dnsResponse
+                                                )
+                                                synchronized(outputLock) { output.write(wrapped) }
+                                                sessionBytesOut.addAndGet(wrapped.size.toLong())
+                                                dohQueriesSession.incrementAndGet()
+                                            }
+                                        } catch (_: Exception) {}
+                                    }
+
+                                    logBatch.add(ConnectionLog(
+                                        packageName = "system",
+                                        appName = "DoH: $queryDomain",
+                                        destIp = destIp,
+                                        destPort = destPort,
+                                        protocol = "DoH",
+                                        allowed = true,
+                                        bytes = length.toLong(),
+                                        timestamp = System.currentTimeMillis(),
+                                        domain = queryDomain,
+                                        blockedByTracker = false
+                                    ))
+
+                                } else {
+                                    // DNS query, no DoH, not blocked - dropped by VPN (blocked)
+                                    totalBlockedSession.incrementAndGet()
+
+                                    logBatch.add(ConnectionLog(
+                                        packageName = "system",
+                                        appName = "DNS: $queryDomain",
+                                        destIp = destIp,
+                                        destPort = destPort,
+                                        protocol = "DNS",
+                                        allowed = false,
+                                        bytes = length.toLong(),
+                                        timestamp = System.currentTimeMillis(),
+                                        domain = queryDomain,
+                                        blockedByTracker = false
+                                    ))
+                                }
+                            } else {
+                                totalBlockedSession.incrementAndGet()
+                            }
+                        } else {
+                            // Malformed DNS
+                            totalBlockedSession.incrementAndGet()
+                        }
+                    } else {
+                        // --- Non-DNS traffic (TCP, UDP to other ports) ---
+                        // These are dropped by the VPN (no route out)
+                        totalBlockedSession.incrementAndGet()
+
+                        val label = "$destIp:$destPort"
+                        logBatch.add(ConnectionLog(
+                            packageName = "system",
+                            appName = label,
+                            destIp = destIp,
+                            destPort = destPort,
+                            protocol = protoName,
+                            allowed = false,
+                            bytes = length.toLong(),
+                            timestamp = System.currentTimeMillis(),
+                            domain = "",
+                            blockedByTracker = false
+                        ))
+                    }
+                } catch (_: Exception) {
+                    totalBlockedSession.incrementAndGet()
+                }
+
+                // Flush log batch: every 10 entries OR every 2 seconds
+                val now = System.currentTimeMillis()
+                if (logBatch.size >= 10 || (logBatch.isNotEmpty() && now - lastFlush >= 2000)) {
                     val batch = ArrayList(logBatch)
                     logBatch.clear()
+                    lastFlush = now
                     scope.launch { batch.forEach { logDao.insert(it) } }
                 }
 
                 buffer.clear()
             }
         } catch (_: Exception) {
-            // fd closed by stopVpn → read throws → loop exits cleanly
+            // fd closed - loop exits
         } finally {
             if (logBatch.isNotEmpty()) {
                 val batch = ArrayList(logBatch)
@@ -236,23 +351,16 @@ class FirewallVpnService : VpnService() {
         }
     }
 
-    /**
-     * Stop VPN by closing the file descriptor.
-     * This causes the blocking input.read() in runVpn to throw,
-     * breaking the loop without needing coroutine cancellation to work on blocking IO.
-     * Safe to call from any thread.
-     */
     private fun stopVpn() {
-        // Close fd first — this unblocks the read loop
+        unregisterNetworkCallback()
+
         try { vpnInterface?.close() } catch (_: Exception) {}
         vpnInterface = null
-
-        // Cancel the coroutine (it should already be exiting from the fd close)
         readJob?.cancel()
         readJob = null
 
-        // Snapshot and reset counters atomically
         val blocked = totalBlockedSession.getAndSet(0)
+        val allowed = totalAllowedSession.getAndSet(0)
         val bytesIn = sessionBytesIn.getAndSet(0)
         val bytesOut = sessionBytesOut.getAndSet(0)
         val trackers = trackersBlockedSession.getAndSet(0)
@@ -260,13 +368,13 @@ class FirewallVpnService : VpnService() {
         val duration = if (sessionStartTime > 0) System.currentTimeMillis() - sessionStartTime else 0
         sessionStartTime = 0
 
-        // Persist stats using snapshot values
-        if (blocked > 0 || bytesIn > 0) {
+        if (blocked > 0 || allowed > 0 || bytesIn > 0) {
             scope.launch {
                 try {
                     val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
                     prefs.edit()
                         .putLong("total_blocked", prefs.getLong("total_blocked", 0) + blocked)
+                        .putLong("total_allowed", prefs.getLong("total_allowed", 0) + allowed)
                         .putLong("total_bytes_in", prefs.getLong("total_bytes_in", 0) + bytesIn)
                         .putLong("total_bytes_out", prefs.getLong("total_bytes_out", 0) + bytesOut)
                         .putLong("trackers_blocked", prefs.getLong("trackers_blocked", 0) + trackers)
@@ -280,12 +388,14 @@ class FirewallVpnService : VpnService() {
 
     override fun onDestroy() {
         stopVpn()
+        releaseWakeLock()
         scope.cancel()
         super.onDestroy()
     }
 
     override fun onRevoke() {
         stopVpn()
+        releaseWakeLock()
         super.onRevoke()
     }
 
@@ -308,7 +418,7 @@ class FirewallVpnService : VpnService() {
         )
         val subtitle = buildString {
             append("Monitoring traffic")
-            if (DohResolver.isEnabled) append(" · DoH active")
+            if (DohResolver.isEnabled) append(" - DoH active")
         }
         return Notification.Builder(this, CHANNEL_ID)
             .setContentTitle("Firewall Active")
