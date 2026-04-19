@@ -1,0 +1,6 @@
+Nouveautes v1.5 :
+
+- Demarrage automatique : Le pare-feu demarre maintenant automatiquement au redemarrage du telephone, meme avant le deverrouillage. Redemarre aussi apres les mises a jour.
+- Tuile Parametres Rapides : Activez ou desactivez le pare-feu depuis la barre de notifications sans ouvrir l'application.
+- Fiabilite amelioree sur Android 10+ avec le demarrage direct.
+- Ameliorations de performances et corrections de bugs.

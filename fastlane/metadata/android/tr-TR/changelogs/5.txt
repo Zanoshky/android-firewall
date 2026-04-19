@@ -1,0 +1,6 @@
+v1.5'teki yenilikler:
+
+- Acilista otomatik baslama: Guvenlik duvari artik telefonunuz yeniden basladiginda otomatik olarak basliyor, kilit acilmadan once bile. Uygulama guncellemelerinden sonra da otomatik yeniden baslar.
+- Hizli Ayarlar kutucugu: Uygulamayi acmadan bildirim panelinden guvenlik duvarini acin/kapatin.
+- Android 10+ uzerinde dogrudan onis destegi ile gelismis guvenilirlik.
+- Performans iyilestirmeleri ve hata duzeltmeleri.

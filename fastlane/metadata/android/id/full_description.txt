@@ -1,0 +1,61 @@
+Ambil kembali kendali akses internet ponsel Anda. Firewall memungkinkan Anda memutuskan aplikasi mana yang bisa online dan memblokir pelacak, iklan, dan layanan fingerprinting di seluruh perangkat. Tanpa root. Tanpa iklan. Tanpa pengumpulan data. Gratis dan open source.
+
+APA YANG MEMBUAT FIREWALL BERBEDA
+Firewall memblokir semuanya secara default. Anda hanya mengizinkan aplikasi yang dipercaya. Semua lainnya - aplikasi sistem, bloatware OEM, dan layanan latar belakang - diblokir secara diam-diam. Data Anda tetap di perangkat. Tidak ada server jarak jauh, akun, atau analitik.
+
+CARA KERJANYA
+Firewall membuat VPN lokal di perangkat Anda. Semua lalu lintas melewatinya. Aplikasi yang diblokir tidak bisa terhubung. Aplikasi yang diizinkan terhubung normal. VPN sepenuhnya lokal. Tidak ada lalu lintas yang keluar melalui server eksternal.
+
+KONTROL INTERNET PER APLIKASI
+- Semua aplikasi diblokir secara default
+- Toggle Wi-Fi dan data seluler terpisah per aplikasi
+- Blokir aplikasi sistem dan bloatware (MIUI, Samsung, Huawei, dll.)
+- Tombol Izinkan Semua dan Blokir Semua
+- Filter berdasarkan Semua, Pengguna, atau Sistem dengan pencarian instan
+- Perubahan berlaku langsung tanpa restart
+
+PEMBLOKIRAN PELACAK, IKLAN, DAN FINGERPRINT
+Mencegat setiap kueri DNS dan memeriksanya terhadap daftar domain yang dikenal. Domain yang cocok langsung diblokir dengan respons NXDOMAIN.
+
+- 130+ domain diblokir sejak awal
+- Daftar komunitas: HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Tambahkan domain blokir kustom
+- Whitelist untuk mencegah false positive
+- Toggle independen dari firewall
+
+DNS OVER HTTPS (DNS TERENKRIPSI)
+ISP Anda bisa melihat setiap domain yang dikunjungi. DoH mengenkripsi kueri ini agar tidak ada yang memantau browsing Anda.
+
+- Pilih dari Cloudflare, Google, atau Quad9
+- Ganti penyedia dengan satu ketukan
+- Toggle DoH secara independen
+- Bekerja bersama pemblokiran pelacak
+
+PERLINDUNGAN SELALU AKTIF
+- Mulai otomatis saat boot, sebelum membuka kunci
+- Restart otomatis setelah pembaruan aplikasi
+- Direct boot aware
+- Quick Settings tile di panel notifikasi
+
+LOG KONEKSI REAL-TIME
+- Log langsung setiap percobaan koneksi
+- IP tujuan, port, protokol, dan nama domain
+- Kode warna: hijau, merah, oranye
+- Filter berdasarkan aplikasi atau domain
+
+STATISTIK LALU LINTAS
+- Total download dan upload
+- Koneksi diblokir, diizinkan, dan keseluruhan
+- Aplikasi teratas berdasarkan volume
+
+PRIVASI DAN KEPERCAYAAN
+- Nol pengumpulan data
+- Tanpa SDK iklan atau layanan pihak ketiga
+- Open source - audit setiap baris kode
+
+KOMPATIBILITAS
+- Android 6.0 hingga Android 15
+- Tanpa root
+- Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Gratis dan open source. Dibuat oleh Marko Zanoski.

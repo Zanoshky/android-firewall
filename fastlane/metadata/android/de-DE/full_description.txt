@@ -1,0 +1,61 @@
+Uebernimm die Kontrolle ueber den Internetzugang deines Handys. Firewall laesst dich entscheiden, welche Apps online gehen duerfen, und blockiert Tracker, Werbung und Fingerprinting auf deinem gesamten Geraet. Kein Root. Keine Werbung. Keine Datenerfassung. Kostenlos und Open Source.
+
+WAS FIREWALL ANDERS MACHT
+Firewall blockiert standardmaessig alles. Du gibst nur die Apps frei, denen du vertraust. Alle anderen - System-Apps, OEM-Bloatware und Hintergrunddienste - werden lautlos blockiert. Deine Daten bleiben auf deinem Geraet. Keine Remote-Server, keine Konten, keine Analysen.
+
+WIE ES FUNKTIONIERT
+Firewall erstellt ein lokales VPN auf deinem Geraet. Der gesamte Netzwerkverkehr wird dadurch geleitet. Blockierte Apps kommen nirgendwo hin. Erlaubte Apps verbinden sich normal. Das VPN ist vollstaendig lokal. Kein Datenverkehr verlaesst dein Geraet.
+
+INTERNET-KONTROLLE PRO APP
+- Alle Apps standardmaessig blockiert
+- Separate Wi-Fi- und Mobilfunk-Schalter pro App
+- Blockiere System-Apps und OEM-Bloatware (MIUI, Samsung, Huawei, etc.)
+- Alle erlauben und Alle blockieren Buttons
+- Filtere nach Alle, Benutzer oder System mit Sofortsuche
+- Aenderungen sofort wirksam ohne Neustart
+
+TRACKER-, WERBE- UND FINGERPRINTING-BLOCKIERUNG
+Faengt jede DNS-Anfrage ab und prueft sie gegen eine Blockliste bekannter Domains. Uebereinstimmende Domains werden sofort mit NXDOMAIN blockiert.
+
+- 130+ Domains sofort blockiert
+- Community-Blocklisten: HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Eigene blockierte Domains hinzufuegen
+- Whitelist fuer Fehlalarme
+- Unabhaengig von der Firewall ein-/ausschalten
+
+DNS UEBER HTTPS (VERSCHLUESSELTES DNS)
+Dein ISP kann jede Domain sehen, die du besuchst. DoH verschluesselt diese Anfragen.
+
+- Waehle zwischen Cloudflare, Google oder Quad9
+- Wechsle den Anbieter mit einem Tipp
+- DoH unabhaengig ein-/ausschalten
+- Funktioniert zusammen mit Tracker-Blockierung
+
+IMMER-AN-SCHUTZ
+- Autostart beim Einschalten, noch bevor du entsperrst
+- Automatischer Neustart nach App-Updates
+- Direct-Boot-kompatibel
+- Schnelleinstellungs-Kachel in der Benachrichtigungsleiste
+
+ECHTZEIT-VERBINDUNGSPROTOKOLLE
+- Live-Protokoll jedes Verbindungsversuchs
+- Ziel-IP, Port, Protokoll und Domainname
+- Farbcodiert: gruen, rot, orange
+- Filtere nach App-Name oder Domain
+
+VERKEHRSSTATISTIKEN
+- Download- und Upload-Summen
+- Blockierte, erlaubte und gesamte Verbindungen
+- Top-Apps nach Datenvolumen
+
+DATENSCHUTZ UND VERTRAUEN
+- Null Datenerfassung
+- Keine Werbe-SDKs oder Drittanbieter-Dienste
+- Open Source - pruefe jede Codezeile selbst
+
+KOMPATIBILITAET
+- Android 6.0 bis Android 15
+- Kein Root erforderlich
+- Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Kostenlos und Open Source. Mit Sorgfalt erstellt von Marko Zanoski.

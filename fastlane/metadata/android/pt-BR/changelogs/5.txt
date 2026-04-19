@@ -1,0 +1,6 @@
+Novidades na v1.5:
+
+- Inicio automatico ao ligar: O firewall agora inicia automaticamente quando voce reinicia o telefone, mesmo antes de desbloquear. Tambem reinicia apos atualizacoes.
+- Botao de Configuracoes Rapidas: Ative ou desative o firewall diretamente pela barra de notificacoes sem abrir o app.
+- Melhoria de confiabilidade no Android 10+ com suporte a inicializacao direta.
+- Melhorias de desempenho e correcoes de bugs.

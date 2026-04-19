@@ -1,0 +1,61 @@
+Reprenez le controle de l'acces internet de votre telephone. Firewall vous permet de decider quelles apps peuvent se connecter et bloque les trackers, publicites et services de fingerprinting sur tout votre appareil. Sans root. Sans publicite. Sans collecte de donnees. Gratuit et open source.
+
+CE QUI REND FIREWALL DIFFERENT
+Firewall bloque tout par defaut. Vous n'autorisez que les apps de confiance. Toutes les autres - apps systeme, bloatwares du fabricant et services en arriere-plan - sont bloquees silencieusement. Vos donnees restent sur votre appareil. Aucun serveur distant, aucun compte, aucune analyse.
+
+COMMENT CA FONCTIONNE
+Firewall cree un VPN local sur votre appareil. Tout le trafic passe par celui-ci. Les apps bloquees n'arrivent nulle part. Les apps autorisees se connectent normalement. Le VPN est entierement local. Aucun trafic ne quitte votre appareil.
+
+CONTROLE INTERNET PAR APP
+- Toutes les apps bloquees par defaut
+- Controles Wi-Fi et donnees mobiles separes par app
+- Bloquez les apps systeme et bloatwares (MIUI, Samsung, Huawei, etc.)
+- Boutons Tout autoriser et Tout bloquer
+- Filtrez par Toutes, Utilisateur ou Systeme avec recherche instantanee
+- Modifications immediates sans redemarrage
+
+BLOCAGE DES TRACKERS, PUBLICITES ET FINGERPRINTING
+Intercepte chaque requete DNS et la verifie contre une liste de domaines connus. Les domaines correspondants sont bloques avec une reponse NXDOMAIN.
+
+- 130+ domaines bloques des l'installation
+- Listes communautaires : HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Ajoutez vos propres domaines bloques
+- Liste blanche pour eviter les faux positifs
+- Activez ou desactivez independamment du pare-feu
+
+DNS SUR HTTPS (DNS CHIFFRE)
+Votre FAI peut voir chaque domaine que vous visitez. DoH chiffre ces requetes pour que personne ne surveille votre navigation.
+
+- Choisissez entre Cloudflare, Google ou Quad9
+- Changez de fournisseur en un appui
+- Activez ou desactivez DoH independamment
+- Fonctionne avec le blocage des trackers
+
+PROTECTION PERMANENTE
+- Demarrage automatique au demarrage, meme avant le deverrouillage
+- Redemarrage automatique apres les mises a jour
+- Compatible avec le demarrage direct
+- Tuile Parametres Rapides dans la barre de notifications
+
+JOURNAUX EN TEMPS REEL
+- Journal en direct de chaque connexion
+- IP de destination, port, protocole et domaine
+- Code couleur : vert, rouge, orange
+- Filtrez par app ou domaine
+
+STATISTIQUES DE TRAFIC
+- Totaux de telechargement et d'envoi
+- Connexions bloquees, autorisees et totales
+- Apps principales par volume de trafic
+
+CONFIDENTIALITE ET CONFIANCE
+- Zero collecte de donnees
+- Aucun SDK publicitaire ni service tiers
+- Open source - auditez chaque ligne de code
+
+COMPATIBILITE
+- Android 6.0 a Android 15
+- Sans root necessaire
+- Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Gratuit et open source. Fait avec soin par Marko Zanoski.

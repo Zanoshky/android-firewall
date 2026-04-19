@@ -1,0 +1,61 @@
+Telefonunuzun internet erisimi uzerinde tam kontrol saglayin. Firewall, hangi uygulamalarin internete cikabilecegine karar vermenizi saglar ve tum cihazinizda takipcileri, reklamlari ve parmak izi hizmetlerini engeller. Root gerektirmez. Reklam yok. Veri toplama yok. Ucretsiz ve acik kaynak.
+
+FIREWALL'I FARKLI KILAN NE
+Firewall varsayilan olarak her seyi engeller. Yalnizca guvendiginiz uygulamalara izin verirsiniz. Sistem uygulamalari, OEM bloatware ve arka plan hizmetleri dahil digerleri sessizce engellenir. Verileriniz cihazinizda kalir. Uzak sunucu yok, hesap yok, analitik yok.
+
+NASIL CALISIR
+Firewall cihazinizda yerel bir VPN olusturur. Tum ag trafigi bunun uzerinden gecer. Engellenen uygulamalar hicbir yere ulasamaz. Izin verilen uygulamalar normal baglanir. VPN tamamen yereldir. Hicbir trafik disari cikmaz.
+
+UYGULAMA BAZINDA INTERNET KONTROLU
+- Tum uygulamalar varsayilan olarak engelli
+- Her uygulama icin ayri Wi-Fi ve mobil veri kontrolleri
+- Sistem uygulamalarini ve bloatware'i engelleyin (MIUI, Samsung, Huawei, etc.)
+- Tumune Izin Ver ve Tumunu Engelle dugmeleri
+- Tumu, Kullanici veya Sistem ile anlik arama
+- Degisiklikler aninda uygulanir
+
+TAKIPCI, REKLAM VE PARMAK IZI ENGELLEME
+Her DNS sorgusunu yakalar ve bilinen domainlerin listesiyle karsilastirir. Eslesen domainler NXDOMAIN ile aninda engellenir.
+
+- 130+ domain bastan engelli
+- Topluluk listeleri: HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Kendi engellenen domainlerinizi ekleyin
+- Yanlis pozitifler icin beyaz liste
+- Guvenlik duvarindan bagimsiz olarak acin/kapatin
+
+HTTPS UZERINDEN DNS (SIFRELI DNS)
+ISP'niz ziyaret ettiginiz her domaini gorebilir. DoH bu sorgulari sifreler.
+
+- Cloudflare, Google veya Quad9 arasindan secin
+- Tek dokunusla saglayici degistirin
+- DoH'u bagimsiz olarak acin/kapatin
+- Takipci engellemeyle birlikte calisir
+
+SUREKLI KORUMA
+- Cihaz acildiginda otomatik baslar, kilit acilmadan once bile
+- Uygulama guncellemelerinden sonra otomatik yeniden baslar
+- Dogrudan onis destegi
+- Hizli Ayarlar kutucugu bildirim panelinde
+
+GERCEK ZAMANLI BAGLANTI GUNLUKLERI
+- Her baglanti girisiminin canli gunlugu
+- Hedef IP, port, protokol ve domain adi
+- Renk kodlu: yesil, kirmizi, turuncu
+- Uygulama adi veya domaine gore filtreleyin
+
+TRAFIK ISTATISTIKLERI
+- Indirme ve yukleme toplamlari
+- Engellenen, izin verilen ve toplam baglantilar
+- Trafik hacmine gore en cok kullanan uygulamalar
+
+GIZLILIK VE GUVEN
+- Sifir veri toplama
+- Reklam SDK'si veya ucuncu taraf hizmeti yok
+- Acik kaynak - her satiri kendiniz denetleyin
+
+UYUMLULUK
+- Android 6.0 ile Android 15 arasi
+- Root gerektirmez
+- Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Ucretsiz ve acik kaynak. Marko Zanoski tarafindan yapilmistir.

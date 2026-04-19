@@ -1,0 +1,61 @@
+Recupera el control del acceso a internet de tu telefono. Firewall te permite decidir que apps pueden conectarse y bloquea rastreadores, anuncios y servicios de fingerprinting en todo tu dispositivo. Sin root. Sin anuncios. Sin recopilacion de datos. Gratuito y de codigo abierto.
+
+QUE HACE DIFERENTE A FIREWALL
+Firewall bloquea todo por defecto. Solo permites las apps en las que confias. Todas las demas - apps del sistema, bloatware del fabricante y servicios en segundo plano - se bloquean silenciosamente. Tus datos permanecen en tu dispositivo. Sin servidores remotos, sin cuentas, sin analiticas.
+
+COMO FUNCIONA
+Firewall crea una VPN local en tu dispositivo. Todo el trafico pasa por ella. Las apps bloqueadas no llegan a ninguna parte. Las apps permitidas se conectan normalmente. La VPN es completamente local. Ningun trafico sale por un servidor externo.
+
+CONTROL DE INTERNET POR APP
+- Todas las apps bloqueadas por defecto
+- Controles separados de Wi-Fi y datos moviles por app
+- Bloquea apps del sistema y bloatware (MIUI, Samsung, Huawei, etc.)
+- Botones Permitir todo y Bloquear todo
+- Filtra por Todas, Usuario o Sistema con busqueda instantanea
+- Cambios inmediatos sin reiniciar
+
+BLOQUEO DE RASTREADORES, ANUNCIOS Y FINGERPRINTING
+Intercepta cada consulta DNS y la compara con una lista de dominios conocidos. Los dominios coincidentes se bloquean con respuesta NXDOMAIN.
+
+- 130+ dominios bloqueados desde el inicio
+- Descarga listas comunitarias: HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Agrega tus propios dominios bloqueados
+- Lista blanca para evitar falsos positivos
+- Activa o desactiva independientemente del firewall
+
+DNS SOBRE HTTPS (DNS CIFRADO)
+Tu ISP puede ver cada dominio que visitas. DoH cifra estas consultas para que nadie monitoree tu navegacion.
+
+- Elige entre Cloudflare, Google o Quad9
+- Cambia de proveedor con un toque
+- Activa o desactiva DoH independientemente
+- Funciona junto con el bloqueo de rastreadores
+
+PROTECCION SIEMPRE ACTIVA
+- Inicio automatico al encender, incluso antes de desbloquear
+- Reinicio automatico tras actualizaciones
+- Compatible con arranque directo
+- Boton de Ajustes Rapidos en la barra de notificaciones
+
+REGISTROS EN TIEMPO REAL
+- Registro en vivo de cada conexion
+- IP de destino, puerto, protocolo y dominio
+- Codificado por colores: verde, rojo, naranja
+- Filtra por app o dominio
+
+ESTADISTICAS DE TRAFICO
+- Totales de descarga y subida
+- Conexiones bloqueadas, permitidas y totales
+- Apps principales por volumen de trafico
+
+PRIVACIDAD Y CONFIANZA
+- Cero recopilacion de datos
+- Sin SDKs de publicidad ni servicios de terceros
+- Codigo abierto - audita cada linea tu mismo
+
+COMPATIBILIDAD
+- Android 6.0 hasta Android 15
+- Sin root necesario
+- Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Gratuito y de codigo abierto. Hecho con cuidado por Marko Zanoski.

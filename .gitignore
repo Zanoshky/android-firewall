@@ -11,3 +11,10 @@ local.properties
 # Signing
 *.jks
 *.keystore
+
+# Fastlane
+fastlane/play-store-credentials.json
+fastlane/report.xml
+fastlane/README.md
+vendor/
+.bundle/

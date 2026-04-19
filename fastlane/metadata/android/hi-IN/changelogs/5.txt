@@ -1,0 +1,6 @@
+v1.5 mein naya:
+
+- Boot par auto-start: Firewall ab phone restart hone par automatically start hota hai, unlock karne se pehle bhi. App updates ke baad bhi restart hota hai.
+- Quick Settings tile: App khole bina notification shade se firewall on/off karein.
+- Android 10+ par direct boot awareness ke saath behtar reliability.
+- Performance improvements aur bug fixes.

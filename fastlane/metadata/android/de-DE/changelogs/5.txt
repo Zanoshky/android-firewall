@@ -1,0 +1,6 @@
+Neu in v1.5:
+
+- Autostart beim Einschalten: Die Firewall startet jetzt automatisch beim Neustart, noch bevor du entsperrst. Startet auch nach App-Updates automatisch neu.
+- Schnelleinstellungs-Kachel: Schalte die Firewall direkt aus der Benachrichtigungsleiste ein oder aus, ohne die App zu oeffnen.
+- Verbesserte Zuverlaessigkeit auf Android 10+ mit Direct-Boot-Unterstuetzung.
+- Leistungsverbesserungen und Fehlerbehebungen.

@@ -1,0 +1,62 @@
+Take back control of your phone's internet access. Firewall lets you decide exactly which apps can go online and blocks trackers, ads, and fingerprinting services across your entire device. No root required. No ads. No data collection. Completely free and open source.
+
+WHAT MAKES FIREWALL DIFFERENT
+Firewall blocks everything by default. You whitelist only the apps you trust. Every other app - including system apps, OEM bloatware, and background services - is silently blocked. Your data stays on your device. No remote servers, no accounts, no analytics.
+
+HOW IT WORKS
+Firewall creates a local VPN on your device. All network traffic routes through it. Blocked apps hit a dead end. Allowed apps bypass the VPN and connect normally. The VPN is entirely local. No traffic leaves your device through an external server.
+
+PER-APP INTERNET CONTROL
+- Every app blocked by default - whitelist only what you trust
+- Separate Wi-Fi and mobile data toggles for each app
+- Block system apps and OEM bloatware (MIUI, Samsung, Huawei, etc.)
+- Bulk Allow All and Block All buttons for quick setup
+- Filter by All, User, or System apps with instant search
+- Changes apply immediately without restarting
+
+TRACKER, AD, AND FINGERPRINT BLOCKING
+Intercepts every DNS query and checks it against a blocklist of known tracker, ad, and fingerprinting domains. Matched domains are instantly blocked with an NXDOMAIN response.
+
+- 130+ tracker and ad domains blocked out of the box
+- Download community blocklists:
+  HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Add your own custom blocked domains
+- Whitelist specific domains to prevent false positives
+- Toggle tracker blocking independently from the firewall
+
+DNS OVER HTTPS (ENCRYPTED DNS)
+Your ISP can see every domain you visit through plain-text DNS. DoH encrypts these queries so nobody can monitor your browsing.
+
+- Choose from Cloudflare, Google, or Quad9
+- Switch providers with a single tap
+- Toggle DoH independently
+- Works alongside tracker blocking
+
+ALWAYS-ON PROTECTION
+- Auto-starts on boot, even before you unlock your phone
+- Restarts automatically after app updates
+- Direct boot aware for maximum reliability
+- Quick Settings tile to toggle from notification shade
+
+REAL-TIME CONNECTION LOGS
+- Live log of every connection attempt
+- Shows destination IP, port, protocol, and domain name
+- Color-coded: green (allowed), red (blocked), orange (tracker-blocked)
+- Filter logs by app name or domain
+
+TRAFFIC STATS
+- Download and upload totals
+- Blocked, allowed, and total connection counts
+- Top apps ranked by traffic volume
+
+PRIVACY AND TRUST
+- Zero data collection - no analytics, no crash reporting, no telemetry
+- No advertising SDKs, no third-party services, no user accounts
+- Fully open source - audit every line of code yourself
+
+COMPATIBILITY
+- Android 6.0 through Android 15
+- No root required
+- Works on Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Free and open source. Made with care by Marko Zanoski.

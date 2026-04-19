@@ -1,0 +1,61 @@
+Apne phone ke internet access par poora control paayein. Firewall aapko decide karne deta hai ki kaunse apps online ja sakte hain aur poore device par trackers, ads aur fingerprinting services ko block karta hai. Root ki zaroorat nahi. Koi ads nahi. Koi data collection nahi. Free aur open source.
+
+FIREWALL ALAG KAISE HAI
+Firewall sab kuch default se block karta hai. Aap sirf un apps ko allow karein jinpar bharosa hai. Baaki sab - system apps, OEM bloatware aur background services - chupchap block ho jaati hain. Aapka data device par rehta hai. Koi remote server nahi, koi account nahi, koi analytics nahi.
+
+KAISE KAAM KARTA HAI
+Firewall aapke device par ek local VPN banata hai. Saara network traffic iske through jaata hai. Blocked apps kahin nahi pahunchti. Allowed apps normally connect hoti hain. VPN poori tarah local hai. Koi traffic bahar nahi jaata.
+
+PER-APP INTERNET CONTROL
+- Sabhi apps default se blocked
+- Har app ke liye alag Wi-Fi aur mobile data toggles
+- System apps aur OEM bloatware block karein (MIUI, Samsung, Huawei, etc.)
+- Sab Allow aur Sab Block buttons
+- All, User ya System mein filter karein instant search ke saath
+- Badlaav turant laagu hote hain bina restart kiye
+
+TRACKER, AD AUR FINGERPRINT BLOCKING
+Har DNS query ko intercept karta hai aur known domains ki blocklist se check karta hai. Matching domains ko NXDOMAIN response se block kiya jaata hai.
+
+- 130+ domains pehle se blocked
+- Community blocklists: HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
+- Custom blocked domains add karein
+- False positives rokne ke liye whitelist
+- Firewall se alag toggle karein
+
+DNS OVER HTTPS (ENCRYPTED DNS)
+Aapka ISP har domain dekh sakta hai jo aap visit karte hain. DoH in queries ko encrypt karta hai.
+
+- Cloudflare, Google ya Quad9 mein se chunein
+- Ek tap se provider badlein
+- DoH ko independently toggle karein
+- Tracker blocking ke saath kaam karta hai
+
+HAMESHA-ON PROTECTION
+- Device boot par automatically start hota hai, unlock se pehle bhi
+- App updates ke baad automatically restart
+- Direct boot aware
+- Quick Settings tile notification shade mein
+
+REAL-TIME CONNECTION LOGS
+- Har connection attempt ka live log
+- Destination IP, port, protocol aur domain name
+- Color-coded: green, red, orange
+- App name ya domain se filter karein
+
+TRAFFIC STATISTICS
+- Download aur upload totals
+- Blocked, allowed aur total connections
+- Traffic volume ke hisaab se top apps
+
+PRIVACY AUR TRUST
+- Zero data collection
+- Koi advertising SDKs ya third-party services nahi
+- Open source - har line audit karein
+
+COMPATIBILITY
+- Android 6.0 se Android 15 tak
+- Root ki zaroorat nahi
+- Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
+
+Free aur open source. Marko Zanoski dwara banaya gaya.

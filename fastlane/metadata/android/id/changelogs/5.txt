@@ -1,0 +1,6 @@
+Yang baru di v1.5:
+
+- Mulai otomatis saat boot: Firewall sekarang mulai otomatis saat ponsel restart, bahkan sebelum Anda membuka kunci. Juga restart otomatis setelah pembaruan aplikasi.
+- Quick Settings tile: Aktifkan atau nonaktifkan firewall langsung dari panel notifikasi tanpa membuka aplikasi.
+- Peningkatan keandalan di Android 10+ dengan dukungan direct boot.
+- Peningkatan performa dan perbaikan bug.

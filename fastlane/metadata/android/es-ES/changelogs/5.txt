@@ -1,0 +1,6 @@
+Novedades en v1.5:
+
+- Inicio automatico al encender: El firewall ahora se inicia automaticamente cuando reinicias tu telefono, incluso antes de desbloquearlo. Tambien se reinicia despues de actualizaciones.
+- Boton de Ajustes Rapidos: Activa o desactiva el firewall directamente desde la barra de notificaciones sin abrir la app.
+- Mejora de fiabilidad en Android 10+ con soporte de arranque directo.
+- Mejoras de rendimiento y correccion de errores.

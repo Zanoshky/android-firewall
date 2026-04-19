@@ -1,0 +1,137 @@
+default_platform(:android)
+
+platform :android do
+
+  desc "Build debug APK"
+  lane :debug do
+    gradle(
+      task: "assembleDebug",
+      project_dir: "."
+    )
+  end
+
+  desc "Build signed release APK and AAB"
+  lane :build_release do
+    gradle(
+      task: "clean"
+    )
+    gradle(
+      task: "bundleRelease",
+      project_dir: ".",
+      properties: {
+        "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"] || "../firewall-release.jks",
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"] || "firewall",
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+      }
+    )
+    gradle(
+      task: "assembleRelease",
+      project_dir: ".",
+      properties: {
+        "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"] || "../firewall-release.jks",
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"] || "firewall",
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+      }
+    )
+  end
+
+  desc "Deploy AAB to Google Play internal testing track"
+  lane :internal do
+    build_release
+    upload_to_play_store(
+      track: "internal",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy AAB to Google Play beta (closed testing) track"
+  lane :beta do
+    build_release
+    upload_to_play_store(
+      track: "beta",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy AAB to Google Play production"
+  lane :release do
+    build_release
+    upload_to_play_store(
+      track: "production",
+      aab: "app/build/outputs/bundle/release/app-release.aab"
+    )
+  end
+
+  desc "Upload only metadata (title, descriptions, changelogs) to Google Play"
+  lane :metadata do
+    upload_to_play_store(
+      version_code: 5,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Upload metadata and screenshots to Google Play"
+  lane :metadata_full do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true
+    )
+  end
+
+  desc "Upload screenshots only to Google Play"
+  lane :screenshots do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Promote internal track to beta"
+  lane :promote_to_beta do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "beta",
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote beta track to production"
+  lane :promote_to_production do
+    upload_to_play_store(
+      track: "beta",
+      track_promote_to: "production",
+      skip_upload_aab: true,
+      skip_upload_apk: true
+    )
+  end
+
+  desc "Validate metadata locally (dry run)"
+  lane :validate do
+    upload_to_play_store(
+      validate_only: true,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+end
