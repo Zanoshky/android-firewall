@@ -24,10 +24,38 @@ object PacketFilter {
         return packet.getShort(headerLen + 2).toInt() and 0xFFFF
     }
 
+    fun sourceIp(packet: ByteBuffer): InetAddress {
+        val addr = ByteArray(4)
+        packet.position(12)
+        packet.get(addr)
+        packet.position(0)
+        return InetAddress.getByAddress(addr)
+    }
+
+    fun sourcePort(packet: ByteBuffer): Int {
+        val headerLen = (packet.get(0).toInt() and 0xF) * 4
+        return packet.getShort(headerLen).toInt() and 0xFFFF
+    }
+
+    /**
+     * When our VPN is up, the active network IS the VPN, which reports no WiFi
+     * transport — naively checking it flips every rebuild to the mobile rule set
+     * and blocks WiFi-allowed apps. Skip VPN networks and look at the real ones.
+     */
     fun isOnWifi(cm: ConnectivityManager): Boolean {
-        val network = cm.activeNetwork ?: return false
-        val caps = cm.getNetworkCapabilities(network) ?: return false
-        return caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+        val active = cm.activeNetwork
+        val activeCaps = active?.let { cm.getNetworkCapabilities(it) }
+        if (activeCaps != null && !activeCaps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+            return activeCaps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+        }
+        @Suppress("DEPRECATION")
+        return cm.allNetworks.any { network ->
+            cm.getNetworkCapabilities(network)?.let { caps ->
+                !caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN) &&
+                    caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                    caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+            } == true
+        }
     }
 
     /**

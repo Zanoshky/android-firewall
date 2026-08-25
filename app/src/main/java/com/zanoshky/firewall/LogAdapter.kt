@@ -47,12 +47,9 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.ViewHolder>() {
         fun bind(log: ConnectionLog) {
             txtApp.text = log.appName
 
-            // Show domain if available, otherwise IP:port
-            txtDest.text = if (log.domain.isNotEmpty()) {
-                "${log.domain} (${log.protocol})"
-            } else {
-                "${log.destIp}:${log.destPort} (${log.protocol})"
-            }
+            // Show domain if available, otherwise IP:port, plus protocol and size
+            val dest = if (log.domain.isNotEmpty()) log.domain else "${log.destIp}:${log.destPort}"
+            txtDest.text = "$dest · ${log.protocol} · ${formatBytes(log.bytes)}"
 
             val now = System.currentTimeMillis()
             val diff = now - log.timestamp
@@ -79,6 +76,12 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.ViewHolder>() {
                         ContextCompat.getColor(ctx, R.color.status_inactive))
                 }
             }
+        }
+
+        private fun formatBytes(bytes: Long): String = when {
+            bytes >= 1_048_576 -> String.format("%.1f MB", bytes / 1_048_576.0)
+            bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
+            else -> "$bytes B"
         }
     }
 }

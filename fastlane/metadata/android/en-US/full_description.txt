@@ -1,62 +1,59 @@
-Take back control of your phone's internet access. Firewall lets you decide exactly which apps can go online and blocks trackers, ads, and fingerprinting services across your entire device. No root required. No ads. No data collection. Completely free and open source.
+A no-root Android firewall with tracker blocking, DNS-over-HTTPS, and connection logging. You choose which apps get online and which trackers get shut down.
 
-WHAT MAKES FIREWALL DIFFERENT
-Firewall blocks everything by default. You whitelist only the apps you trust. Every other app - including system apps, OEM bloatware, and background services - is silently blocked. Your data stays on your device. No remote servers, no accounts, no analytics.
+No ads. No tracking. No analytics. No data collection. No external servers. Everything runs locally on your device.
 
 HOW IT WORKS
-Firewall creates a local VPN on your device. All network traffic routes through it. Blocked apps hit a dead end. Allowed apps bypass the VPN and connect normally. The VPN is entirely local. No traffic leaves your device through an external server.
 
-PER-APP INTERNET CONTROL
-- Every app blocked by default - whitelist only what you trust
+Firewall creates a local VPN on your device. All network traffic routes through it. Apps you have not whitelisted hit a dead end. Apps you allow bypass the VPN and connect normally. The VPN is entirely local - no traffic leaves through a remote server.
+
+FEATURES
+
+Per-App Firewall
+- All apps blocked by default - whitelist only what you trust
 - Separate Wi-Fi and mobile data toggles for each app
-- Block system apps and OEM bloatware (MIUI, Samsung, Huawei, etc.)
-- Bulk Allow All and Block All buttons for quick setup
-- Filter by All, User, or System apps with instant search
-- Changes apply immediately without restarting
+- Block system apps and OEM bloatware
+- Changes apply within a second, no restart needed
 
-TRACKER, AD, AND FINGERPRINT BLOCKING
-Intercepts every DNS query and checks it against a blocklist of known tracker, ad, and fingerprinting domains. Matched domains are instantly blocked with an NXDOMAIN response.
+Tracker and Ad Blocking
+- Intercepts DNS queries and blocks known trackers, ads, and fingerprinting
+- Bundled default blocklist active out of the box
+- Download community blocklists (HaGeZi, OISD, 1Hosts, Steven Black, AdGuard)
+- Add custom blocked domains and whitelist false positives
 
-- 130+ tracker and ad domains blocked out of the box
-- Download community blocklists:
-  HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black, AdGuard DNS
-- Add your own custom blocked domains
-- Whitelist specific domains to prevent false positives
-- Toggle tracker blocking independently from the firewall
-
-DNS OVER HTTPS (ENCRYPTED DNS)
-Your ISP can see every domain you visit through plain-text DNS. DoH encrypts these queries so nobody can monitor your browsing.
-
+DNS over HTTPS
+- Encrypt all DNS queries so your ISP cannot see what you visit
 - Choose from Cloudflare, Google, or Quad9
-- Switch providers with a single tap
-- Toggle DoH independently
-- Works alongside tracker blocking
 
-ALWAYS-ON PROTECTION
-- Auto-starts on boot, even before you unlock your phone
-- Restarts automatically after app updates
-- Direct boot aware for maximum reliability
-- Quick Settings tile to toggle from notification shade
+App Lock
+- Require a PIN to open the app
+- Protects rules from being changed by someone with device access
+- Brute-force lockout after wrong attempts
 
-REAL-TIME CONNECTION LOGS
-- Live log of every connection attempt
-- Shows destination IP, port, protocol, and domain name
-- Color-coded: green (allowed), red (blocked), orange (tracker-blocked)
-- Filter logs by app name or domain
+Backup and Restore
+- Export rules, domains, and settings to JSON
+- Restore on the same or different device
 
-TRAFFIC STATS
-- Download and upload totals
-- Blocked, allowed, and total connection counts
+Auto-Start on Boot
+- Restarts automatically after reboot or app update
+- Works before device unlock (direct boot aware)
+
+Quick Settings Tile
+- Toggle from the notification shade
+- Respects App Lock when enabled
+
+Connection Logs
+- Real-time log with app attribution (Android 10+)
+- Filter by status, search by app or domain
+- Export to CSV
+
+Traffic Stats
+- Per-app and global download/upload totals
 - Top apps ranked by traffic volume
 
-PRIVACY AND TRUST
-- Zero data collection - no analytics, no crash reporting, no telemetry
-- No advertising SDKs, no third-party services, no user accounts
-- Fully open source - audit every line of code yourself
+PRIVACY
+
+Zero data collection. No analytics, no crash reporting, no telemetry. The only outbound connections are DoH queries (when enabled) and blocklist downloads (when you tap download).
 
 COMPATIBILITY
-- Android 6.0 through Android 15
-- No root required
-- Works on Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
 
-Free and open source. Made with care by Marko Zanoski.
+Android 6.0 through Android 16. No root required. Works on all devices.

@@ -40,7 +40,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:textColor="@color/chart_download" />
+                android:textColor="@color/chart_download" android:fontFamily="monospace"
+            />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -54,7 +55,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:textColor="@color/chart_upload" />
+                android:textColor="@color/chart_upload" android:fontFamily="monospace"
+            />
         </LinearLayout>
     </LinearLayout>
 
@@ -64,5 +66,5 @@
         android:layout_height="wrap_content"
         android:textSize="13sp"
         android:textColor="@color/text_secondary"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="monospace" />
 </LinearLayout>

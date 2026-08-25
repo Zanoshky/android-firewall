@@ -10,14 +10,23 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.materialswitch.MaterialSwitch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,10 +39,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtTotalApps: TextView
     private lateinit var txtUptime: TextView
     private lateinit var txtTotalTraffic: TextView
+    private lateinit var switchFirewall: MaterialSwitch
+
+    private lateinit var lockOverlay: View
+    private lateinit var editLockPin: EditText
+    private lateinit var txtLockError: TextView
 
     private val handler = Handler(Looper.getMainLooper())
     private var uptimeRunnable: Runnable? = null
+    private var lockoutRunnable: Runnable? = null
     private val VPN_REQUEST_CODE = 100
+
+    /** While the lock overlay is up, back leaves the app rather than falling through. */
+    private val lockedBackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +71,9 @@ class MainActivity : AppCompatActivity() {
         txtUptime = findViewById(R.id.txtUptime)
         txtTotalTraffic = findViewById(R.id.txtTotalTraffic)
 
+        setupLockOverlay()
+        onBackPressedDispatcher.addCallback(this, lockedBackCallback)
+
         // ViewPager + BottomNav
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
@@ -61,12 +86,28 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_logs -> viewPager.currentItem = 1
                 R.id.nav_stats -> viewPager.currentItem = 2
                 R.id.nav_blocklist -> viewPager.currentItem = 3
+                R.id.nav_settings -> viewPager.currentItem = 4
             }
             true
         }
 
+        // Keep the nav highlight in step with the pager. ViewPager2 restores its own
+        // position across recreate(), which the restore flow relies on.
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val itemId = when (position) {
+                    1 -> R.id.nav_logs
+                    2 -> R.id.nav_stats
+                    3 -> R.id.nav_blocklist
+                    4 -> R.id.nav_settings
+                    else -> R.id.nav_apps
+                }
+                if (bottomNav.selectedItemId != itemId) bottomNav.selectedItemId = itemId
+            }
+        })
+
         // Firewall toggle
-        val switchFirewall = findViewById<MaterialSwitch>(R.id.switchFirewall)
+        switchFirewall = findViewById(R.id.switchFirewall)
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         switchFirewall.isChecked = prefs.getBoolean("enabled", false)
         updateStatusUI(switchFirewall.isChecked)
@@ -80,6 +121,8 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
+                // The permission dialog can background us; do not treat that as leaving.
+                AppLock.suppressNextRelock()
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
             }
         }
@@ -89,10 +132,139 @@ class MainActivity : AppCompatActivity() {
         DohResolver.init(this)
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Runs before the first draw, so locked content is never briefly visible.
+        if (AppLock.needsUnlock(this)) showLock() else hideLock()
+    }
+
+    override fun onStop() {
+        // A rotation or other config change tears the activity down and rebuilds it
+        // straight away. That is not the user leaving the app, so it must not relock.
+        if (!isChangingConfigurations) AppLock.onActivityStopped()
+        super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        syncFirewallSwitch()
+        refreshHeroCounts()
+    }
+
+    /**
+     * Reconcile the switch with reality. Covers:
+     * - Service killed by OS/battery optimization while pref stayed "enabled".
+     * - VPN revoked by another app (onRevoke clears the pref).
+     * - Coming back from the VPN consent dialog after denial.
+     *
+     * If the pref says enabled but the service is dead, we restart it silently
+     * (same as BootReceiver does). If the service is dead AND the pref was cleared
+     * (revoke path), the switch flips off.
+     */
+    private fun syncFirewallSwitch() {
+        val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
+        val wantEnabled = prefs.getBoolean("enabled", false)
+
+        if (wantEnabled && !FirewallVpnService.isRunning) {
+            // Service died under us. Attempt a silent restart.
+            launchVpnService()
+        }
+
+        // Avoid re-firing the listener by only setting when different.
+        if (switchFirewall.isChecked != wantEnabled) {
+            switchFirewall.isChecked = wantEnabled
+        }
+        updateStatusUI(wantEnabled)
+    }
+
     override fun onDestroy() {
         uptimeRunnable?.let { handler.removeCallbacks(it) }
+        lockoutRunnable?.let { handler.removeCallbacks(it) }
         super.onDestroy()
     }
+
+    // --- App Lock ---
+
+    private fun setupLockOverlay() {
+        lockOverlay = findViewById(R.id.lockOverlay)
+        editLockPin = findViewById(R.id.editLockPin)
+        txtLockError = findViewById(R.id.txtLockError)
+
+        findViewById<TextView>(R.id.btnUnlock).setOnClickListener { attemptUnlock() }
+        editLockPin.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                attemptUnlock()
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun showLock() {
+        lockOverlay.visibility = View.VISIBLE
+        lockedBackCallback.isEnabled = true
+        editLockPin.text.clear()
+        txtLockError.text = ""
+        refreshLockout()
+    }
+
+    private fun hideLock() {
+        lockOverlay.visibility = View.GONE
+        lockedBackCallback.isEnabled = false
+        lockoutRunnable?.let { handler.removeCallbacks(it) }
+        lockoutRunnable = null
+        hideKeyboard()
+    }
+
+    /** Reflects the cool-down after repeated wrong PINs, counting down once a second. */
+    private fun refreshLockout() {
+        lockoutRunnable?.let { handler.removeCallbacks(it) }
+        val remaining = AppLock.lockoutRemainingMs()
+        if (remaining <= 0) {
+            editLockPin.isEnabled = true
+            return
+        }
+        editLockPin.isEnabled = false
+        val seconds = (remaining + 999) / 1000
+        txtLockError.text = "Too many attempts. Try again in ${seconds}s"
+        lockoutRunnable = Runnable { refreshLockout() }
+        handler.postDelayed(lockoutRunnable!!, 1000)
+    }
+
+    private fun attemptUnlock() {
+        if (AppLock.lockoutRemainingMs() > 0) {
+            refreshLockout()
+            return
+        }
+        val pin = editLockPin.text.toString()
+        if (pin.isEmpty()) {
+            txtLockError.text = "Enter your PIN"
+            return
+        }
+        lifecycleScope.launch {
+            // PBKDF2 - keep it off the main thread.
+            val ok = withContext(Dispatchers.Default) { AppLock.verify(this@MainActivity, pin) }
+            if (ok) {
+                hideLock()
+            } else {
+                editLockPin.text.clear()
+                if (AppLock.lockoutRemainingMs() > 0) {
+                    refreshLockout()
+                } else {
+                    val left = AppLock.attemptsRemaining()
+                    txtLockError.text = "Incorrect PIN. $left attempt${if (left == 1) "" else "s"} left"
+                }
+            }
+        }
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(editLockPin.windowToken, 0)
+    }
+
+    // --- Dashboard ---
 
     private fun startLiveUpdates() {
         uptimeRunnable = object : Runnable {
@@ -119,7 +291,7 @@ class MainActivity : AppCompatActivity() {
 
         val totalIn = prefs.getLong("total_bytes_in", 0) + FirewallVpnService.sessionBytesIn.get()
         val totalOut = prefs.getLong("total_bytes_out", 0) + FirewallVpnService.sessionBytesOut.get()
-        txtTotalTraffic.text = "D ${formatBytes(totalIn)}  U ${formatBytes(totalOut)}"
+        txtTotalTraffic.text = "↓ ${formatBytes(totalIn)}  ↑ ${formatBytes(totalOut)}"
 
         if (isActive && FirewallVpnService.sessionStartTime > 0) {
             val elapsed = System.currentTimeMillis() - FirewallVpnService.sessionStartTime
@@ -138,6 +310,18 @@ class MainActivity : AppCompatActivity() {
         txtTotalApps.text = allApps.size.toString()
     }
 
+    /** Lightweight DB query so the hero card is never stale after recreate/rotation. */
+    private fun refreshHeroCounts() {
+        lifecycleScope.launch {
+            val dao = RuleDatabase.get(this@MainActivity).ruleDao()
+            val total = withContext(Dispatchers.IO) { dao.countAll() }
+            val allowed = withContext(Dispatchers.IO) { dao.countAllowed() }
+            txtBlockedCount.text = (total - allowed).toString()
+            txtAllowedCount.text = allowed.toString()
+            txtTotalApps.text = total.toString()
+        }
+    }
+
     private fun updateStatusUI(active: Boolean) {
         if (active) {
             heroCard.setBackgroundResource(R.drawable.bg_hero_card)
@@ -153,6 +337,8 @@ class MainActivity : AppCompatActivity() {
     fun startFirewall() {
         val vpnIntent = VpnService.prepare(this)
         if (vpnIntent != null) {
+            // The system consent dialog backgrounds us; do not treat that as leaving.
+            AppLock.suppressNextRelock()
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE)
         } else {
             launchVpnService()
@@ -180,8 +366,16 @@ class MainActivity : AppCompatActivity() {
     @Deprecated("Use registerForActivityResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            launchVpnService()
+        if (requestCode == VPN_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                launchVpnService()
+            } else {
+                // User denied VPN consent. Roll back the pref and switch.
+                val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
+                prefs.edit().putBoolean("enabled", false).apply()
+                switchFirewall.isChecked = false
+                updateStatusUI(false)
+            }
         }
     }
 

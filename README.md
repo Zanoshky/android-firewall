@@ -21,7 +21,9 @@ The VPN is entirely local. No traffic leaves your device through a remote server
 - Block system apps and OEM bloatware (MIUI, Samsung, Huawei, etc.)
 - Filter apps by All, User, or System with a search bar
 - Bulk "Allow All" and "Block All" buttons for the current filtered view
-- Changes take effect immediately without restarting the firewall
+- Rule changes are picked up by the firewall automatically within a second
+
+**Important - restart the app you are blocking or unblocking.** Rule changes apply to *new* connections. An app that is already running may hold on to connections it opened earlier, and Android caches its network state. To block an app reliably, fully close it first (swipe it away from recents, or use Force Stop in system settings), then flip the toggle. The same applies in reverse: after unblocking an app, close and reopen it so it picks up its restored internet access.
 
 ### Tracker and Ad Blocking
 
@@ -57,14 +59,34 @@ For this to work reliably, disable battery optimization for the Firewall app in 
 
 ### Quick Settings Tile
 
-Toggle the firewall on or off directly from your notification shade without opening the app. Pull down your quick settings panel, tap "Edit", and add the Firewall tile.
+Toggle the firewall on or off directly from your notification shade without opening the app. Pull down your quick settings panel, tap "Edit", and add the Firewall tile. When App Lock is enabled, turning protection off from the tile opens the app for PIN entry.
+
+### App Lock
+
+Require a PIN (4-8 digits) before the app can be opened. Protects your rules from being changed by someone with physical access to your device.
+
+- PIN is hashed with PBKDF2 - never stored in plain text
+- Brute-force lockout after 5 wrong attempts (30 second cooldown)
+- Lock engages whenever the app leaves the foreground
+- No recovery mechanism - if you forget your PIN, you must reinstall
+
+### Backup and Restore
+
+Export all your settings to a single JSON file and restore them on the same or a different device.
+
+- Exports: per-app rules, custom blocked domains, whitelisted domains, blocklist sources, tracker blocking and DoH settings
+- Does not export: PIN, logs, traffic stats
+- Restore replaces all current rules and re-downloads blocklists
+- Plain JSON, no encryption - store it somewhere safe
 
 ### Connection Logs
 
 - Real-time log of every connection attempt passing through the VPN
-- Each entry shows destination IP, port, protocol, and domain name
+- Each entry shows the originating app (Android 10+), destination IP, port, protocol, domain name, and packet size
 - Color-coded entries: green for allowed, red for blocked, orange for tracker-blocked
-- Filter logs by app name or domain
+- One-tap filter chips: All, Blocked, Allowed, Trackers
+- Search by app name, IP address, or domain
+- Export logs to a CSV file and share it anywhere - useful for spotting data leaks
 - Auto-refreshes every 3 seconds
 - Logs older than 7 days are automatically pruned
 
@@ -99,6 +121,8 @@ The main screen shows a status card with:
 
 The firewall is now running. All apps not explicitly allowed are blocked.
 
+Tip: when you block or unblock an app that is currently running, close it fully and reopen it - running apps can keep using connections they opened before the rule changed.
+
 ## Permissions
 
 | Permission | Why |
@@ -109,7 +133,6 @@ The firewall is now running. All apps not explicitly allowed are blocked.
 | Boot Completed | Restarts the firewall after reboot if it was enabled. |
 | Foreground Service | Keeps the firewall running reliably in the background. |
 | Notifications | Shows a status notification when the firewall is active (required on Android 13+). |
-| Wake Lock | Prevents the system from killing the VPN service during deep sleep. |
 
 ## Privacy
 
@@ -122,9 +145,13 @@ Your firewall rules, connection logs, traffic stats, and blocklist data are stor
 
 ## Compatibility
 
-- Android 6.0 (Marshmallow) through Android 15
+- Android 6.0 (Marshmallow) through Android 16
 - No root required
 - Works on all devices including Samsung, Xiaomi, Huawei, Pixel, OnePlus, etc.
+
+## What's new
+
+See the [changelog](CHANGELOG.md) for release history. Highlights of 1.8: rule changes apply instantly without toggling, automatic recovery when Android kills the service, App Lock with PIN protection, and backup/restore.
 
 ## License
 

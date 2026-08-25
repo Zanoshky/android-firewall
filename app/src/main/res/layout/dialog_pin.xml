@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  Shared PIN dialog body. Rows are shown or hidden by SettingsFragment depending
+  on whether it is setting, changing, or confirming removal of the PIN.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/txtPinHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:layout_marginBottom="14dp" />
+
+    <EditText
+        android:id="@+id/editPinCurrent"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_search"
+        android:hint="Current PIN"
+        android:textColorHint="@color/text_hint"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:inputType="numberPassword"
+        android:maxLength="12"
+        android:paddingHorizontal="16dp"
+        android:importantForAutofill="no"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/editPinNew"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_search"
+        android:hint="New PIN (4 to 12 digits)"
+        android:textColorHint="@color/text_hint"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:inputType="numberPassword"
+        android:maxLength="12"
+        android:paddingHorizontal="16dp"
+        android:importantForAutofill="no"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:id="@+id/editPinConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_search"
+        android:hint="Confirm PIN"
+        android:textColorHint="@color/text_hint"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:inputType="numberPassword"
+        android:maxLength="12"
+        android:paddingHorizontal="16dp"
+        android:importantForAutofill="no"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:id="@+id/txtPinError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/danger"
+        android:textSize="13sp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone" />
+
+</LinearLayout>

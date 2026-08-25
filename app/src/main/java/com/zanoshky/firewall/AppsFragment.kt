@@ -1,6 +1,10 @@
 package com.zanoshky.firewall
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +35,12 @@ class AppsFragment : Fragment() {
     private var searchQuery = ""
     private val restartHandler = Handler(Looper.getMainLooper())
     private var restartPending: Runnable? = null
+
+    private val packageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (isAdded) loadApps()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_apps, container, false)
@@ -71,6 +82,22 @@ class AppsFragment : Fragment() {
         view.findViewById<TextView>(R.id.btnBlockAll).setOnClickListener { bulkSetAll(false) }
         view.findViewById<TextView>(R.id.btnAllowAll).setOnClickListener { bulkSetAll(true) }
 
+        ContextCompat.registerReceiver(
+            requireContext(),
+            packageReceiver,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addAction(Intent.ACTION_PACKAGE_REPLACED)
+                addDataScheme("package")
+            },
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reload on every resume so installs/uninstalls made outside the app show up.
         loadApps()
     }
 
@@ -80,6 +107,16 @@ class AppsFragment : Fragment() {
             val apps = withContext(Dispatchers.IO) { AppRepository.getInstalledApps(ctx) }
             val rules = withContext(Dispatchers.IO) { dao.getAll() }
             val stats = withContext(Dispatchers.IO) { trafficDao.getAll() }
+
+            // Purge rules for packages that are no longer installed
+            val installed = apps.mapTo(HashSet()) { it.packageName }
+            val stale = rules.filter { it.packageName !in installed }
+            if (stale.isNotEmpty()) {
+                withContext(Dispatchers.IO) {
+                    stale.forEach { dao.delete(it.packageName) }
+                }
+            }
+
             val ruleMap = rules.associateBy { it.packageName }
             val statsMap = stats.associateBy { it.packageName }
 
@@ -118,9 +155,7 @@ class AppsFragment : Fragment() {
 
         // Persist all rules in one batch
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            for (app in visible) {
-                dao.upsert(AppRule(app.packageName, app.allowWifi, app.allowMobile))
-            }
+            dao.upsertAll(visible.map { AppRule(it.packageName, it.allowWifi, it.allowMobile) })
         }
 
         // Refresh UI
@@ -157,21 +192,20 @@ class AppsFragment : Fragment() {
         scheduleVpnRestart()
     }
 
+    /**
+     * Restart the tunnel so rule changes take effect. Uses the application context
+     * and survives view destruction — cancelling this on lifecycle events would leave
+     * a newly-blocked app in the tunnel's bypass list with full network access.
+     */
     private fun scheduleVpnRestart() {
+        val appCtx = context?.applicationContext ?: return
         restartPending?.let { restartHandler.removeCallbacks(it) }
-        restartPending = Runnable {
-            (activity as? MainActivity)?.let {
-                val prefs = it.getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
-                if (prefs.getBoolean("enabled", false)) {
-                    it.startFirewall()
-                }
-            }
-        }
+        restartPending = Runnable { TunnelControl.requestRebuild(appCtx) }
         restartHandler.postDelayed(restartPending!!, 500)
     }
 
     override fun onDestroyView() {
-        restartPending?.let { restartHandler.removeCallbacks(it) }
+        try { requireContext().unregisterReceiver(packageReceiver) } catch (_: Exception) {}
         super.onDestroyView()
     }
 }

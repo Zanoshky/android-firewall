@@ -14,11 +14,12 @@ import android.net.NetworkRequest
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import android.os.PowerManager
 import android.util.Log
 import kotlinx.coroutines.*
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
@@ -28,9 +29,11 @@ class FirewallVpnService : VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var readJob: Job? = null
-    private var wakeLock: PowerManager.WakeLock? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private val ownerCache = HashMap<String, Pair<String, String>?>()
     private val isRebuilding = AtomicBoolean(false)
+    @Volatile private var lastNetworkKey: String? = null
+    private var rebuildDebounce: Job? = null
 
     companion object {
         const val ACTION_START = "com.zanoshky.firewall.START"
@@ -38,6 +41,9 @@ class FirewallVpnService : VpnService() {
         private const val CHANNEL_ID = "firewall_channel"
         private const val NOTIFICATION_ID = 1
         private const val TAG = "FirewallVPN"
+
+        /** True while the VPN tunnel is established and processing packets. */
+        @Volatile var isRunning: Boolean = false
 
         val totalBlockedSession = AtomicLong(0)
         val totalAllowedSession = AtomicLong(0)
@@ -53,7 +59,6 @@ class FirewallVpnService : VpnService() {
         createNotificationChannel()
         BlocklistManager.init(this)
         DohResolver.init(this)
-        acquireWakeLock()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -74,13 +79,16 @@ class FirewallVpnService : VpnService() {
     private fun rebuildTunnel() {
         if (!isRebuilding.compareAndSet(false, true)) return
         try {
+            isRunning = false
             try { vpnInterface?.close() } catch (_: Exception) {}
             vpnInterface = null
             readJob?.cancel()
             readJob = null
-            readJob = scope.launch {
-                try { runVpn() } finally { isRebuilding.set(false) }
-            }
+            // Release the guard before launching: the coroutine is the steady-state
+            // packet loop, not a "rebuild in progress". The guard only serializes the
+            // teardown-and-re-establish window above.
+            isRebuilding.set(false)
+            readJob = scope.launch { runVpn() }
         } catch (e: Exception) {
             isRebuilding.set(false)
             Log.e(TAG, "rebuildTunnel failed", e)
@@ -94,14 +102,42 @@ class FirewallVpnService : VpnService() {
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
         val cb = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) { rebuildTunnel() }
+            override fun onAvailable(network: Network) {
+                onNetworkEvent(network, cm.getNetworkCapabilities(network))
+            }
             override fun onLost(network: Network) { /* rebuild when available */ }
             override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                rebuildTunnel()
+                onNetworkEvent(network, caps)
             }
         }
         networkCallback = cb
         cm.registerNetworkCallback(request, cb)
+    }
+
+    /**
+     * onCapabilitiesChanged fires constantly (signal strength, validation, metering),
+     * but per-app rules only depend on which network/transport we're on. Only rebuild
+     * the tunnel when that actually changes, debounced so rapid handovers coalesce.
+     */
+    private fun onNetworkEvent(network: Network, caps: NetworkCapabilities?) {
+        val key = networkKey(network, caps)
+        if (key == lastNetworkKey) return
+        lastNetworkKey = key
+        rebuildDebounce?.cancel()
+        rebuildDebounce = scope.launch {
+            delay(1000)
+            rebuildTunnel()
+        }
+    }
+
+    private fun networkKey(network: Network?, caps: NetworkCapabilities?): String {
+        val transport = when {
+            caps == null -> "none"
+            caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "wifi"
+            caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "cell"
+            else -> "other"
+        }
+        return "$network/$transport"
     }
 
     private fun unregisterNetworkCallback() {
@@ -114,18 +150,36 @@ class FirewallVpnService : VpnService() {
         networkCallback = null
     }
 
-    private fun acquireWakeLock() {
-        if (wakeLock == null) {
-            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-            wakeLock = pm.newWakeLock(
-                PowerManager.PARTIAL_WAKE_LOCK, "Firewall::VpnWakeLock"
-            ).apply { acquire() }
-        }
-    }
-
-    private fun releaseWakeLock() {
-        wakeLock?.let { if (it.isHeld) it.release() }
-        wakeLock = null
+    /**
+     * Resolve which app owns a connection (Android 10+). Results are cached per
+     * connection 4-tuple so the syscall only happens once per new connection.
+     */
+    private fun resolveOwnerApp(
+        proto: Int, srcAddr: InetAddress, srcPort: Int, destAddr: InetAddress, destPort: Int
+    ): Pair<String, String>? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        if (proto != 6 && proto != 17) return null
+        val key = "$proto|$srcPort|${destAddr.hostAddress}|$destPort"
+        if (ownerCache.containsKey(key)) return ownerCache[key]
+        val result = try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val uid = cm.getConnectionOwnerUid(
+                proto, InetSocketAddress(srcAddr, srcPort), InetSocketAddress(destAddr, destPort)
+            )
+            if (uid > 0) {
+                packageManager.getPackagesForUid(uid)?.firstOrNull()?.let { pkg ->
+                    val label = try {
+                        packageManager.getApplicationLabel(
+                            packageManager.getApplicationInfo(pkg, 0)
+                        ).toString()
+                    } catch (_: Exception) { pkg }
+                    pkg to label
+                }
+            } else null
+        } catch (_: Exception) { null }
+        if (ownerCache.size > 2000) ownerCache.clear()
+        ownerCache[key] = result
+        return result
     }
 
     private suspend fun runVpn() {
@@ -163,18 +217,42 @@ class FirewallVpnService : VpnService() {
         try { builder.addDisallowedApplication(packageName) }
         catch (_: PackageManager.NameNotFoundException) {}
 
-        for (pkg in allowedPackages) {
-            try { builder.addDisallowedApplication(pkg) }
-            catch (_: PackageManager.NameNotFoundException) {}
+        // Android enforces network access per-UID, not per-package. Excluding an
+        // allowed package whose UID is shared with a blocked package would let the
+        // blocked one ride along with full access. Only exclude a package when
+        // every package in its UID group is allowed.
+        val allowedSet = allowedPackages.toSet()
+        val byUid = allApps.filter { it.uid > 1000 }.groupBy { it.uid }
+        for (app in allApps) {
+            if (app.packageName !in allowedSet) continue
+            val uidMates = byUid[app.uid] ?: continue
+            if (uidMates.all { it.packageName in allowedSet }) {
+                try { builder.addDisallowedApplication(app.packageName) }
+                catch (_: PackageManager.NameNotFoundException) {}
+            }
         }
 
-        val fd = builder.establish() ?: return
+        // Fail closed: if establish() fails (e.g. another VPN grabbed the slot),
+        // retry instead of silently leaving traffic unprotected.
+        var established: ParcelFileDescriptor? = null
+        for (attempt in 1..3) {
+            established = builder.establish()
+            if (established != null) break
+            Log.e(TAG, "VPN establish() failed (attempt $attempt)")
+            delay(2000)
+        }
+        val fd = established ?: return
         vpnInterface = fd
+        isRunning = true
 
         if (sessionStartTime == 0L) {
             sessionStartTime = System.currentTimeMillis()
         }
 
+        // Seed the key so the callback's immediate onAvailable for the current
+        // network doesn't trigger a pointless rebuild right after establish().
+        val activeNetwork = cm.activeNetwork
+        lastNetworkKey = networkKey(activeNetwork, activeNetwork?.let { cm.getNetworkCapabilities(it) })
         registerNetworkCallback()
 
         val input = FileInputStream(fd.fileDescriptor)
@@ -187,7 +265,8 @@ class FirewallVpnService : VpnService() {
         try {
             while (true) {
                 val length = input.read(buffer.array())
-                if (length <= 0) continue
+                if (length < 0) break // fd closed - would busy-spin on continue
+                if (length == 0) continue
 
                 sessionBytesIn.addAndGet(length.toLong())
                 buffer.limit(length)
@@ -206,7 +285,8 @@ class FirewallVpnService : VpnService() {
                 }
 
                 try {
-                    val destIp = PacketFilter.destinationIp(buffer).hostAddress ?: "?"
+                    val destAddr = PacketFilter.destinationIp(buffer)
+                    val destIp = destAddr.hostAddress ?: "?"
                     val destPort = if ((proto == 6 || proto == 17) && length >= 24)
                         PacketFilter.destinationPort(buffer) else 0
 
@@ -312,10 +392,15 @@ class FirewallVpnService : VpnService() {
                         // These are dropped by the VPN (no route out)
                         totalBlockedSession.incrementAndGet()
 
-                        val label = "$destIp:$destPort"
+                        val srcPort = if ((proto == 6 || proto == 17) && length >= 24)
+                            PacketFilter.sourcePort(buffer) else 0
+                        val owner = if (srcPort > 0)
+                            resolveOwnerApp(proto, PacketFilter.sourceIp(buffer), srcPort, destAddr, destPort)
+                        else null
+
                         logBatch.add(ConnectionLog(
-                            packageName = "system",
-                            appName = label,
+                            packageName = owner?.first ?: "system",
+                            appName = owner?.second ?: "$destIp:$destPort",
                             destIp = destIp,
                             destPort = destPort,
                             protocol = protoName,
@@ -336,7 +421,7 @@ class FirewallVpnService : VpnService() {
                     val batch = ArrayList(logBatch)
                     logBatch.clear()
                     lastFlush = now
-                    scope.launch { batch.forEach { logDao.insert(it) } }
+                    scope.launch { logDao.insertAll(batch) }
                 }
 
                 buffer.clear()
@@ -346,13 +431,16 @@ class FirewallVpnService : VpnService() {
         } finally {
             if (logBatch.isNotEmpty()) {
                 val batch = ArrayList(logBatch)
-                scope.launch { batch.forEach { logDao.insert(it) } }
+                scope.launch { logDao.insertAll(batch) }
             }
         }
     }
 
     private fun stopVpn() {
+        isRunning = false
         unregisterNetworkCallback()
+        rebuildDebounce?.cancel()
+        rebuildDebounce = null
 
         try { vpnInterface?.close() } catch (_: Exception) {}
         vpnInterface = null
@@ -388,14 +476,16 @@ class FirewallVpnService : VpnService() {
 
     override fun onDestroy() {
         stopVpn()
-        releaseWakeLock()
         scope.cancel()
         super.onDestroy()
     }
 
     override fun onRevoke() {
+        // Another VPN took over. Clear the pref so the switch shows "off" when the
+        // user next opens the app, instead of lying about protection being active.
+        getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
+            .edit().putBoolean("enabled", false).apply()
         stopVpn()
-        releaseWakeLock()
         super.onRevoke()
     }
 

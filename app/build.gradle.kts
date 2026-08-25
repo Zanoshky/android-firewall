@@ -5,19 +5,19 @@ plugins {
 
 android {
     namespace = "com.zanoshky.firewall"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.zanoshky.firewall"
         minSdk = 23
-        targetSdk = 35
-        versionCode = 5
-        versionName = "1.5"
+        targetSdk = 36
+        versionCode = 8
+        versionName = "1.8"
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "../firewall-release.jks")
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "firewall-release.jks")
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
             keyAlias = System.getenv("KEY_ALIAS") ?: "firewall"
             keyPassword = System.getenv("KEY_PASSWORD") ?: ""
@@ -50,4 +50,5 @@ dependencies {
     ksp("androidx.room:room-compiler:2.8.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("androidx.activity:activity-ktx:1.8.0")
 }

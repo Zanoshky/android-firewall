@@ -2,18 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_apps"
-        android:icon="@android:drawable/ic_menu_manage"
+        android:icon="@drawable/ic_nav_apps"
         android:title="Apps" />
     <item
         android:id="@+id/nav_logs"
-        android:icon="@android:drawable/ic_menu_recent_history"
+        android:icon="@drawable/ic_nav_logs"
         android:title="Logs" />
     <item
         android:id="@+id/nav_stats"
-        android:icon="@android:drawable/ic_menu_info_details"
+        android:icon="@drawable/ic_nav_stats"
         android:title="Stats" />
     <item
         android:id="@+id/nav_blocklist"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:icon="@drawable/ic_nav_block"
         android:title="Trackers" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="Settings" />
 </menu>

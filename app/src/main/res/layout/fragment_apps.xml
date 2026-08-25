@@ -83,6 +83,17 @@
             android:layout_marginEnd="16dp" />
     </LinearLayout>
 
+    <!-- Rule-change hint -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        android:text="Rules apply to new connections. Fully close a running app before blocking it, then reopen it - same when you unblock."
+        android:textColor="@color/text_hint"
+        android:textSize="11sp"
+        android:lineSpacingExtra="2dp" />
+
     <!-- App list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerApps"

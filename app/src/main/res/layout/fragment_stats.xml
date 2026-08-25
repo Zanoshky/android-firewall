@@ -48,7 +48,7 @@
                     android:text="0 B"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="monospace"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
 
@@ -74,7 +74,7 @@
                     android:text="0 B"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="monospace"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
@@ -112,7 +112,7 @@
                     android:text="0"
                     android:textColor="@color/accent_pink"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="monospace" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                     android:text="0"
                     android:textColor="@color/accent_cyan"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="monospace" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
                     android:text="0"
                     android:textColor="@color/accent_blue"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="monospace" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

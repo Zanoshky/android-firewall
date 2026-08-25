@@ -10,17 +10,34 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="14dp"
+        android:paddingBottom="10dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Connection Logs"
+            android:text="Activity"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
+            android:letterSpacing="-0.01"
             android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/btnExportLogs"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:text="Export CSV"
+            android:textColor="@color/accent"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="12dp"
+            android:background="@drawable/bg_chip"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="8dp" />
 
         <TextView
             android:id="@+id/btnClearLogs"
@@ -28,32 +45,69 @@
             android:layout_height="32dp"
             android:gravity="center"
             android:text="Clear"
-            android:textColor="@color/accent_pink"
+            android:textColor="@color/danger"
             android:textSize="13sp"
             android:fontFamily="sans-serif-medium"
             android:paddingHorizontal="12dp"
-            android:background="@drawable/bg_toggle_off"
+            android:background="@drawable/bg_chip"
+            android:foreground="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true" />
     </LinearLayout>
 
-    <!-- Filter -->
+    <!-- Search -->
     <EditText
         android:id="@+id/editFilterLogs"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="42dp"
         android:layout_marginHorizontal="16dp"
         android:background="@drawable/bg_search"
         android:drawableStart="@android:drawable/ic_menu_search"
         android:drawablePadding="10dp"
         android:drawableTint="@color/text_hint"
-        android:hint="Filter by app, IP, or domain..."
+        android:hint="Filter by app, IP, or domain"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:textSize="13sp"
         android:inputType="text"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="14dp"
         android:importantForAutofill="no" />
+
+    <!-- Status filter chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
+
+            <TextView
+                android:id="@+id/chipAll"
+                style="@style/Widget.Firewall.Chip"
+                android:text="All" />
+
+            <TextView
+                android:id="@+id/chipBlocked"
+                style="@style/Widget.Firewall.Chip"
+                android:text="Blocked" />
+
+            <TextView
+                android:id="@+id/chipAllowed"
+                style="@style/Widget.Firewall.Chip"
+                android:text="Allowed" />
+
+            <TextView
+                android:id="@+id/chipTrackers"
+                style="@style/Widget.Firewall.Chip"
+                android:layout_marginEnd="0dp"
+                android:text="Trackers" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerLogs"
@@ -70,7 +124,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="No connection logs yet.\nLogs appear when apps try to connect."
+        android:lineSpacingExtra="4dp"
+        android:text="Nothing here yet.\nConnection attempts appear as apps go online."
         android:textColor="@color/text_hint"
         android:textSize="14sp"
         android:visibility="gone" />

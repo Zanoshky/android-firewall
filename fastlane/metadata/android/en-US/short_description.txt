@@ -1,1 +1,1 @@
-Block apps from internet. Block trackers and ads. Encrypted DNS. No root.
+No-root firewall with tracker blocking and DNS over HTTPS.

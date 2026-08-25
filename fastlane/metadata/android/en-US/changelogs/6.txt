@@ -1,0 +1,7 @@
+What's new in v1.6:
+
+- Major battery fix: the firewall no longer keeps your CPU awake or rebuilds the tunnel on every network change.
+- Blocking fixes: rule changes always apply now, Wi-Fi rules are detected correctly, and apps can no longer slip through via a shared app identity.
+- Logs now show which app made each connection and the packet size - spot data leaks at a glance.
+- Filter logs by Blocked, Allowed, or Trackers, and export everything to CSV.
+- Fresh dark design.

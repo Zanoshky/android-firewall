@@ -21,7 +21,10 @@ data class TrafficStat(
     val lastAllowed: Long = 0
 )
 
-@Entity(tableName = "connection_logs")
+@Entity(
+    tableName = "connection_logs",
+    indices = [Index("timestamp"), Index("appName")]
+)
 data class ConnectionLog(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val packageName: String,
@@ -47,11 +50,27 @@ interface RuleDao {
     @Upsert
     suspend fun upsert(rule: AppRule)
 
+    @Upsert
+    suspend fun upsertAll(rules: List<AppRule>)
+
+    @Query("DELETE FROM rules WHERE packageName = :pkg")
+    suspend fun delete(pkg: String)
+
+    /** Used by restore, which replaces the rule set rather than merging into it. */
+    @Query("DELETE FROM rules")
+    suspend fun deleteAll()
+
     @Query("SELECT packageName FROM rules WHERE allowWifi = 1")
     suspend fun getAllowedWifi(): List<String>
 
     @Query("SELECT packageName FROM rules WHERE allowMobile = 1")
     suspend fun getAllowedMobile(): List<String>
+
+    @Query("SELECT COUNT(*) FROM rules WHERE allowWifi = 1 OR allowMobile = 1")
+    suspend fun countAllowed(): Int
+
+    @Query("SELECT COUNT(*) FROM rules")
+    suspend fun countAll(): Int
 }
 
 @Dao
@@ -93,13 +112,50 @@ interface TrafficDao {
     suspend fun getTopByTraffic(limit: Int): List<TrafficStat>
 }
 
+/** Per-app aggregate used by the Stats screen, computed in SQL instead of in memory. */
+data class AppTrafficAgg(
+    val appName: String,
+    val totalBytes: Long,
+    val entryCount: Int
+)
+
 @Dao
 interface ConnectionLogDao {
     @Insert
     suspend fun insert(log: ConnectionLog)
 
+    @Insert
+    suspend fun insertAll(logs: List<ConnectionLog>)
+
     @Query("SELECT * FROM connection_logs ORDER BY timestamp DESC LIMIT :limit")
     suspend fun getRecent(limit: Int): List<ConnectionLog>
+
+    /**
+     * Filtered log query. [status]: 0 = all, 1 = blocked, 2 = allowed, 3 = trackers.
+     * [query] matches app name, destination IP, or domain (empty = no text filter).
+     */
+    @Query("""
+        SELECT * FROM connection_logs
+        WHERE (:status = 0
+            OR (:status = 1 AND allowed = 0 AND blockedByTracker = 0)
+            OR (:status = 2 AND allowed = 1)
+            OR (:status = 3 AND blockedByTracker = 1))
+        AND (:query = ''
+            OR appName LIKE '%' || :query || '%'
+            OR destIp LIKE '%' || :query || '%'
+            OR domain LIKE '%' || :query || '%')
+        ORDER BY timestamp DESC LIMIT :limit
+    """)
+    suspend fun getFiltered(status: Int, query: String, limit: Int): List<ConnectionLog>
+
+    @Query("""
+        SELECT appName, SUM(bytes) AS totalBytes, COUNT(*) AS entryCount
+        FROM connection_logs
+        GROUP BY appName
+        ORDER BY totalBytes DESC
+        LIMIT :limit
+    """)
+    suspend fun getTrafficByApp(limit: Int): List<AppTrafficAgg>
 
     @Query("SELECT * FROM connection_logs WHERE packageName = :pkg ORDER BY timestamp DESC LIMIT :limit")
     suspend fun getForApp(pkg: String, limit: Int): List<ConnectionLog>
@@ -122,7 +178,7 @@ interface ConnectionLogDao {
 
 @Database(
     entities = [AppRule::class, TrafficStat::class, ConnectionLog::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class RuleDatabase : RoomDatabase() {

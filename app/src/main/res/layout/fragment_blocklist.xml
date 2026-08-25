@@ -47,7 +47,8 @@
                 android:id="@+id/switchBlocklist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Toggle tracker blocking" />
+                android:contentDescription="Toggle tracker blocking"
+                android:saveEnabled="false" />
         </LinearLayout>
 
         <!-- DoH toggle -->
@@ -87,7 +88,8 @@
                 android:id="@+id/switchDoh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Toggle DNS over HTTPS" />
+                android:contentDescription="Toggle DNS over HTTPS"
+                android:saveEnabled="false" />
         </LinearLayout>
 
         <!-- DoH provider selector -->
@@ -169,7 +171,7 @@
                     android:text="0"
                     android:textColor="@color/accent_pink"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="monospace" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -195,7 +197,7 @@
                     android:text="0"
                     android:textColor="@color/accent_blue"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="monospace" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -221,7 +223,7 @@
                     android:text="0"
                     android:textColor="@color/accent_cyan"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="monospace" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

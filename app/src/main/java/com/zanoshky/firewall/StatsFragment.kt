@@ -69,11 +69,10 @@ class StatsFragment : Fragment() {
             val totalIn = prefs.getLong("total_bytes_in", 0) + FirewallVpnService.sessionBytesIn.get()
             val totalOut = prefs.getLong("total_bytes_out", 0) + FirewallVpnService.sessionBytesOut.get()
 
-            val totalBlocked = withContext(Dispatchers.IO) { logDao.getBlockedCount() }
-            val totalCount = withContext(Dispatchers.IO) { logDao.getCount() }
+            val (totalBlocked, totalCount, trafficAgg) = withContext(Dispatchers.IO) {
+                Triple(logDao.getBlockedCount(), logDao.getCount(), logDao.getTrafficByApp(50))
+            }
             val totalAllowed = totalCount - totalBlocked
-
-            val recentLogs = withContext(Dispatchers.IO) { logDao.getRecent(5000) }
 
             if (!isAdded) return@launch
             val v = view ?: return@launch
@@ -84,37 +83,26 @@ class StatsFragment : Fragment() {
             v.findViewById<TextView>(R.id.txtStatsAllowed).text = formatCount(totalAllowed)
             v.findViewById<TextView>(R.id.txtStatsTotal).text = formatCount(totalCount)
 
-            setupTrafficList(recentLogs)
+            setupTrafficList(trafficAgg)
         }
     }
 
-    private fun setupTrafficList(logs: List<ConnectionLog>) {
+    private fun setupTrafficList(aggregates: List<AppTrafficAgg>) {
         val ctx = context ?: return
         val pm = ctx.packageManager
 
-        data class Agg(var bytes: Long = 0, var count: Int = 0)
-        val map = HashMap<String, Agg>()
-        for (log in logs) {
-            val agg = map.getOrPut(log.appName) { Agg() }
-            agg.bytes += log.bytes
-            agg.count++
+        val items = aggregates.map { agg ->
+            val icon = try {
+                if (agg.appName.contains('.')) pm.getApplicationIcon(agg.appName) else null
+            } catch (_: PackageManager.NameNotFoundException) { null }
+            AppTrafficInfo(
+                packageName = agg.appName,
+                appName = "${agg.appName} (${agg.entryCount})",
+                icon = icon,
+                bytesIn = agg.totalBytes,
+                bytesOut = 0
+            )
         }
-
-        val items = map.entries
-            .sortedByDescending { it.value.bytes }
-            .take(50)
-            .map { (name, agg) ->
-                val icon = try {
-                    if (name.contains('.')) pm.getApplicationIcon(name) else null
-                } catch (_: PackageManager.NameNotFoundException) { null }
-                AppTrafficInfo(
-                    packageName = name,
-                    appName = "$name (${agg.count})",
-                    icon = icon,
-                    bytesIn = agg.bytes,
-                    bytesOut = 0
-                )
-            }
         trafficAdapter.submitList(items)
     }
 

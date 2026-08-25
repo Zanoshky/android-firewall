@@ -1,0 +1,7 @@
+Critical fix: rule changes (allowing/blocking apps) now take effect immediately without toggling the firewall off and on.
+
+Fixed: firewall automatically recovers if Android kills the service in the background. Previously the switch showed "Protected" while traffic was unprotected.
+
+New: App Lock with PIN protection, backup and restore, Quick Settings tile respects the lock.
+
+Fixed: screen rotation no longer re-locks the app. Restored settings no longer revert after backup restore.

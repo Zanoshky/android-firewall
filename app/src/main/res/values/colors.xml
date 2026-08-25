@@ -1,59 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 Light palette -->
-    <color name="bg_dark">#FFFBFBFE</color>
-    <color name="bg_card">#FFF3F3F6</color>
-    <color name="bg_card_elevated">#FFFFFFFF</color>
-    <color name="surface">#FFFFFFFF</color>
-    <color name="surface_variant">#FFE7E7EB</color>
-    <color name="on_surface">#FF1B1B1F</color>
-    <color name="outline">#FF79747E</color>
-    <color name="outline_variant">#FFCAC4D0</color>
+    <!-- Dark security-console palette. One cool gray family, one emerald accent. -->
+    <color name="bg_dark">#FF0C1116</color>
+    <color name="bg_card">#FF141A21</color>
+    <color name="bg_card_elevated">#FF18202A</color>
+    <color name="surface">#FF10161D</color>
+    <color name="surface_variant">#FF1C242E</color>
+    <color name="on_surface">#FFE6EBF1</color>
+    <color name="outline">#FF5A6673</color>
+    <color name="outline_variant">#FF232D38</color>
 
-    <!-- Primary -->
-    <color name="accent_blue">#FF4F46E5</color>
-    <color name="accent_blue_container">#FFE0E7FF</color>
+    <!-- Single accent: desaturated emerald -->
+    <color name="accent">#FF3ECF8E</color>
+    <color name="accent_container">#FF12291F</color>
+    <color name="accent_border">#FF275B45</color>
 
-    <!-- Secondary / success -->
-    <color name="accent_cyan">#FF059669</color>
-    <color name="accent_cyan_container">#FFD1FAE5</color>
+    <!-- Legacy aliases (accent) -->
+    <color name="accent_blue">#FF3ECF8E</color>
+    <color name="accent_blue_container">#FF12291F</color>
+    <color name="accent_cyan">#FF3ECF8E</color>
+    <color name="accent_cyan_container">#FF12291F</color>
 
-    <!-- Error / danger -->
-    <color name="accent_pink">#FFDC2626</color>
-    <color name="accent_pink_container">#FFFEE2E2</color>
-
-    <!-- Warning -->
-    <color name="accent_orange">#FFD97706</color>
-    <color name="accent_orange_container">#FFFEF3C7</color>
+    <!-- Status colors: muted red for blocked, muted amber for trackers -->
+    <color name="danger">#FFE06C75</color>
+    <color name="danger_container">#FF2A1A1D</color>
+    <color name="accent_pink">#FFE06C75</color>
+    <color name="accent_pink_container">#FF2A1A1D</color>
+    <color name="accent_orange">#FFD8A054</color>
+    <color name="accent_orange_container">#FF2A2114</color>
 
     <!-- Text -->
-    <color name="text_primary">#FF1B1B1F</color>
-    <color name="text_secondary">#FF49454F</color>
-    <color name="text_hint">#FF79747E</color>
+    <color name="text_primary">#FFE6EBF1</color>
+    <color name="text_secondary">#FF93A1B0</color>
+    <color name="text_hint">#FF5C6975</color>
 
     <!-- Toggles -->
-    <color name="toggle_on">#FF059669</color>
-    <color name="toggle_off">#FFE7E7EB</color>
+    <color name="toggle_on">#FF3ECF8E</color>
+    <color name="toggle_off">#FF1C242E</color>
 
     <!-- Divider -->
-    <color name="divider">#FFE7E7EB</color>
+    <color name="divider">#FF1E2833</color>
 
     <!-- Search -->
-    <color name="search_bg">#FFF3F3F6</color>
+    <color name="search_bg">#FF141A21</color>
 
     <!-- Status -->
-    <color name="status_active">#FF059669</color>
-    <color name="status_inactive">#FF79747E</color>
+    <color name="status_active">#FF3ECF8E</color>
+    <color name="status_inactive">#FF5C6975</color>
 
-    <!-- Charts -->
-    <color name="chart_download">#FF4F46E5</color>
-    <color name="chart_upload">#FF059669</color>
+    <!-- Charts: accent for download, desaturated blue-gray for upload -->
+    <color name="chart_download">#FF3ECF8E</color>
+    <color name="chart_upload">#FF7FA6C4</color>
 
-    <!-- Gradient for hero card -->
-    <color name="gradient_start">#FF4F46E5</color>
-    <color name="gradient_end">#FF7C3AED</color>
+    <!-- Hero card (active): same-hue dark emerald gradient, not a rainbow fade -->
+    <color name="gradient_start">#FF16382B</color>
+    <color name="gradient_end">#FF0E2119</color>
 
     <!-- Hero card text -->
-    <color name="hero_text">#FFFFFFFF</color>
-    <color name="hero_text_secondary">#CCE0E7FF</color>
+    <color name="hero_text">#FFE9F5EE</color>
+    <color name="hero_text_secondary">#FF8FB8A4</color>
 </resources>
