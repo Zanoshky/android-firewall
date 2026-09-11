@@ -2,16 +2,34 @@
 
 ## Prerequisites
 
-- Ruby 2.7+ (macOS ships with it)
-- Bundler: `gem install bundler`
 - A Google Play Developer account with the app already uploaded once manually
+- fastlane, installed one of the two ways below
 
 ## Install
 
+The `Gemfile.lock` here was written by Bundler 4, which needs a modern Ruby.
+macOS only ships Ruby 2.6, so `bundle install` fails on a clean Mac with
+`Could not find 'bundler' (4.0.19)` followed by `You must use Bundler 4 or
+greater with this lockfile`. Either install fastlane on its own, which brings
+its own Ruby:
+
 ```bash
-cd firewall
-bundle install
+brew install fastlane
+fastlane android screenshots      # note: no `bundle exec`
 ```
+
+Or install a current Ruby first and keep using the Gemfile:
+
+```bash
+brew install ruby
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"   # add to your shell profile
+gem install bundler
+bundle install
+bundle exec fastlane android screenshots
+```
+
+Either way the lane names below are the same. With the Homebrew fastlane, drop
+the `bundle exec` prefix from every command.
 
 ## Google Play API Setup
 
@@ -30,7 +48,7 @@ The credentials file is gitignored. Never commit it.
 ### Build
 
 ```bash
-bundle exec fastlane debug           # Debug APK
+bundle exec fastlane android debug           # Debug APK
 bundle exec fastlane build_release   # Signed release APK + AAB
 ```
 
