@@ -2,7 +2,7 @@
 
 All notable user-facing changes to Firewall.
 
-## Unreleased
+## 1.9 — September 2026
 
 ### Fixed
 

@@ -1,0 +1,7 @@
+Fixed: blocking or allowing an app no longer gets lost. Leaving the Apps tab or backgrounding the app right after a toggle could cancel the save, so the rule silently never applied.
+
+Fixed: reopening the app no longer restarts the tunnel.
+
+Fixed: all five community blocklists are listed now, not just the first, and per-app traffic shows every app instead of one.
+
+Fixed: the HaGeZi Light blocklist downloads again. Its address had moved.

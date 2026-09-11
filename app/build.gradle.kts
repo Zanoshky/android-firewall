@@ -11,8 +11,8 @@ android {
         applicationId = "com.zanoshky.firewall"
         minSdk = 23
         targetSdk = 36
-        versionCode = 8
-        versionName = "1.8"
+        versionCode = 9
+        versionName = "1.9"
     }
 
     signingConfigs {
