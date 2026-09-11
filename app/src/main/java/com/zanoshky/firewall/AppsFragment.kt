@@ -6,8 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -33,8 +31,6 @@ class AppsFragment : Fragment() {
     @Volatile private var allApps: List<AppInfo> = emptyList()
     private var currentFilter = 0
     private var searchQuery = ""
-    private val restartHandler = Handler(Looper.getMainLooper())
-    private var restartPending: Runnable? = null
 
     private val packageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -154,14 +150,12 @@ class AppsFragment : Fragment() {
         }
 
         // Persist all rules in one batch
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            dao.upsertAll(visible.map { AppRule(it.packageName, it.allowWifi, it.allowMobile) })
-        }
+        val ctx = context ?: return
+        RuleWriter.saveAll(ctx, dao, visible.map { AppRule(it.packageName, it.allowWifi, it.allowMobile) })
 
         // Refresh UI
         applyFilter()
         (activity as? MainActivity)?.updateCounts(allApps)
-        scheduleVpnRestart()
     }
 
     private fun getFilteredApps(): List<AppInfo> {
@@ -185,23 +179,10 @@ class AppsFragment : Fragment() {
     }
 
     private fun saveRule(app: AppInfo) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            dao.upsert(AppRule(app.packageName, app.allowWifi, app.allowMobile))
-        }
+        val ctx = context ?: return
+        // Writing and rebuilding both outlive this view; see RuleWriter.
+        RuleWriter.save(ctx, dao, AppRule(app.packageName, app.allowWifi, app.allowMobile))
         (activity as? MainActivity)?.updateCounts(allApps)
-        scheduleVpnRestart()
-    }
-
-    /**
-     * Restart the tunnel so rule changes take effect. Uses the application context
-     * and survives view destruction — cancelling this on lifecycle events would leave
-     * a newly-blocked app in the tunnel's bypass list with full network access.
-     */
-    private fun scheduleVpnRestart() {
-        val appCtx = context?.applicationContext ?: return
-        restartPending?.let { restartHandler.removeCallbacks(it) }
-        restartPending = Runnable { TunnelControl.requestRebuild(appCtx) }
-        restartHandler.postDelayed(restartPending!!, 500)
     }
 
     override fun onDestroyView() {

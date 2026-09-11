@@ -2,9 +2,9 @@
   {
     "id": "hagezi_light",
     "name": "HaGeZi Light",
-    "description": "Curated list blocking ads, tracking and metrics. Low false positives. ~140K domains.",
-    "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt",
-    "format": "hosts"
+    "description": "Curated list blocking ads, tracking and metrics. Low false positives. ~35K domains.",
+    "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/light.txt",
+    "format": "adblock"
   },
   {
     "id": "oisd_small",

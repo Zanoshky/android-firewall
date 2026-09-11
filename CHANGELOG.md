@@ -2,6 +2,15 @@
 
 All notable user-facing changes to Firewall.
 
+## Unreleased
+
+### Fixed
+
+- **Blocking or allowing an app is never lost again.** The rule was written on the screen's own coroutine scope, so leaving the Apps tab, rotating, or backgrounding the app right after a toggle cancelled the write. The tunnel then rebuilt from the old rules and the change silently did not apply. The write now runs for the lifetime of the process, and the rebuild is sequenced after it instead of racing it on a timer.
+- **Resuming the app no longer restarts or stops the tunnel.** Correcting the switch from code fired its own listener, which was indistinguishable from a tap.
+- **All five community blocklists are listed.** The lists sat in a plain `ScrollView`, which lays out only the first row of a `RecyclerView`, so only the first source was ever shown. The same bug hid every per-app row but one on the Stats tab, and the custom and whitelisted domain lists.
+- **The HaGeZi Light download works again.** Its `hosts/` path no longer exists upstream; the source now points at the maintained `adblock/` list, and its domain count in the description matches what is actually downloaded.
+
 ## 1.8 — August 2026
 
 ### Fixed

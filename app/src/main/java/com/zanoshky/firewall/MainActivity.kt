@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtTotalTraffic: TextView
     private lateinit var switchFirewall: MaterialSwitch
 
+    /** True while the code is correcting the switch, so its listener stays quiet. */
+    private var syncingSwitch = false
+
     private lateinit var lockOverlay: View
     private lateinit var editLockPin: EditText
     private lateinit var txtLockError: TextView
@@ -113,6 +116,9 @@ class MainActivity : AppCompatActivity() {
         updateStatusUI(switchFirewall.isChecked)
 
         switchFirewall.setOnCheckedChangeListener { _, isChecked ->
+            // Programmatic corrections must not be mistaken for a tap, or resuming
+            // the activity would start or stop the tunnel all over again.
+            if (syncingSwitch) return@setOnCheckedChangeListener
             prefs.edit().putBoolean("enabled", isChecked).apply()
             updateStatusUI(isChecked)
             if (isChecked) startFirewall() else stopFirewall()
@@ -170,11 +176,16 @@ class MainActivity : AppCompatActivity() {
             launchVpnService()
         }
 
-        // Avoid re-firing the listener by only setting when different.
-        if (switchFirewall.isChecked != wantEnabled) {
-            switchFirewall.isChecked = wantEnabled
-        }
+        setSwitchSilently(wantEnabled)
         updateStatusUI(wantEnabled)
+    }
+
+    /** Move the switch to [checked] without the listener treating it as a tap. */
+    private fun setSwitchSilently(checked: Boolean) {
+        if (switchFirewall.isChecked == checked) return
+        syncingSwitch = true
+        switchFirewall.isChecked = checked
+        syncingSwitch = false
     }
 
     override fun onDestroy() {
@@ -373,7 +384,7 @@ class MainActivity : AppCompatActivity() {
                 // User denied VPN consent. Roll back the pref and switch.
                 val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
                 prefs.edit().putBoolean("enabled", false).apply()
-                switchFirewall.isChecked = false
+                setSwitchSilently(false)
                 updateStatusUI(false)
             }
         }
