@@ -144,8 +144,10 @@ class MainActivity : AppCompatActivity() {
         RuleStore.ensureLoaded(this)
         lifecycleScope.launch {
             installedApps = withContext(Dispatchers.IO) {
-                try { packageManager.getInstalledApplications(0).count { it.uid > 1000 } }
-                catch (_: Exception) { 0 }
+                try {
+                    packageManager.getInstalledApplications(0)
+                        .count { it.uid > 1000 && it.packageName != packageName }
+                } catch (_: Exception) { 0 }
             }
         }
         startLiveUpdates()

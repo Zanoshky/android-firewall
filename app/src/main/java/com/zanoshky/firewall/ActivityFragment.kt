@@ -155,7 +155,8 @@ class ActivityFragment : Fragment() {
             if (installedCount == 0) {
                 installedCount = withContext(Dispatchers.IO) {
                     try {
-                        ctx.packageManager.getInstalledApplications(0).count { it.uid > 1000 }
+                        ctx.packageManager.getInstalledApplications(0)
+                            .count { it.uid > 1000 && it.packageName != ctx.packageName }
                     } catch (_: Exception) { 0 }
                 }
             }
