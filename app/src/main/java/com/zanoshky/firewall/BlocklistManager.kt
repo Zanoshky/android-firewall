@@ -19,24 +19,27 @@ data class BlocklistSource(
     val format: String
 )
 
+/**
+ * The tracker and ad lists: one bundled with the app and any the user downloads.
+ *
+ * This object owns only the lists that come from somewhere else. The user's own
+ * block and allow rules live in [DomainRules] and are consulted first, so an
+ * allow rule can lift a domain out of a list of a hundred thousand names without
+ * that list having to be rewritten.
+ */
 object BlocklistManager {
 
     private const val PREFS_NAME = "blocklist_prefs"
     private const val KEY_ENABLED = "blocklist_enabled"
-    private const val KEY_CUSTOM_DOMAINS = "custom_blocked_domains"
-    private const val KEY_WHITELISTED = "whitelisted_domains"
     private const val DOWNLOADED_DIR = "blocklists"
 
-    // Thread-safe domain set - swapped atomically, read by VPN thread
-    @Volatile
-    private var activeDomains: Set<String> = emptySet()
+    /** Swapped whole, so the tunnel thread sees either the old set or the new one. */
+    @Volatile private var activeDomains: Set<String> = emptySet()
 
-    @Volatile
-    var isEnabled: Boolean = false
+    @Volatile var isEnabled: Boolean = false
         private set
 
-    @Volatile
-    var isLoading: Boolean = false
+    @Volatile var isLoading: Boolean = false
         private set
 
     private fun prefs(context: Context): SharedPreferences =
@@ -44,153 +47,69 @@ object BlocklistManager {
 
     fun init(context: Context) {
         isEnabled = prefs(context).getBoolean(KEY_ENABLED, false)
-        // Don't load on main thread - will be loaded on first VPN start or via suspend
     }
 
-    /** Call from coroutine only */
     suspend fun setEnabledAsync(context: Context, enabled: Boolean) {
         isEnabled = enabled
         prefs(context).edit().putBoolean(KEY_ENABLED, enabled).apply()
-        if (enabled) {
-            loadAllDomainsAsync(context)
-        } else {
-            activeDomains = emptySet()
-        }
+        if (enabled) loadDomains(context) else activeDomains = emptySet()
     }
 
+    /** True when [domain] or any parent of it is on one of the loaded lists. */
     fun isDomainBlocked(domain: String): Boolean {
         if (!isEnabled) return false
-        val domains = activeDomains // local snapshot
+        val domains = activeDomains
         if (domains.isEmpty()) return false
-        var d = domain.lowercase()
-        while (d.contains('.')) {
+        var d = domain
+        while (true) {
             if (domains.contains(d)) return true
-            d = d.substringAfter('.')
-        }
-        return false
-    }
-
-    /** Async loading - safe to call from any coroutine */
-    suspend fun loadAllDomainsAsync(context: Context) = withContext(Dispatchers.IO) {
-        isLoading = true
-        try {
-            val domains = HashSet<String>()
-
-            try {
-                context.assets.open("blocklist_default.txt").bufferedReader().useLines { lines ->
-                    lines.forEach { line -> parseDomainLine(line)?.let { domains.add(it) } }
-                }
-            } catch (_: Exception) {}
-
-            val dir = File(context.filesDir, DOWNLOADED_DIR)
-            if (dir.exists()) {
-                dir.listFiles()?.forEach { file ->
-                    try {
-                        file.bufferedReader().useLines { lines ->
-                            lines.forEach { line -> parseDomainLine(line)?.let { domains.add(it) } }
-                        }
-                    } catch (_: Exception) {}
-                }
-            }
-
-            getCustomDomains(context).forEach { domains.add(it.lowercase()) }
-            getWhitelistedDomains(context).forEach { domains.remove(it.lowercase()) }
-
-            // Atomic swap - VPN thread sees either old or new set, never empty
-            activeDomains = domains
-        } finally {
-            isLoading = false
-        }
-    }
-
-    suspend fun reloadAsync(context: Context) {
-        if (isEnabled) loadAllDomainsAsync(context)
-    }
-
-    /** Sync reload for VPN service (already on IO thread) */
-    fun reloadSync(context: Context) {
-        if (!isEnabled) return
-        isLoading = true
-        try {
-            val domains = HashSet<String>()
-
-            try {
-                context.assets.open("blocklist_default.txt").bufferedReader().useLines { lines ->
-                    lines.forEach { line -> parseDomainLine(line)?.let { domains.add(it) } }
-                }
-            } catch (_: Exception) {}
-
-            val dir = File(context.filesDir, DOWNLOADED_DIR)
-            if (dir.exists()) {
-                dir.listFiles()?.forEach { file ->
-                    try {
-                        file.bufferedReader().useLines { lines ->
-                            lines.forEach { line -> parseDomainLine(line)?.let { domains.add(it) } }
-                        }
-                    } catch (_: Exception) {}
-                }
-            }
-
-            getCustomDomains(context).forEach { domains.add(it.lowercase()) }
-            getWhitelistedDomains(context).forEach { domains.remove(it.lowercase()) }
-
-            activeDomains = domains
-        } finally {
-            isLoading = false
+            val dot = d.indexOf('.')
+            if (dot < 0) return false
+            d = d.substring(dot + 1)
+            if (!d.contains('.')) return false
         }
     }
 
     fun getActiveCount(): Int = activeDomains.size
 
-    // --- Custom domains ---
-
-    fun getCustomDomains(context: Context): List<String> {
-        val raw = prefs(context).getString(KEY_CUSTOM_DOMAINS, "") ?: ""
-        return if (raw.isEmpty()) emptyList() else raw.split("\n").filter { it.isNotBlank() }
+    suspend fun reloadAsync(context: Context) {
+        if (isEnabled) loadDomains(context)
     }
 
-    fun addCustomDomain(context: Context, domain: String) {
-        val current = getCustomDomains(context).toMutableList()
-        val d = domain.lowercase().trim()
-        if (d.isNotEmpty() && d !in current) {
-            current.add(d)
-            prefs(context).edit().putString(KEY_CUSTOM_DOMAINS, current.joinToString("\n")).apply()
-            // Copy-on-write update
-            activeDomains = HashSet(activeDomains).apply { add(d) }
+    /** For the service, which is already on a background thread. */
+    fun reloadSync(context: Context) {
+        if (!isEnabled) return
+        readAll(context)
+    }
+
+    private suspend fun loadDomains(context: Context) = withContext(Dispatchers.IO) {
+        readAll(context)
+    }
+
+    private fun readAll(context: Context) {
+        isLoading = true
+        try {
+            val domains = HashSet<String>()
+            try {
+                context.assets.open("blocklist_default.txt").bufferedReader().useLines { lines ->
+                    lines.forEach { line -> parseDomainLine(line)?.let { domains.add(it) } }
+                }
+            } catch (_: Exception) {}
+
+            val dir = File(context.filesDir, DOWNLOADED_DIR)
+            if (dir.exists()) {
+                dir.listFiles()?.forEach { file ->
+                    try {
+                        file.bufferedReader().useLines { lines ->
+                            lines.forEach { line -> parseDomainLine(line)?.let { domains.add(it) } }
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
+            activeDomains = domains
+        } finally {
+            isLoading = false
         }
-    }
-
-    fun removeCustomDomain(context: Context, domain: String) {
-        val current = getCustomDomains(context).toMutableList()
-        val d = domain.lowercase().trim()
-        current.remove(d)
-        prefs(context).edit().putString(KEY_CUSTOM_DOMAINS, current.joinToString("\n")).apply()
-        activeDomains = HashSet(activeDomains).apply { remove(d) }
-    }
-
-    // --- Whitelist ---
-
-    fun getWhitelistedDomains(context: Context): List<String> {
-        val raw = prefs(context).getString(KEY_WHITELISTED, "") ?: ""
-        return if (raw.isEmpty()) emptyList() else raw.split("\n").filter { it.isNotBlank() }
-    }
-
-    suspend fun addWhitelistedDomain(context: Context, domain: String) {
-        val current = getWhitelistedDomains(context).toMutableList()
-        val d = domain.lowercase().trim()
-        if (d.isNotEmpty() && d !in current) {
-            current.add(d)
-            prefs(context).edit().putString(KEY_WHITELISTED, current.joinToString("\n")).apply()
-            activeDomains = HashSet(activeDomains).apply { remove(d) }
-        }
-    }
-
-    suspend fun removeWhitelistedDomain(context: Context, domain: String) {
-        val current = getWhitelistedDomains(context).toMutableList()
-        val d = domain.lowercase().trim()
-        current.remove(d)
-        prefs(context).edit().putString(KEY_WHITELISTED, current.joinToString("\n")).apply()
-        reloadAsync(context)
     }
 
     // --- Remote sources ---
@@ -212,10 +131,8 @@ object BlocklistManager {
         } catch (_: Exception) { emptyList() }
     }
 
-    fun isSourceDownloaded(context: Context, sourceId: String): Boolean {
-        val file = File(context.filesDir, "$DOWNLOADED_DIR/$sourceId.txt")
-        return file.exists()
-    }
+    fun isSourceDownloaded(context: Context, sourceId: String): Boolean =
+        File(context.filesDir, "$DOWNLOADED_DIR/$sourceId.txt").exists()
 
     suspend fun getDownloadedSourceCount(context: Context, sourceId: String): Int =
         withContext(Dispatchers.IO) {
@@ -232,7 +149,7 @@ object BlocklistManager {
                 conn.connectTimeout = 15000
                 conn.readTimeout = 120000
                 conn.requestMethod = "GET"
-                conn.setRequestProperty("User-Agent", "Firewall/1.4 Android")
+                conn.setRequestProperty("User-Agent", "Firewall Android")
 
                 if (conn.responseCode != 200) {
                     conn.disconnect()
@@ -249,7 +166,6 @@ object BlocklistManager {
                     BufferedReader(InputStreamReader(conn.inputStream)).useLines { lines ->
                         lines.forEach { line ->
                             val domain = when (source.format) {
-                                "hosts" -> parseHostsLine(line)
                                 "adblock" -> parseAdblockLine(line)
                                 else -> parseDomainLine(line)
                             }
@@ -290,25 +206,20 @@ object BlocklistManager {
         } else null
     }
 
-    private fun parseHostsLine(line: String): String? = parseDomainLine(line)
-
     private fun parseAdblockLine(line: String): String? {
         val trimmed = line.trim()
         if (trimmed.startsWith('!') || trimmed.startsWith('[') || trimmed.isEmpty()) return null
-        if (trimmed.startsWith("||")) {
-            // Strip || prefix, then take everything before ^ or $ (modifiers)
-            val raw = trimmed.removePrefix("||")
-            val caretIdx = raw.indexOf('^')
-            val dollarIdx = raw.indexOf('$')
-            val endIdx = when {
-                caretIdx >= 0 && dollarIdx >= 0 -> minOf(caretIdx, dollarIdx)
-                caretIdx >= 0 -> caretIdx
-                dollarIdx >= 0 -> dollarIdx
-                else -> raw.length
-            }
-            val domain = raw.substring(0, endIdx).lowercase()
-            return if (domain.contains('.') && !domain.contains('/') && !domain.contains('*') && domain.isNotEmpty()) domain else null
+        if (!trimmed.startsWith("||")) return null
+        val raw = trimmed.removePrefix("||")
+        val caret = raw.indexOf('^')
+        val dollar = raw.indexOf('$')
+        val end = when {
+            caret >= 0 && dollar >= 0 -> minOf(caret, dollar)
+            caret >= 0 -> caret
+            dollar >= 0 -> dollar
+            else -> raw.length
         }
-        return null
+        val domain = raw.substring(0, end).lowercase()
+        return if (domain.contains('.') && !domain.contains('/') && !domain.contains('*')) domain else null
     }
 }

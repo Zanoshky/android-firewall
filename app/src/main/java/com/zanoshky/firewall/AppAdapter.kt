@@ -1,9 +1,9 @@
 package com.zanoshky.firewall
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -11,8 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 class AppAdapter(
-    private val onToggleWifi: (AppInfo) -> Unit,
-    private val onToggleMobile: (AppInfo) -> Unit
+    private val onModeChanged: (AppInfo, Int) -> Unit
 ) : RecyclerView.Adapter<AppAdapter.ViewHolder>() {
 
     private var apps: List<AppInfo> = emptyList()
@@ -25,19 +24,30 @@ class AppAdapter(
             override fun areItemsTheSame(old: Int, new: Int) =
                 oldList[old].packageName == list[new].packageName
             override fun areContentsTheSame(old: Int, new: Int) =
-                oldList[old].allowWifi == list[new].allowWifi &&
-                oldList[old].allowMobile == list[new].allowMobile &&
-                oldList[old].blockedRequests == list[new].blockedRequests
+                oldList[old].mode == list[new].mode &&
+                    oldList[old].lookups == list[new].lookups &&
+                    oldList[old].blocked == list[new].blocked
         })
         apps = list
         diff.dispatchUpdatesTo(this)
     }
 
+    /**
+     * Repaint every row. A bulk change mutates the same AppInfo objects the
+     * adapter is already holding, so a diff against them finds nothing to do.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    fun refreshAll() {
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount() = apps.size
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_app, parent, false)
         return ViewHolder(view)
     }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(apps[position])
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -46,14 +56,11 @@ class AppAdapter(
         private val txtPackage: TextView = view.findViewById(R.id.txtPackage)
         private val txtSystemBadge: TextView = view.findViewById(R.id.txtSystemBadge)
         private val txtAppStats: TextView = view.findViewById(R.id.txtAppStats)
-        private val btnWifi: FrameLayout = view.findViewById(R.id.btnWifi)
-        private val txtWifi: TextView = view.findViewById(R.id.txtWifi)
-        private val btnMobile: FrameLayout = view.findViewById(R.id.btnMobile)
-        private val txtMobile: TextView = view.findViewById(R.id.txtMobile)
+        private val btnBypass: TextView = view.findViewById(R.id.btnBypass)
+        private val btnFiltered: TextView = view.findViewById(R.id.btnFiltered)
+        private val btnBlocked: TextView = view.findViewById(R.id.btnBlocked)
 
         private val ctx = view.context
-        private val colorOn = ContextCompat.getColor(ctx, R.color.toggle_on)
-        private val colorOff = ContextCompat.getColor(ctx, R.color.text_hint)
 
         fun bind(app: AppInfo) {
             imgIcon.setImageDrawable(app.icon)
@@ -61,39 +68,44 @@ class AppAdapter(
             txtPackage.text = app.packageName
             txtSystemBadge.visibility = if (app.isSystem) View.VISIBLE else View.GONE
 
-            val totalReqs = app.blockedRequests + app.allowedRequests
-            if (totalReqs > 0) {
+            if (app.lookups > 0) {
                 txtAppStats.visibility = View.VISIBLE
-                txtAppStats.text = "${formatCount(app.blockedRequests)} blocked - ${formatCount(app.allowedRequests)} allowed"
+                txtAppStats.text = "${app.lookups} lookups, ${app.blocked} blocked"
             } else {
                 txtAppStats.visibility = View.GONE
             }
 
-            updateToggle(btnWifi, txtWifi, app.allowWifi)
-            updateToggle(btnMobile, txtMobile, app.allowMobile)
+            paint(app.mode)
 
-            btnWifi.setOnClickListener {
-                app.allowWifi = !app.allowWifi
-                updateToggle(btnWifi, txtWifi, app.allowWifi)
-                onToggleWifi(app)
-            }
-            btnMobile.setOnClickListener {
-                app.allowMobile = !app.allowMobile
-                updateToggle(btnMobile, txtMobile, app.allowMobile)
-                onToggleMobile(app)
+            btnBypass.setOnClickListener { choose(app, AppMode.BYPASS) }
+            btnFiltered.setOnClickListener { choose(app, AppMode.FILTERED) }
+            btnBlocked.setOnClickListener { choose(app, AppMode.BLOCKED) }
+        }
+
+        private fun choose(app: AppInfo, mode: Int) {
+            if (app.mode == mode) return
+            app.mode = mode
+            paint(mode)
+            onModeChanged(app, mode)
+        }
+
+        private fun paint(mode: Int) {
+            style(btnBypass, mode == AppMode.BYPASS, R.drawable.bg_segment_bypass, R.color.mode_bypass)
+            style(btnFiltered, mode == AppMode.FILTERED, R.drawable.bg_segment_filtered, R.color.accent)
+            style(btnBlocked, mode == AppMode.BLOCKED, R.drawable.bg_segment_blocked, R.color.danger)
+
+            itemView.contentDescription = when (mode) {
+                AppMode.BYPASS -> "Bypass, not filtered"
+                AppMode.FILTERED -> "Filtered through the firewall"
+                else -> "Blocked"
             }
         }
 
-        private fun formatCount(n: Long): String = when {
-            n >= 1_000_000 -> String.format("%.1fM", n / 1_000_000.0)
-            n >= 1_000 -> String.format("%.1fK", n / 1_000.0)
-            else -> n.toString()
-        }
-
-        private fun updateToggle(btn: FrameLayout, txt: TextView, allowed: Boolean) {
-            btn.setBackgroundResource(if (allowed) R.drawable.bg_toggle_on else R.drawable.bg_toggle_off)
-            txt.setTextColor(if (allowed) colorOn else colorOff)
-            btn.contentDescription = if (allowed) "Allowed – tap to block" else "Blocked – tap to allow"
+        private fun style(button: TextView, active: Boolean, background: Int, colour: Int) {
+            button.setBackgroundResource(if (active) background else R.drawable.bg_segment_off)
+            button.setTextColor(
+                ContextCompat.getColor(ctx, if (active) colour else R.color.text_hint)
+            )
         }
     }
 }

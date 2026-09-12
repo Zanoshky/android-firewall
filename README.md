@@ -1,158 +1,140 @@
 # Firewall
 
-A no-root Android firewall with tracker blocking, DNS-over-HTTPS, and connection logging. You choose which apps get online - and which trackers get shut down.
+A firewall for Android that needs no root, with tracker blocking, DNS over HTTPS, and a log of everything your phone looks up. You decide, app by app, what the firewall does with it.
 
 No ads. No tracking. No analytics. No data collection. No external servers. Everything runs locally on your device.
 
 ## How it works
 
-Firewall creates a local VPN on your device. All network traffic routes through it. Apps you have not whitelisted hit a dead end - their packets go nowhere. Apps you allow bypass the VPN and connect normally.
+Firewall runs a local VPN, but it does not carry your traffic. The tunnel claims one small, reserved range of addresses: its own resolver, the sinkhole that blocked names point at, and the handful of public resolvers that apps reach for directly. Your photos, your video and your downloads never enter the app at all. They leave the phone over the real network at full speed.
 
-On top of that, the firewall intercepts DNS queries to block known trackers, ad networks, and fingerprinting services. With DNS-over-HTTPS enabled, your DNS lookups are encrypted so your ISP cannot see what domains you are visiting.
+What does come through the tunnel is every name your phone looks up. That is the point where a firewall can actually decide something, and it is cheap: lookups are small and rare, so there is nothing keeping the CPU awake and nothing to slow a download down.
 
-The VPN is entirely local. No traffic leaves your device through a remote server. Blocked traffic is dropped on-device, and blocked tracker domains receive an instant NXDOMAIN response without ever reaching the internet.
+A name that is blocked is answered with an address that goes nowhere, and the connection that follows is refused on the spot. A name that is allowed is resolved for real, encrypted if you asked for that.
+
+## How each app is handled
+
+Every app is in one of three modes, and the Apps tab says which:
+
+- **Bypass**: outside the tunnel. Untouched, unfiltered, costs nothing. For an app that has to use the network's own resolver, or that you simply do not want the firewall near.
+- **Filtered**: inside the tunnel. Its lookups go through the firewall, so encryption, tracker blocking and your domain rules all apply to it. This is the mode that makes blocking a website actually work in your browser.
+- **Blocked**: inside the tunnel and given no working addresses at all, so it cannot open anything new.
+
+Changes take effect on the app's very next lookup. There is no waiting and no restarting the firewall.
+
+Two things worth knowing. An app that is already running can hold on to connections it opened before you changed the rule, so close it fully and reopen it. And blocking works by refusing names: an app with an address written into its code can still try that one address.
+
+The old Wi-Fi and mobile toggles are gone. They said nothing about what happened to the traffic, and an app you allowed was excluded from the tunnel entirely, which is why blocking a domain never did anything to it.
 
 ## Features
 
-### Per-App Firewall
+### Domain rules
 
-- All apps are blocked by default - whitelist only what you trust
-- Separate Wi-Fi and mobile data toggles for each app
-- Block system apps and OEM bloatware (MIUI, Samsung, Huawei, etc.)
-- Filter apps by All, User, or System with a search bar
-- Bulk "Allow All" and "Block All" buttons for the current filtered view
-- Rule changes are picked up by the firewall automatically within a second
+Your own block list and allow list for ordinary websites, kept apart from the downloaded tracker lists.
 
-**Important - restart the app you are blocking or unblocking.** Rule changes apply to *new* connections. An app that is already running may hold on to connections it opened earlier, and Android caches its network state. To block an app reliably, fully close it first (swipe it away from recents, or use Force Stop in system settings), then flip the toggle. The same applies in reverse: after unblocking an app, close and reopen it so it picks up its restored internet access.
+- A rule covers the domain and everything under it, so blocking `google.com` also blocks `www.google.com` and `mail.google.com`
+- The more specific rule wins, so you can block a domain and allow one name inside it
+- The allow list is also how you undo a tracker list that got something wrong
+- Paste a full URL if that is easier; it is reduced to the host name
+- Rules apply at once, to every app set to Filtered
 
-### Tracker and Ad Blocking
+### Tracker and ad blocking
 
-The firewall intercepts every DNS query and checks it against a blocklist of known tracker, ad, and fingerprinting domains. Matched domains are instantly blocked with an NXDOMAIN response - the request never reaches the internet.
+Every lookup is checked against a list of known tracker, ad and fingerprinting domains.
 
-- Bundled default blocklist with 130+ domains, active out of the box
-- Download community blocklists from trusted sources:
-  - HaGeZi Light (~140K domains)
-  - OISD Small (~57K domains)
-  - 1Hosts Lite (~195K domains)
-  - Steven Black Unified (~170K domains)
-  - AdGuard DNS Filter (~166K domains)
-- Add your own custom blocked domains
-- Whitelist specific domains to prevent false positives
-- Toggle tracker blocking on or off independently from the firewall
-- Running count of total trackers blocked and domains loaded
+- Bundled default list, active out of the box
+- Optional community lists: HaGeZi Light, OISD Small, 1Hosts Lite, Steven Black Unified, AdGuard DNS Filter
+- Downloaded once and kept on the phone
+- Can be turned off without turning the firewall off
 
-### DNS over HTTPS (DoH)
+### DNS over HTTPS
 
-When enabled, all DNS queries from your device are encrypted and sent to a trusted DNS provider over HTTPS instead of plain text. This prevents your ISP, network operator, or anyone on the same Wi-Fi from seeing which websites you visit.
+With this on, lookups are encrypted and sent to a provider of your choice instead of travelling in plain text, so your network operator and anyone else on the same Wi-Fi cannot read which sites you open.
 
-- Three providers to choose from: Cloudflare, Google, or Quad9
-- Switch providers with a single tap
-- Toggle DoH on or off independently from the firewall and tracker blocking
-- Running count of total DoH queries resolved
-- Works alongside tracker blocking - blocked domains are caught before the DoH query is sent
+- Cloudflare, Google or Quad9
+- Falls back to the network's own resolver if the encrypted path fails, rather than leaving you with no answer
+- Works alongside tracker blocking: a blocked name is stopped before any query is sent
 
-### Auto-Start on Boot
+Apps that do their own DNS over HTTPS, and Android's own Private DNS setting, both take lookups away from the firewall. Turn Private DNS off under Network and internet if you want filtering to cover everything; the app tells you on the Activity tab when it is on.
 
-The firewall automatically restarts when your phone reboots, so you are always protected without needing to open the app. This works even before you unlock your device (direct boot aware). The firewall also restarts automatically after an app update.
+### Activity
 
-For this to work reliably, disable battery optimization for the Firewall app in your device settings (Settings > Battery > Battery Optimization > Firewall > Don't Optimize).
+Stats and log in one place, because the numbers and the entries behind them belong on the same screen.
 
-### Quick Settings Tile
+- Lookups seen, how many were stopped, and what share of them were encrypted
+- Which did the stopping: tracker lists, your own rules, or a blocked app
+- A bar per hour for the last day, green for let through and red for stopped
+- Where your apps stand: filtered, bypassed, blocked, and how long protection has been on
+- The names blocked most often
+- The full log, filterable by app, domain or address, with chips for Blocked, Allowed and Trackers
+- Tap an entry to block that domain, or to always allow it
+- Export to CSV
 
-Toggle the firewall on or off directly from your notification shade without opening the app. Pull down your quick settings panel, tap "Edit", and add the Firewall tile. When App Lock is enabled, turning protection off from the tile opens the app for PIN entry.
+### Starting on boot
+
+The firewall restarts when your phone reboots, before you unlock it, and after an app update. For this to be reliable, exclude Firewall from battery optimisation in your device settings.
+
+### Quick settings tile
+
+Toggle the firewall from the notification shade. With App Lock on, turning protection off from the tile opens the app for the passcode.
 
 ### App Lock
 
-Require a PIN (4-8 digits) before the app can be opened. Protects your rules from being changed by someone with physical access to your device.
+Ask for a passcode before the app opens, so your rules cannot be changed by someone holding your phone.
 
-- PIN is hashed with PBKDF2 - never stored in plain text
-- Brute-force lockout after 5 wrong attempts (30 second cooldown)
-- Lock engages whenever the app leaves the foreground
-- No recovery mechanism - if you forget your PIN, you must reinstall
+- Letters, digits and symbols, four characters or more
+- Hashed with PBKDF2, never stored as text
+- Locked out for 30 seconds after five wrong tries
+- Locks again whenever the app leaves the foreground
+- No recovery: forget it and you have to reinstall
 
-### Backup and Restore
+### Backup and restore
 
-Export all your settings to a single JSON file and restore them on the same or a different device.
+Export everything you configured to a single JSON file and restore it here or on another phone.
 
-- Exports: per-app rules, custom blocked domains, whitelisted domains, blocklist sources, tracker blocking and DoH settings
-- Does not export: PIN, logs, traffic stats
-- Restore replaces all current rules and re-downloads blocklists
-- Plain JSON, no encryption - store it somewhere safe
+- Included: how each app is handled, your domain rules, which tracker lists you downloaded, and your tracker and encryption settings
+- Not included: your passcode, your activity and your counters
+- Restore replaces rather than merges, and fetches the tracker lists again
+- Plain JSON, no encryption, so keep it somewhere safe
 
-### Connection Logs
-
-- Real-time log of every connection attempt passing through the VPN
-- Each entry shows the originating app (Android 10+), destination IP, port, protocol, domain name, and packet size
-- Color-coded entries: green for allowed, red for blocked, orange for tracker-blocked
-- One-tap filter chips: All, Blocked, Allowed, Trackers
-- Search by app name, IP address, or domain
-- Export logs to a CSV file and share it anywhere - useful for spotting data leaks
-- Auto-refreshes every 3 seconds
-- Logs older than 7 days are automatically pruned
-
-### Traffic Stats
-
-- Global download and upload byte totals
-- Total blocked, allowed, and overall connection counts
-- Top apps ranked by traffic volume
-- Per-app connection count breakdown
-- All stats auto-refresh every 5 seconds
-- Session uptime displayed on the main screen
-
-### Dashboard
-
-The main screen shows a status card with:
-
-- Firewall on/off toggle
-- Protection status (Protected / Inactive)
-- Session uptime
-- Blocked and allowed app counts
-- Total apps monitored
-- Total connections processed
-- Download and upload totals
-
-## Getting Started
+## Getting started
 
 1. Install the app
-2. Tap the toggle on the main screen to enable the firewall
-3. Android will ask you to approve the VPN connection - tap OK
-4. Go to the Apps tab and allow the apps you want to have internet access
-5. Go to the Trackers tab to enable tracker blocking and optionally enable DoH
-
-The firewall is now running. All apps not explicitly allowed are blocked.
-
-Tip: when you block or unblock an app that is currently running, close it fully and reopen it - running apps can keep using connections they opened before the rule changed.
+2. Tap the switch on the main screen and approve the VPN prompt
+3. Open the Apps tab and choose how each app is handled. "Filter all" is a good starting point, then move anything that misbehaves to Bypass
+4. Open the Trackers tab to turn on tracker blocking and encrypted lookups
+5. Open the Domains tab to block anything you want gone
 
 ## Permissions
 
 | Permission | Why |
 |---|---|
-| VPN Service | Creates a local VPN to filter traffic and intercept DNS. Nothing leaves your device through a remote server. |
-| Query All Packages | Lists all installed apps so you can control each one individually. |
-| Internet | Required for the VPN tunnel, DoH queries, and blocklist downloads. |
-| Boot Completed | Restarts the firewall after reboot if it was enabled. |
-| Foreground Service | Keeps the firewall running reliably in the background. |
-| Notifications | Shows a status notification when the firewall is active (required on Android 13+). |
+| VPN Service | Runs the local tunnel that carries lookups. No traffic leaves your device through a remote server. |
+| Query All Packages | Lists your installed apps so each one can be handled separately. |
+| Internet | The tunnel, encrypted lookups, and tracker list downloads. |
+| Boot Completed | Restarts the firewall after a reboot if it was on. |
+| Foreground Service | Keeps the firewall running. |
+| Notifications | The status notification while the firewall is active, required on Android 13 and newer. |
 
 ## Privacy
 
-This app collects zero data. There are no analytics, no crash reporting, no telemetry, and no network calls to external servers. The only outbound connections the app makes are:
+This app collects nothing. No analytics, no crash reporting, no telemetry. The only outbound connections it makes are:
 
-- DoH queries to your chosen DNS provider (Cloudflare, Google, or Quad9), only when you enable DoH
-- Blocklist downloads from GitHub, only when you tap download on a source
+- Encrypted lookups to the provider you chose, and only when you turn that on
+- Tracker list downloads from GitHub, and only when you tap download
 
-Your firewall rules, connection logs, traffic stats, and blocklist data are stored in a local database on your device and never leave it.
+Your rules and your activity are stored on the device and never leave it.
 
 ## Compatibility
 
-- Android 6.0 (Marshmallow) through Android 16
-- No root required
-- Works on all devices including Samsung, Xiaomi, Huawei, Pixel, OnePlus, etc.
+- Android 6.0 through Android 16
+- No root
+- Works on Samsung, Xiaomi, Huawei, Pixel, OnePlus and the rest
 
 ## What's new
 
-See the [changelog](CHANGELOG.md) for release history. Highlights of 1.8: rule changes apply instantly without toggling, automatic recovery when Android kills the service, App Lock with PIN protection, and backup/restore.
+See the [changelog](CHANGELOG.md). The headline of 1.11: blocking a domain finally works in apps you allowed, apps are handled by mode rather than by network, and the logs and stats are one screen.
 
 ## License
 
-MIT License - do whatever you want with it.
+MIT License. Do whatever you want with it.

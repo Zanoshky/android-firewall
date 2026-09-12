@@ -9,10 +9,16 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
 /**
- * Optional PIN gate for the app UI.
+ * Optional passcode gate for the app UI.
+ *
+ * The passcode is any text: letters, digits and symbols, four characters or
+ * more. It used to be digits only, which made the whole thing a four digit
+ * number someone could work through while you fetched a coffee. Old numeric
+ * PINs keep working unchanged, because the stored form was never the PIN
+ * itself, only a PBKDF2 hash of it.
  *
  * State ownership:
- *  - The PIN salt/hash live in their own SharedPreferences file ("lock_prefs").
+ *  - The salt and hash live in their own SharedPreferences file ("lock_prefs").
  *    Nothing else writes to it, and [BackupManager] deliberately never reads or
  *    writes it, so a shared backup file can never leak or overwrite someone's PIN.
  *  - Whether the current process is unlocked is in-memory only. Process death
@@ -38,8 +44,8 @@ object AppLock {
     private const val KEY_BITS = 256
     private const val SALT_BYTES = 16
 
-    const val MIN_PIN_LENGTH = 4
-    const val MAX_PIN_LENGTH = 12
+    const val MIN_LENGTH = 4
+    const val MAX_LENGTH = 64
 
     /** Failed unlock attempts allowed before a cool-down kicks in. */
     private const val MAX_ATTEMPTS = 5
@@ -53,7 +59,7 @@ object AppLock {
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** True when a PIN has been set. */
+    /** True when a passcode has been set. */
     fun isEnabled(context: Context): Boolean =
         !prefs(context).getString(KEY_HASH, null).isNullOrEmpty()
 
@@ -87,17 +93,17 @@ object AppLock {
     fun attemptsRemaining(): Int = (MAX_ATTEMPTS - failedAttempts).coerceAtLeast(0)
 
     /**
-     * Verify [pin] and unlock the process on success. Runs PBKDF2, so call this
-     * from a background dispatcher.
+     * Verify [passcode] and unlock the process on success. Runs PBKDF2, so call
+     * this from a background dispatcher.
      */
-    fun verify(context: Context, pin: String): Boolean {
+    fun verify(context: Context, passcode: String): Boolean {
         if (lockoutRemainingMs() > 0) return false
 
         val p = prefs(context)
         val storedHash = p.getString(KEY_HASH, null) ?: return false
         val storedSalt = p.getString(KEY_SALT, null) ?: return false
 
-        val candidate = derive(pin, decodeHex(storedSalt))
+        val candidate = derive(passcode, decodeHex(storedSalt))
         val matches = MessageDigest.isEqual(candidate, decodeHex(storedHash))
 
         if (matches) {
@@ -115,36 +121,41 @@ object AppLock {
     }
 
     /**
-     * Store a new PIN and treat the current process as unlocked. Runs PBKDF2, so
-     * call this from a background dispatcher.
+     * Store a new passcode and treat the current process as unlocked. Runs
+     * PBKDF2, so call this from a background dispatcher.
      */
-    fun setPin(context: Context, pin: String) {
+    fun setPasscode(context: Context, passcode: String) {
         val salt = ByteArray(SALT_BYTES).also { SecureRandom().nextBytes(it) }
         prefs(context).edit()
             .putString(KEY_SALT, encodeHex(salt))
-            .putString(KEY_HASH, encodeHex(derive(pin, salt)))
+            .putString(KEY_HASH, encodeHex(derive(passcode, salt)))
             .apply()
         failedAttempts = 0
         lockedOutUntil = 0
         unlocked = true
     }
 
-    fun clearPin(context: Context) {
+    fun clearPasscode(context: Context) {
         prefs(context).edit().remove(KEY_HASH).remove(KEY_SALT).apply()
         failedAttempts = 0
         lockedOutUntil = 0
         unlocked = true
     }
 
-    fun validatePinFormat(pin: String): String? = when {
-        pin.length < MIN_PIN_LENGTH -> "PIN must be at least $MIN_PIN_LENGTH digits"
-        pin.length > MAX_PIN_LENGTH -> "PIN must be at most $MAX_PIN_LENGTH digits"
-        !pin.all { it.isDigit() } -> "PIN must contain digits only"
+    /**
+     * Letters, digits and symbols are all fine. Whitespace is not: a passcode
+     * with a space in it is easy to mistype and impossible to see, and a leading
+     * or trailing one would be invisible in the field.
+     */
+    fun validateFormat(passcode: String): String? = when {
+        passcode.length < MIN_LENGTH -> "Use at least $MIN_LENGTH characters"
+        passcode.length > MAX_LENGTH -> "Use at most $MAX_LENGTH characters"
+        passcode.any { it.isWhitespace() } -> "Spaces are not allowed"
         else -> null
     }
 
-    private fun derive(pin: String, salt: ByteArray): ByteArray {
-        val spec = PBEKeySpec(pin.toCharArray(), salt, ITERATIONS, KEY_BITS)
+    private fun derive(passcode: String, salt: ByteArray): ByteArray {
+        val spec = PBEKeySpec(passcode.toCharArray(), salt, ITERATIONS, KEY_BITS)
         return try {
             SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec).encoded
         } finally {

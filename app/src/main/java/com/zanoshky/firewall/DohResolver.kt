@@ -3,14 +3,25 @@ package com.zanoshky.firewall
 import android.content.Context
 import android.content.SharedPreferences
 import java.io.ByteArrayOutputStream
+import java.net.DatagramPacket
+import java.net.DatagramSocket
 import java.net.HttpURLConnection
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.URL
-import java.nio.ByteBuffer
 
 /**
- * DNS-over-HTTPS resolver. Intercepts DNS queries from the VPN tunnel,
- * resolves them via a DoH provider (Cloudflare/Google/Quad9), and
- * builds a raw DNS response packet to write back into the tunnel.
+ * Where a lookup goes once the firewall has decided to let it through.
+ *
+ * With DNS over HTTPS on, the query is posted to the chosen provider as RFC 8484
+ * wire format, so nobody between the phone and that provider can read which site
+ * is being opened. With it off, the query is forwarded to the resolver the
+ * network handed out, in plain text, exactly as it would have gone without the
+ * firewall.
+ *
+ * If the encrypted path fails, the query falls back to the plain one rather than
+ * leaving the app with no answer at all. A phone that cannot resolve anything
+ * looks broken, and a user with a broken phone turns the firewall off.
  */
 object DohResolver {
 
@@ -29,6 +40,15 @@ object DohResolver {
         "google" to "https://dns.google/dns-query",
         "quad9" to "https://dns.quad9.net/dns-query"
     )
+
+    val providerNames = mapOf(
+        "cloudflare" to "Cloudflare",
+        "google" to "Google",
+        "quad9" to "Quad9"
+    )
+
+    /** Used when the network offers no resolver of its own. */
+    private val FALLBACK_UPSTREAM = listOf("1.1.1.1", "8.8.8.8")
 
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -49,138 +69,88 @@ object DohResolver {
         prefs(context).edit().putString(KEY_PROVIDER, id).apply()
     }
 
-    fun getProviderUrl(): String = providers[provider] ?: providers["cloudflare"]!!
+    fun getProviderUrl(): String = providers[provider] ?: providers.getValue("cloudflare")
+
+    fun providerLabel(): String = providerNames[provider] ?: "Cloudflare"
 
     /**
-     * Resolve a raw DNS query via DoH (RFC 8484 wire format POST).
-     * Returns the raw DNS response bytes, or null on failure.
+     * Answer [query], counting how it was answered. [upstream] is the resolver
+     * list the underlying network handed out, and [protect] keeps our own socket
+     * out of the tunnel so a lookup cannot loop back into itself.
      */
-    fun resolve(dnsQuery: ByteArray): ByteArray? {
+    fun resolve(
+        query: ByteArray,
+        upstream: List<String>,
+        protect: (DatagramSocket) -> Unit
+    ): ByteArray? {
+        if (isEnabled) {
+            val encrypted = overHttps(query)
+            if (encrypted != null) {
+                Stats.dohQueries.incrementAndGet()
+                return encrypted
+            }
+        }
+        val plain = overUdp(query, upstream, protect)
+        if (plain != null) Stats.plainQueries.incrementAndGet()
+        return plain
+    }
+
+    private fun overHttps(query: ByteArray): ByteArray? {
         return try {
-            val url = URL(getProviderUrl())
-            val conn = url.openConnection() as HttpURLConnection
+            val conn = URL(getProviderUrl()).openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/dns-message")
             conn.setRequestProperty("Accept", "application/dns-message")
-            conn.connectTimeout = 5000
-            conn.readTimeout = 5000
+            conn.connectTimeout = 4000
+            conn.readTimeout = 4000
             conn.doOutput = true
-
-            conn.outputStream.use { it.write(dnsQuery) }
+            conn.outputStream.use { it.write(query) }
 
             if (conn.responseCode != 200) {
                 conn.disconnect()
                 return null
             }
-
             val response = conn.inputStream.use { input ->
-                val baos = ByteArrayOutputStream()
-                val buf = ByteArray(4096)
-                var n: Int
-                while (input.read(buf).also { n = it } != -1) {
-                    baos.write(buf, 0, n)
+                val out = ByteArrayOutputStream()
+                val buf = ByteArray(2048)
+                var n = input.read(buf)
+                while (n != -1) {
+                    out.write(buf, 0, n)
+                    n = input.read(buf)
                 }
-                baos.toByteArray()
+                out.toByteArray()
             }
             conn.disconnect()
-            response
+            if (response.size >= 12) response else null
         } catch (_: Exception) {
             null
         }
     }
 
-    /**
-     * Build a DNS NXDOMAIN response for a blocked domain.
-     * Copies the transaction ID and question from the original query.
-     */
-    fun buildBlockedResponse(dnsQuery: ByteArray): ByteArray {
-        val resp = ByteArrayOutputStream()
-        // Transaction ID (first 2 bytes from query)
-        resp.write(dnsQuery, 0, 2)
-        // Flags: QR=1, AA=1, RCODE=3 (NXDOMAIN) = 0x8183
-        resp.write(0x81)
-        resp.write(0x83)
-        // QDCOUNT = 1
-        resp.write(0x00)
-        resp.write(0x01)
-        // ANCOUNT = 0
-        resp.write(0x00)
-        resp.write(0x00)
-        // NSCOUNT = 0
-        resp.write(0x00)
-        resp.write(0x00)
-        // ARCOUNT = 0
-        resp.write(0x00)
-        resp.write(0x00)
-        // Copy question section from original query (starts at byte 12)
-        if (dnsQuery.size > 12) {
-            var pos = 12
-            // Skip domain name labels
-            while (pos < dnsQuery.size) {
-                val len = dnsQuery[pos].toInt() and 0xFF
-                if (len == 0) { pos++; break }
-                pos += len + 1
+    private fun overUdp(
+        query: ByteArray,
+        upstream: List<String>,
+        protect: (DatagramSocket) -> Unit
+    ): ByteArray? {
+        val servers = (upstream + FALLBACK_UPSTREAM).distinct().take(3)
+        for (server in servers) {
+            try {
+                DatagramSocket().use { socket ->
+                    protect(socket)
+                    socket.soTimeout = 3000
+                    val address = InetAddress.getByName(server)
+                    socket.send(DatagramPacket(query, query.size, InetSocketAddress(address, 53)))
+                    val buffer = ByteArray(4096)
+                    val reply = DatagramPacket(buffer, buffer.size)
+                    socket.receive(reply)
+                    if (reply.length >= 12) {
+                        return buffer.copyOf(reply.length)
+                    }
+                }
+            } catch (_: Exception) {
+                // Try the next resolver.
             }
-            // Include QTYPE (2) + QCLASS (2)
-            val questionEnd = minOf(pos + 4, dnsQuery.size)
-            resp.write(dnsQuery, 12, questionEnd - 12)
         }
-        return resp.toByteArray()
-    }
-
-    /**
-     * Wrap a raw DNS response into a full IP+UDP packet to write back to the VPN tunnel.
-     * Swaps src/dst IP and ports from the original packet.
-     */
-    fun wrapDnsResponse(originalPacket: ByteBuffer, originalLength: Int, dnsResponse: ByteArray): ByteArray {
-        val ipHeaderLen = (originalPacket.get(0).toInt() and 0xF) * 4
-
-        // Extract original addresses and ports
-        val srcIp = ByteArray(4)
-        val dstIp = ByteArray(4)
-        originalPacket.position(12); originalPacket.get(srcIp)
-        originalPacket.position(16); originalPacket.get(dstIp)
-        originalPacket.position(0)
-
-        val srcPort = originalPacket.getShort(ipHeaderLen).toInt() and 0xFFFF
-        val dstPort = originalPacket.getShort(ipHeaderLen + 2).toInt() and 0xFFFF
-
-        val udpLen = 8 + dnsResponse.size
-        val totalLen = ipHeaderLen + udpLen
-        val packet = ByteArray(totalLen)
-        val buf = ByteBuffer.wrap(packet)
-
-        // IP header
-        buf.put((0x45).toByte()) // IPv4, header len 20
-        buf.put(0) // TOS
-        buf.putShort(totalLen.toShort()) // total length
-        buf.putShort(0) // identification
-        buf.putShort(0x4000.toShort()) // flags: don't fragment
-        buf.put(64) // TTL
-        buf.put(17) // protocol: UDP
-        buf.putShort(0) // checksum (0 = let OS handle)
-        buf.put(dstIp) // src = original dst (we're the "server")
-        buf.put(srcIp) // dst = original src
-
-        // IP checksum
-        var sum = 0L
-        for (i in 0 until 20 step 2) {
-            sum += ((packet[i].toInt() and 0xFF) shl 8) or (packet[i + 1].toInt() and 0xFF)
-        }
-        while (sum shr 16 != 0L) sum = (sum and 0xFFFF) + (sum shr 16)
-        val checksum = sum.inv().toShort()
-        buf.putShort(10, checksum)
-
-        // UDP header
-        buf.position(ipHeaderLen)
-        buf.putShort(dstPort.toShort()) // src port = original dst port
-        buf.putShort(srcPort.toShort()) // dst port = original src port
-        buf.putShort(udpLen.toShort())
-        buf.putShort(0) // UDP checksum (optional for IPv4)
-
-        // DNS payload
-        buf.put(dnsResponse)
-
-        return packet
+        return null
     }
 }

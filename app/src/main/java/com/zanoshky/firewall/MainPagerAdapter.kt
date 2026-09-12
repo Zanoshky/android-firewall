@@ -8,8 +8,8 @@ class MainPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
     override fun getItemCount() = 5
     override fun createFragment(position: Int): Fragment = when (position) {
         0 -> AppsFragment()
-        1 -> LogsFragment()
-        2 -> StatsFragment()
+        1 -> ActivityFragment()
+        2 -> DomainsFragment()
         3 -> BlocklistFragment()
         4 -> SettingsFragment()
         else -> AppsFragment()

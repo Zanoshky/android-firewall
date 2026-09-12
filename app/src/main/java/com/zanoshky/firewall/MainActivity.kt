@@ -33,25 +33,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var heroCard: LinearLayout
     private lateinit var txtStatus: TextView
     private lateinit var txtSubtitle: TextView
-    private lateinit var txtBlockedCount: TextView
-    private lateinit var txtAllowedCount: TextView
-    private lateinit var txtTotalDropped: TextView
-    private lateinit var txtTotalApps: TextView
+    private lateinit var txtHeroFiltered: TextView
+    private lateinit var txtHeroBypass: TextView
+    private lateinit var txtHeroBlocked: TextView
+    private lateinit var txtHeroStopped: TextView
     private lateinit var txtUptime: TextView
-    private lateinit var txtTotalTraffic: TextView
+    private lateinit var txtHeroSummary: TextView
     private lateinit var switchFirewall: MaterialSwitch
 
     /** True while the code is correcting the switch, so its listener stays quiet. */
     private var syncingSwitch = false
 
     private lateinit var lockOverlay: View
-    private lateinit var editLockPin: EditText
+    private lateinit var editPasscode: EditText
     private lateinit var txtLockError: TextView
 
     private val handler = Handler(Looper.getMainLooper())
-    private var uptimeRunnable: Runnable? = null
+    private var liveRunnable: Runnable? = null
     private var lockoutRunnable: Runnable? = null
-    private val VPN_REQUEST_CODE = 100
+    private val vpnRequestCode = 100
+
+    /** Apps with a uid of their own, counted once; the modes change, this does not. */
+    private var installedApps = 0
 
     /** While the lock overlay is up, back leaves the app rather than falling through. */
     private val lockedBackCallback = object : OnBackPressedCallback(false) {
@@ -67,29 +70,29 @@ class MainActivity : AppCompatActivity() {
         heroCard = findViewById(R.id.heroCard)
         txtStatus = findViewById(R.id.txtStatus)
         txtSubtitle = findViewById(R.id.txtSubtitle)
-        txtBlockedCount = findViewById(R.id.txtBlockedCount)
-        txtAllowedCount = findViewById(R.id.txtAllowedCount)
-        txtTotalDropped = findViewById(R.id.txtTotalDropped)
-        txtTotalApps = findViewById(R.id.txtTotalApps)
+        txtHeroFiltered = findViewById(R.id.txtHeroFiltered)
+        txtHeroBypass = findViewById(R.id.txtHeroBypass)
+        txtHeroBlocked = findViewById(R.id.txtHeroBlocked)
+        txtHeroStopped = findViewById(R.id.txtHeroStopped)
         txtUptime = findViewById(R.id.txtUptime)
-        txtTotalTraffic = findViewById(R.id.txtTotalTraffic)
+        txtHeroSummary = findViewById(R.id.txtHeroSummary)
 
         setupLockOverlay()
         onBackPressedDispatcher.addCallback(this, lockedBackCallback)
 
-        // ViewPager + BottomNav
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         viewPager.adapter = MainPagerAdapter(this)
         viewPager.isUserInputEnabled = false
+        viewPager.offscreenPageLimit = 1
 
         bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_apps -> viewPager.currentItem = 0
-                R.id.nav_logs -> viewPager.currentItem = 1
-                R.id.nav_stats -> viewPager.currentItem = 2
-                R.id.nav_blocklist -> viewPager.currentItem = 3
-                R.id.nav_settings -> viewPager.currentItem = 4
+            viewPager.currentItem = when (item.itemId) {
+                R.id.nav_activity -> 1
+                R.id.nav_domains -> 2
+                R.id.nav_trackers -> 3
+                R.id.nav_settings -> 4
+                else -> 0
             }
             true
         }
@@ -99,9 +102,9 @@ class MainActivity : AppCompatActivity() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val itemId = when (position) {
-                    1 -> R.id.nav_logs
-                    2 -> R.id.nav_stats
-                    3 -> R.id.nav_blocklist
+                    1 -> R.id.nav_activity
+                    2 -> R.id.nav_domains
+                    3 -> R.id.nav_trackers
                     4 -> R.id.nav_settings
                     else -> R.id.nav_apps
                 }
@@ -109,7 +112,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // Firewall toggle
         switchFirewall = findViewById(R.id.switchFirewall)
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         switchFirewall.isChecked = prefs.getBoolean("enabled", false)
@@ -126,16 +128,27 @@ class MainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+            ) {
                 // The permission dialog can background us; do not treat that as leaving.
                 AppLock.suppressNextRelock()
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101
+                )
             }
         }
 
-        startLiveUpdates()
         BlocklistManager.init(this)
         DohResolver.init(this)
+        DomainRules.init(this)
+        RuleStore.ensureLoaded(this)
+        lifecycleScope.launch {
+            installedApps = withContext(Dispatchers.IO) {
+                try { packageManager.getInstalledApplications(0).count { it.uid > 1000 } }
+                catch (_: Exception) { 0 }
+            }
+        }
+        startLiveUpdates()
     }
 
     override fun onStart() {
@@ -154,28 +167,17 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         syncFirewallSwitch()
-        refreshHeroCounts()
     }
 
     /**
-     * Reconcile the switch with reality. Covers:
-     * - Service killed by OS/battery optimization while pref stayed "enabled".
-     * - VPN revoked by another app (onRevoke clears the pref).
-     * - Coming back from the VPN consent dialog after denial.
-     *
-     * If the pref says enabled but the service is dead, we restart it silently
-     * (same as BootReceiver does). If the service is dead AND the pref was cleared
-     * (revoke path), the switch flips off.
+     * Reconcile the switch with reality. Covers the service being killed for
+     * battery or memory while the preference still said enabled, another VPN
+     * revoking ours, and coming back from the consent dialog after a refusal.
      */
     private fun syncFirewallSwitch() {
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         val wantEnabled = prefs.getBoolean("enabled", false)
-
-        if (wantEnabled && !FirewallVpnService.isRunning) {
-            // Service died under us. Attempt a silent restart.
-            launchVpnService()
-        }
-
+        if (wantEnabled && !FirewallVpnService.isRunning) launchVpnService()
         setSwitchSilently(wantEnabled)
         updateStatusUI(wantEnabled)
     }
@@ -189,7 +191,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        uptimeRunnable?.let { handler.removeCallbacks(it) }
+        liveRunnable?.let { handler.removeCallbacks(it) }
         lockoutRunnable?.let { handler.removeCallbacks(it) }
         super.onDestroy()
     }
@@ -198,24 +200,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupLockOverlay() {
         lockOverlay = findViewById(R.id.lockOverlay)
-        editLockPin = findViewById(R.id.editLockPin)
+        editPasscode = findViewById(R.id.editLockPasscode)
         txtLockError = findViewById(R.id.txtLockError)
 
         findViewById<TextView>(R.id.btnUnlock).setOnClickListener { attemptUnlock() }
-        editLockPin.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                attemptUnlock()
-                true
-            } else {
-                false
-            }
+        editPasscode.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) { attemptUnlock(); true } else false
         }
     }
 
     private fun showLock() {
         lockOverlay.visibility = View.VISIBLE
         lockedBackCallback.isEnabled = true
-        editLockPin.text.clear()
+        editPasscode.text.clear()
         txtLockError.text = ""
         refreshLockout()
     }
@@ -228,17 +225,17 @@ class MainActivity : AppCompatActivity() {
         hideKeyboard()
     }
 
-    /** Reflects the cool-down after repeated wrong PINs, counting down once a second. */
+    /** Reflects the cool-down after repeated wrong tries, counting down once a second. */
     private fun refreshLockout() {
         lockoutRunnable?.let { handler.removeCallbacks(it) }
         val remaining = AppLock.lockoutRemainingMs()
         if (remaining <= 0) {
-            editLockPin.isEnabled = true
+            editPasscode.isEnabled = true
             return
         }
-        editLockPin.isEnabled = false
+        editPasscode.isEnabled = false
         val seconds = (remaining + 999) / 1000
-        txtLockError.text = "Too many attempts. Try again in ${seconds}s"
+        txtLockError.text = "Too many tries. Wait ${seconds}s"
         lockoutRunnable = Runnable { refreshLockout() }
         handler.postDelayed(lockoutRunnable!!, 1000)
     }
@@ -248,23 +245,23 @@ class MainActivity : AppCompatActivity() {
             refreshLockout()
             return
         }
-        val pin = editLockPin.text.toString()
-        if (pin.isEmpty()) {
-            txtLockError.text = "Enter your PIN"
+        val passcode = editPasscode.text.toString()
+        if (passcode.isEmpty()) {
+            txtLockError.text = "Enter your passcode"
             return
         }
         lifecycleScope.launch {
-            // PBKDF2 - keep it off the main thread.
-            val ok = withContext(Dispatchers.Default) { AppLock.verify(this@MainActivity, pin) }
+            // PBKDF2, so keep it off the main thread.
+            val ok = withContext(Dispatchers.Default) { AppLock.verify(this@MainActivity, passcode) }
             if (ok) {
                 hideLock()
             } else {
-                editLockPin.text.clear()
+                editPasscode.text.clear()
                 if (AppLock.lockoutRemainingMs() > 0) {
                     refreshLockout()
                 } else {
                     val left = AppLock.attemptsRemaining()
-                    txtLockError.text = "Incorrect PIN. $left attempt${if (left == 1) "" else "s"} left"
+                    txtLockError.text = "Wrong passcode. $left ${if (left == 1) "try" else "tries"} left"
                 }
             }
         }
@@ -272,76 +269,74 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(editLockPin.windowToken, 0)
+        imm?.hideSoftInputFromWindow(editPasscode.windowToken, 0)
     }
 
-    // --- Dashboard ---
+    // --- Hero card ---
 
     private fun startLiveUpdates() {
-        uptimeRunnable = object : Runnable {
+        liveRunnable = object : Runnable {
             override fun run() {
                 updateLiveStats()
                 handler.postDelayed(this, 2000)
             }
         }
-        handler.post(uptimeRunnable!!)
+        handler.post(liveRunnable!!)
     }
 
     private fun updateLiveStats() {
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
-        val isActive = prefs.getBoolean("enabled", false)
+        val active = prefs.getBoolean("enabled", false)
+        val totals = Stats.totals(this)
 
-        val blockedHist = prefs.getLong("total_blocked", 0)
-        val blockedSess = FirewallVpnService.totalBlockedSession.get()
-        val allowedHist = prefs.getLong("total_allowed", 0)
-        val allowedSess = FirewallVpnService.totalAllowedSession.get()
+        txtHeroStopped.text = formatCount(totals.blocked)
+        refreshModeCounts()
 
-        val totalBlocked = blockedHist + blockedSess
-        val totalAllowed = allowedHist + allowedSess
-        txtTotalDropped.text = formatCount(totalBlocked + totalAllowed)
-
-        val totalIn = prefs.getLong("total_bytes_in", 0) + FirewallVpnService.sessionBytesIn.get()
-        val totalOut = prefs.getLong("total_bytes_out", 0) + FirewallVpnService.sessionBytesOut.get()
-        txtTotalTraffic.text = "↓ ${formatBytes(totalIn)}  ↑ ${formatBytes(totalOut)}"
-
-        if (isActive && FirewallVpnService.sessionStartTime > 0) {
-            val elapsed = System.currentTimeMillis() - FirewallVpnService.sessionStartTime
-            txtUptime.text = formatDuration(elapsed)
+        if (active && Stats.sessionStart > 0) {
+            txtUptime.text = formatDuration(System.currentTimeMillis() - Stats.sessionStart)
+            txtHeroSummary.text = "${formatCount(totals.queries)} lookups seen"
         } else {
             txtUptime.text = ""
-            txtTotalTraffic.text = ""
+            txtHeroSummary.text = ""
         }
     }
 
+    /**
+     * Called by the Apps tab the moment a mode changes, so the card never lags
+     * behind a tap. The two second tick recomputes the same thing from the rule
+     * store, which covers the app being opened on any other tab.
+     */
     fun updateCounts(allApps: List<AppInfo>) {
-        val allowed = allApps.count { it.allowWifi || it.allowMobile }
-        val blocked = allApps.size - allowed
-        txtBlockedCount.text = blocked.toString()
-        txtAllowedCount.text = allowed.toString()
-        txtTotalApps.text = allApps.size.toString()
+        if (allApps.isEmpty()) return
+        if (installedApps == 0) installedApps = allApps.size
+        txtHeroFiltered.text = allApps.count { it.mode == AppMode.FILTERED }.toString()
+        txtHeroBypass.text = allApps.count { it.mode == AppMode.BYPASS }.toString()
+        txtHeroBlocked.text = allApps.count { it.mode == AppMode.BLOCKED }.toString()
     }
 
-    /** Lightweight DB query so the hero card is never stale after recreate/rotation. */
-    private fun refreshHeroCounts() {
-        lifecycleScope.launch {
-            val dao = RuleDatabase.get(this@MainActivity).ruleDao()
-            val total = withContext(Dispatchers.IO) { dao.countAll() }
-            val allowed = withContext(Dispatchers.IO) { dao.countAllowed() }
-            txtBlockedCount.text = (total - allowed).toString()
-            txtAllowedCount.text = allowed.toString()
-            txtTotalApps.text = total.toString()
-        }
+    private fun refreshModeCounts() {
+        if (installedApps == 0) return
+        val modes = RuleStore.snapshot()
+        val filtered = modes.count { it.value == AppMode.FILTERED }
+        val bypass = modes.count { it.value == AppMode.BYPASS }
+        txtHeroFiltered.text = filtered.toString()
+        txtHeroBypass.text = bypass.toString()
+        txtHeroBlocked.text = (installedApps - filtered - bypass).coerceAtLeast(0).toString()
     }
 
     private fun updateStatusUI(active: Boolean) {
         if (active) {
             heroCard.setBackgroundResource(R.drawable.bg_hero_card)
             txtStatus.text = "Protected"
-            txtSubtitle.text = "Firewall is active"
+            txtSubtitle.text = if (DohResolver.isEnabled) {
+                "Lookups filtered and encrypted"
+            } else {
+                "Lookups filtered"
+            }
         } else {
             heroCard.setBackgroundResource(R.drawable.bg_hero_card_inactive)
             txtStatus.text = "Inactive"
-            txtSubtitle.text = "Tap toggle to start"
+            txtSubtitle.text = "Tap the switch to start"
         }
     }
 
@@ -350,17 +345,16 @@ class MainActivity : AppCompatActivity() {
         if (vpnIntent != null) {
             // The system consent dialog backgrounds us; do not treat that as leaving.
             AppLock.suppressNextRelock()
-            startActivityForResult(vpnIntent, VPN_REQUEST_CODE)
+            startActivityForResult(vpnIntent, vpnRequestCode)
         } else {
             launchVpnService()
         }
     }
 
     private fun stopFirewall() {
-        val intent = Intent(this, FirewallVpnService::class.java).apply {
+        startService(Intent(this, FirewallVpnService::class.java).apply {
             action = FirewallVpnService.ACTION_STOP
-        }
-        startService(intent)
+        })
     }
 
     private fun launchVpnService() {
@@ -377,42 +371,34 @@ class MainActivity : AppCompatActivity() {
     @Deprecated("Use registerForActivityResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == VPN_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                launchVpnService()
-            } else {
-                // User denied VPN consent. Roll back the pref and switch.
-                val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
-                prefs.edit().putBoolean("enabled", false).apply()
-                setSwitchSilently(false)
-                updateStatusUI(false)
-            }
+        if (requestCode != vpnRequestCode) return
+        if (resultCode == Activity.RESULT_OK) {
+            launchVpnService()
+        } else {
+            // The user refused VPN consent. Roll the preference and switch back.
+            getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
+                .edit().putBoolean("enabled", false).apply()
+            setSwitchSilently(false)
+            updateStatusUI(false)
         }
     }
 
     private fun formatDuration(ms: Long): String {
-        val secs = ms / 1000
-        val mins = secs / 60
-        val hours = mins / 60
+        val seconds = ms / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
         val days = hours / 24
         return when {
             days > 0 -> "${days}d ${hours % 24}h"
-            hours > 0 -> "${hours}h ${mins % 60}m"
-            mins > 0 -> "${mins}m ${secs % 60}s"
-            else -> "${secs}s"
+            hours > 0 -> "${hours}h ${minutes % 60}m"
+            minutes > 0 -> "${minutes}m ${seconds % 60}s"
+            else -> "${seconds}s"
         }
     }
 
     private fun formatCount(n: Long): String = when {
-        n >= 1_000_000 -> String.format("%.1fM", n / 1_000_000.0)
-        n >= 1_000 -> String.format("%.1fK", n / 1_000.0)
+        n >= 1_000_000 -> String.format(java.util.Locale.US, "%.1fM", n / 1_000_000.0)
+        n >= 1_000 -> String.format(java.util.Locale.US, "%.1fK", n / 1_000.0)
         else -> n.toString()
-    }
-
-    private fun formatBytes(bytes: Long): String = when {
-        bytes >= 1_073_741_824 -> String.format("%.1f GB", bytes / 1_073_741_824.0)
-        bytes >= 1_048_576 -> String.format("%.1f MB", bytes / 1_048_576.0)
-        bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
-        else -> "$bytes B"
     }
 }

@@ -9,9 +9,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
-class LogAdapter : RecyclerView.Adapter<LogAdapter.ViewHolder>() {
+class LogAdapter(
+    private val onClick: (ConnectionLog) -> Unit = {}
+) : RecyclerView.Adapter<LogAdapter.ViewHolder>() {
 
     private var logs: List<ConnectionLog> = emptyList()
     private val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
@@ -30,10 +33,12 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.ViewHolder>() {
     }
 
     override fun getItemCount() = logs.size
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false)
         return ViewHolder(view)
     }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(logs[position])
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -46,42 +51,30 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.ViewHolder>() {
 
         fun bind(log: ConnectionLog) {
             txtApp.text = log.appName
-
-            // Show domain if available, otherwise IP:port, plus protocol and size
-            val dest = if (log.domain.isNotEmpty()) log.domain else "${log.destIp}:${log.destPort}"
-            txtDest.text = "$dest · ${log.protocol} · ${formatBytes(log.bytes)}"
-
-            val now = System.currentTimeMillis()
-            val diff = now - log.timestamp
-            txtTime.text = if (diff < 86400000) timeFormat.format(Date(log.timestamp))
-                           else dateFormat.format(Date(log.timestamp))
-
-            when {
-                log.blockedByTracker -> {
-                    txtStatus.text = "TRACKER"
-                    txtStatus.setTextColor(ContextCompat.getColor(ctx, R.color.accent_orange))
-                    (viewDot.background as? GradientDrawable)?.setColor(
-                        ContextCompat.getColor(ctx, R.color.accent_orange))
-                }
-                log.allowed -> {
-                    txtStatus.text = "ALLOWED"
-                    txtStatus.setTextColor(ContextCompat.getColor(ctx, R.color.status_active))
-                    (viewDot.background as? GradientDrawable)?.setColor(
-                        ContextCompat.getColor(ctx, R.color.status_active))
-                }
-                else -> {
-                    txtStatus.text = "BLOCKED"
-                    txtStatus.setTextColor(ContextCompat.getColor(ctx, R.color.status_inactive))
-                    (viewDot.background as? GradientDrawable)?.setColor(
-                        ContextCompat.getColor(ctx, R.color.status_inactive))
-                }
+            txtDest.text = if (log.domain.isNotEmpty()) {
+                "${log.domain} · ${log.protocol}"
+            } else {
+                "${log.destIp}:${log.destPort} · ${log.protocol}"
             }
-        }
 
-        private fun formatBytes(bytes: Long): String = when {
-            bytes >= 1_048_576 -> String.format("%.1f MB", bytes / 1_048_576.0)
-            bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
-            else -> "$bytes B"
+            val age = System.currentTimeMillis() - log.timestamp
+            txtTime.text = if (age < 86_400_000) timeFormat.format(Date(log.timestamp))
+            else dateFormat.format(Date(log.timestamp))
+
+            val colour = when (log.blockReason) {
+                BlockReason.TRACKER -> R.color.accent_orange
+                BlockReason.BLOCKLIST -> R.color.danger
+                BlockReason.APP_BLOCKED -> R.color.danger
+                BlockReason.DROPPED -> R.color.danger
+                else -> R.color.accent
+            }
+            txtStatus.text = BlockReason.label(log.blockReason)
+            txtStatus.setTextColor(ContextCompat.getColor(ctx, colour))
+            (viewDot.background as? GradientDrawable)?.setColor(
+                ContextCompat.getColor(ctx, colour)
+            )
+
+            itemView.setOnClickListener { onClick(log) }
         }
     }
 }

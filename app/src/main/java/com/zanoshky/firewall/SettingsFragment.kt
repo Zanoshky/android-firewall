@@ -29,7 +29,7 @@ class SettingsFragment : Fragment() {
 
     private lateinit var switchAppLock: MaterialSwitch
     private lateinit var txtLockStatus: TextView
-    private lateinit var btnChangePin: TextView
+    private lateinit var btnChangePasscode: TextView
     private lateinit var txtExportSummary: TextView
     private lateinit var txtBackupProgress: TextView
     private lateinit var rowExport: View
@@ -55,7 +55,7 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         switchAppLock = view.findViewById(R.id.switchAppLock)
         txtLockStatus = view.findViewById(R.id.txtLockStatus)
-        btnChangePin = view.findViewById(R.id.btnChangePin)
+        btnChangePasscode = view.findViewById(R.id.btnChangePin)
         txtExportSummary = view.findViewById(R.id.txtExportSummary)
         txtBackupProgress = view.findViewById(R.id.txtBackupProgress)
         rowExport = view.findViewById(R.id.rowExport)
@@ -68,10 +68,10 @@ class SettingsFragment : Fragment() {
             val enabled = context?.let { AppLock.isEnabled(it) } ?: return@setOnCheckedChangeListener
             // Only react to user-driven changes; refreshLockUi() sets the state itself.
             if (isChecked == enabled) return@setOnCheckedChangeListener
-            if (isChecked) showSetPinDialog(requireCurrent = false) else showRemovePinDialog()
+            if (isChecked) showSetPasscodeDialog(requireCurrent = false) else showRemovePasscodeDialog()
         }
 
-        btnChangePin.setOnClickListener { showSetPinDialog(requireCurrent = true) }
+        btnChangePasscode.setOnClickListener { showSetPasscodeDialog(requireCurrent = true) }
 
         rowExport.setOnClickListener {
             if (busy) return@setOnClickListener
@@ -104,11 +104,11 @@ class SettingsFragment : Fragment() {
         // Assign without firing the listener's user-change branch: the listener
         // compares against the stored value, which is already up to date here.
         switchAppLock.isChecked = enabled
-        txtLockStatus.text = if (enabled) "On - PIN required to open the app" else "Off"
-        btnChangePin.visibility = if (enabled) View.VISIBLE else View.GONE
+        txtLockStatus.text = if (enabled) "On, a passcode is needed to open the app" else "Off"
+        btnChangePasscode.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
-    private fun showSetPinDialog(requireCurrent: Boolean) {
+    private fun showSetPasscodeDialog(requireCurrent: Boolean) {
         val ctx = context ?: return
         val body = LayoutInflater.from(ctx).inflate(R.layout.dialog_pin, null)
         val editCurrent = body.findViewById<EditText>(R.id.editPinCurrent)
@@ -119,14 +119,15 @@ class SettingsFragment : Fragment() {
 
         editCurrent.visibility = if (requireCurrent) View.VISIBLE else View.GONE
         txtHint.text = if (requireCurrent) {
-            "Enter your current PIN, then choose a new one."
+            "Enter your current passcode, then choose a new one."
         } else {
-            "Choose a PIN between ${AppLock.MIN_PIN_LENGTH} and ${AppLock.MAX_PIN_LENGTH} digits. " +
-                "There is no recovery if you forget it - you would have to reinstall the app and lose your rules."
+            "Letters, digits and symbols, at least ${AppLock.MIN_LENGTH} characters. " +
+                "There is no way to recover it: forget it and the app has to be reinstalled, " +
+                "which loses your rules."
         }
 
         val dialog = MaterialAlertDialogBuilder(ctx)
-            .setTitle(if (requireCurrent) "Change PIN" else "Set PIN")
+            .setTitle(if (requireCurrent) "Change passcode" else "Set a passcode")
             .setView(body)
             .setNegativeButton("Cancel") { _, _ -> refreshLockUi() }
             .setPositiveButton("Save", null)
@@ -136,33 +137,33 @@ class SettingsFragment : Fragment() {
         dialog.show()
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             val current = editCurrent.text.toString()
-            val newPin = editNew.text.toString()
+            val newPasscode = editNew.text.toString()
             val confirm = editConfirm.text.toString()
 
-            val formatError = AppLock.validatePinFormat(newPin)
+            val formatError = AppLock.validateFormat(newPasscode)
             when {
                 formatError != null -> showError(txtError, formatError)
-                newPin != confirm -> showError(txtError, "The two PINs do not match")
+                newPasscode != confirm -> showError(txtError, "The two passcodes do not match")
                 else -> viewLifecycleOwner.lifecycleScope.launch {
                     val c = context ?: return@launch
                     // PBKDF2 - keep it off the main thread.
                     if (requireCurrent) {
                         val ok = withContext(Dispatchers.Default) { AppLock.verify(c, current) }
                         if (!ok) {
-                            showError(txtError, "Current PIN is incorrect")
+                            showError(txtError, "That is not your current passcode")
                             return@launch
                         }
                     }
-                    withContext(Dispatchers.Default) { AppLock.setPin(c, newPin) }
+                    withContext(Dispatchers.Default) { AppLock.setPasscode(c, newPasscode) }
                     dialog.dismiss()
                     refreshLockUi()
-                    toast(if (requireCurrent) "PIN changed" else "App Lock enabled")
+                    toast(if (requireCurrent) "Passcode changed" else "App Lock is on")
                 }
             }
         }
     }
 
-    private fun showRemovePinDialog() {
+    private fun showRemovePasscodeDialog() {
         val ctx = context ?: return
         val body = LayoutInflater.from(ctx).inflate(R.layout.dialog_pin, null)
         val editCurrent = body.findViewById<EditText>(R.id.editPinCurrent)
@@ -172,7 +173,7 @@ class SettingsFragment : Fragment() {
         body.findViewById<View>(R.id.editPinNew).visibility = View.GONE
         body.findViewById<View>(R.id.editPinConfirm).visibility = View.GONE
         editCurrent.visibility = View.VISIBLE
-        txtHint.text = "Enter your current PIN to turn App Lock off."
+        txtHint.text = "Enter your current passcode to turn App Lock off."
 
         val dialog = MaterialAlertDialogBuilder(ctx)
             .setTitle("Turn off App Lock")
@@ -190,13 +191,13 @@ class SettingsFragment : Fragment() {
                     AppLock.verify(c, editCurrent.text.toString())
                 }
                 if (!ok) {
-                    showError(txtError, "PIN is incorrect")
+                    showError(txtError, "That is not your passcode")
                     return@launch
                 }
-                AppLock.clearPin(c)
+                AppLock.clearPasscode(c)
                 dialog.dismiss()
                 refreshLockUi()
-                toast("App Lock disabled")
+                toast("App Lock is off")
             }
         }
     }
@@ -215,12 +216,9 @@ class SettingsFragment : Fragment() {
             val ruleCount = withContext(Dispatchers.IO) {
                 RuleDatabase.get(ctx).ruleDao().getAll().size
             }
-            val domainCount = withContext(Dispatchers.IO) {
-                BlocklistManager.getCustomDomains(ctx).size +
-                    BlocklistManager.getWhitelistedDomains(ctx).size
-            }
+            val domainCount = DomainRules.blockedCount() + DomainRules.allowedCount()
             if (!isAdded) return@launch
-            txtExportSummary.text = "$ruleCount app rules, $domainCount custom domains"
+            txtExportSummary.text = "$ruleCount app rules, $domainCount domain rules"
         }
     }
 
@@ -231,8 +229,8 @@ class SettingsFragment : Fragment() {
             val result = BackupManager.export(ctx, uri)
             setBusy(false, null)
             if (!isAdded) return@launch
-            result.onSuccess { s ->
-                toast("Exported ${s.rules} app rules and ${s.customDomains + s.whitelistedDomains} domains")
+            result.onSuccess { summary ->
+                toast("Exported ${summary.rules} app rules and ${summary.domains} domain rules")
             }
             result.onFailure { e ->
                 toast("Export failed: ${e.message}")
@@ -245,9 +243,9 @@ class SettingsFragment : Fragment() {
         MaterialAlertDialogBuilder(ctx)
             .setTitle("Restore from backup?")
             .setMessage(
-                "This replaces all of your current per-app rules, custom domains and whitelist " +
-                    "with the contents of the file. Apps missing from the backup end up blocked. " +
-                    "Blocklists recorded in the backup are re-downloaded, which needs a connection."
+                "This replaces your app modes and your domain rules with what is in the file. " +
+                    "Apps the backup does not mention end up blocked. Tracker lists named in it are " +
+                    "downloaded again, which needs a connection."
             )
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Restore") { _, _ -> runRestore(uri) }
@@ -269,9 +267,11 @@ class SettingsFragment : Fragment() {
             setBusy(false, null)
             if (!isAdded) return@launch
 
-            result.onSuccess { s ->
-                val failed = if (s.sourcesFailed > 0) ", ${s.sourcesFailed} blocklist downloads failed" else ""
-                toast("Restored ${s.rules} app rules and ${s.customDomains + s.whitelistedDomains} domains$failed")
+            result.onSuccess { summary ->
+                val failed = if (summary.sourcesFailed > 0) {
+                    ", ${summary.sourcesFailed} list downloads failed"
+                } else ""
+                toast("Restored ${summary.rules} app rules and ${summary.domains} domain rules$failed")
                 // No shared observable state exists between fragments, so recreate the
                 // activity to pull every tab back in sync with the restored data.
                 // The toggles carry android:saveEnabled="false" precisely so this

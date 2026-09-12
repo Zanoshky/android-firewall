@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  Shared PIN dialog body. Rows are shown or hidden by SettingsFragment depending
+  Shared passcode dialog body. Rows are shown or hidden by SettingsFragment depending
   on whether it is setting, changing, or confirming removal of the PIN.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,12 +24,12 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/bg_search"
-        android:hint="Current PIN"
+        android:hint="Current passcode"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:textSize="15sp"
-        android:inputType="numberPassword"
-        android:maxLength="12"
+        android:inputType="textPassword"
+        android:maxLength="64"
         android:paddingHorizontal="16dp"
         android:importantForAutofill="no"
         android:visibility="gone" />
@@ -39,12 +39,12 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/bg_search"
-        android:hint="New PIN (4 to 12 digits)"
+        android:hint="New passcode"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:textSize="15sp"
-        android:inputType="numberPassword"
-        android:maxLength="12"
+        android:inputType="textPassword"
+        android:maxLength="64"
         android:paddingHorizontal="16dp"
         android:importantForAutofill="no"
         android:layout_marginTop="10dp" />
@@ -54,12 +54,12 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/bg_search"
-        android:hint="Confirm PIN"
+        android:hint="Repeat new passcode"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:textSize="15sp"
-        android:inputType="numberPassword"
-        android:maxLength="12"
+        android:inputType="textPassword"
+        android:maxLength="64"
         android:paddingHorizontal="16dp"
         android:importantForAutofill="no"
         android:layout_marginTop="10dp" />

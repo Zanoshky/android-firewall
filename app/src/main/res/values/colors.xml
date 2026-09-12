@@ -17,17 +17,20 @@
 
     <!-- Legacy aliases (accent) -->
     <color name="accent_blue">#FF3ECF8E</color>
-    <color name="accent_blue_container">#FF12291F</color>
     <color name="accent_cyan">#FF3ECF8E</color>
-    <color name="accent_cyan_container">#FF12291F</color>
 
     <!-- Status colors: muted red for blocked, muted amber for trackers -->
     <color name="danger">#FFE06C75</color>
     <color name="danger_container">#FF2A1A1D</color>
     <color name="accent_pink">#FFE06C75</color>
-    <color name="accent_pink_container">#FF2A1A1D</color>
     <color name="accent_orange">#FFD8A054</color>
     <color name="accent_orange_container">#FF2A2114</color>
+
+    <!-- Per-app modes: one colour each, reused everywhere the mode is shown -->
+    <color name="mode_bypass">#FF7FA6C4</color>
+    <color name="mode_bypass_container">#FF15212B</color>
+    <color name="mode_bypass_border">#FF2F4A5C</color>
+    <color name="danger_border">#FF5C2F35</color>
 
     <!-- Text -->
     <color name="text_primary">#FFE6EBF1</color>
@@ -35,7 +38,6 @@
     <color name="text_hint">#FF5C6975</color>
 
     <!-- Toggles -->
-    <color name="toggle_on">#FF3ECF8E</color>
     <color name="toggle_off">#FF1C242E</color>
 
     <!-- Divider -->
@@ -48,9 +50,6 @@
     <color name="status_active">#FF3ECF8E</color>
     <color name="status_inactive">#FF5C6975</color>
 
-    <!-- Charts: accent for download, desaturated blue-gray for upload -->
-    <color name="chart_download">#FF3ECF8E</color>
-    <color name="chart_upload">#FF7FA6C4</color>
 
     <!-- Hero card (active): same-hue dark emerald gradient, not a rainbow fade -->
     <color name="gradient_start">#FF16382B</color>

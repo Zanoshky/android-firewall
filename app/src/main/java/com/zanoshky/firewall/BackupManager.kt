@@ -14,51 +14,47 @@ import java.util.Locale
 /**
  * Plain-JSON export and import of everything the user configured.
  *
- * What is in scope, and why:
- *  - Per-app rules (the `rules` table). The whole point of the feature.
- *  - Custom blocked domains and whitelisted domains ("blocklist_prefs").
- *  - Tracker blocking on/off, DoH on/off and provider ("doh_prefs").
- *  - Which online blocklist sources were downloaded, by id. The downloaded
- *    files themselves are hundreds of thousands of lines, so the backup stores
- *    ids and restore re-downloads them.
+ * In scope, and why:
+ *  - How each app is handled (the `rules` table). The whole point of the feature.
+ *  - The user's own domain rules, both lists.
+ *  - Tracker blocking on or off, encrypted lookups on or off and the provider.
+ *  - Which tracker lists were downloaded, by id. The files themselves run to
+ *    hundreds of thousands of lines, so restore fetches them again.
  *
- * What is deliberately excluded:
- *  - The App Lock PIN. A backup file is meant to be copied around; it must never
- *    carry credentials, and restoring someone else's file must not change your PIN.
- *  - Traffic counters, connection logs and per-app stats. They are telemetry, not
- *    configuration, and the running VPN service does read-modify-write on the same
- *    counter keys on its flush timer - writing them from here would race that flush.
- *  - The master firewall on/off switch. That is device state, and turning the VPN
- *    on requires system consent that only an Activity can request.
+ * Deliberately out of scope:
+ *  - The App Lock passcode. A backup file is meant to be copied around; it must
+ *    never carry a credential, and restoring someone else's file must not change
+ *    the passcode on this phone.
+ *  - Counters and the activity log. They are a record of what happened, not
+ *    configuration, and the running service does read-modify-write on the same
+ *    counter keys on its own timer.
+ *  - The master switch. That is device state, and turning the tunnel on needs
+ *    system consent that only an Activity can ask for.
  *
- * Restore is replace, not merge: rules absent from the file end up with no row,
- * which means fully blocked. That is the app's safe default.
+ * Restore replaces rather than merges: an app the file does not mention ends up
+ * with no row, which means blocked, and that is the safe direction to be wrong in.
+ *
+ * Schema 2 replaced the pair of "allowed on Wi-Fi" and "allowed on mobile" flags
+ * with one mode. A schema 1 file still restores: an app allowed on either network
+ * becomes Filtered.
  */
 object BackupManager {
 
-    const val SCHEMA_VERSION = 1
+    const val SCHEMA_VERSION = 2
     const val MIME_TYPE = "application/json"
 
     private const val BLOCKLIST_PREFS = "blocklist_prefs"
     private const val KEY_BLOCKLIST_ENABLED = "blocklist_enabled"
-    private const val KEY_CUSTOM_DOMAINS = "custom_blocked_domains"
-    private const val KEY_WHITELISTED = "whitelisted_domains"
 
     private const val DOH_PREFS = "doh_prefs"
     private const val KEY_DOH_ENABLED = "doh_enabled"
     private const val KEY_DOH_PROVIDER = "doh_provider"
 
-    data class BackupSummary(
-        val rules: Int,
-        val customDomains: Int,
-        val whitelistedDomains: Int,
-        val sources: Int
-    )
+    data class BackupSummary(val rules: Int, val domains: Int, val sources: Int)
 
     data class RestoreSummary(
         val rules: Int,
-        val customDomains: Int,
-        val whitelistedDomains: Int,
+        val domains: Int,
         val sourcesDownloaded: Int,
         val sourcesFailed: Int
     )
@@ -74,8 +70,8 @@ object BackupManager {
         withContext(Dispatchers.IO) {
             try {
                 val rules = RuleDatabase.get(context).ruleDao().getAll()
-                val custom = BlocklistManager.getCustomDomains(context)
-                val whitelist = BlocklistManager.getWhitelistedDomains(context)
+                val blocked = DomainRules.blockedDomains(context)
+                val allowed = DomainRules.allowedDomains(context)
                 val sourceIds = BlocklistManager.getSources(context)
                     .map { it.id }
                     .filter { BlocklistManager.isSourceDownloaded(context, it) }
@@ -91,27 +87,25 @@ object BackupManager {
                     put("trackerBlockingEnabled", blocklistPrefs.getBoolean(KEY_BLOCKLIST_ENABLED, false))
                     put("dohEnabled", dohPrefs.getBoolean(KEY_DOH_ENABLED, false))
                     put("dohProvider", dohPrefs.getString(KEY_DOH_PROVIDER, "cloudflare"))
-                    put("customBlockedDomains", JSONArray(custom))
-                    put("whitelistedDomains", JSONArray(whitelist))
+                    put("blockedDomains", JSONArray(blocked))
+                    put("allowedDomains", JSONArray(allowed))
                     put("blocklistSources", JSONArray(sourceIds))
                     put("rules", JSONArray().apply {
                         rules.forEach { rule ->
                             put(JSONObject().apply {
                                 put("packageName", rule.packageName)
-                                put("allowWifi", rule.allowWifi)
-                                put("allowMobile", rule.allowMobile)
+                                put("mode", rule.mode)
                             })
                         }
                     })
                 }
 
-                val bytes = root.toString(2).toByteArray()
                 val stream = context.contentResolver.openOutputStream(uri, "wt")
                     ?: return@withContext Result.failure(Exception("Could not open the selected file"))
-                stream.use { it.write(bytes) }
+                stream.use { it.write(root.toString(2).toByteArray()) }
 
                 Result.success(
-                    BackupSummary(rules.size, custom.size, whitelist.size, sourceIds.size)
+                    BackupSummary(rules.size, blocked.size + allowed.size, sourceIds.size)
                 )
             } catch (e: Exception) {
                 Result.failure(e)
@@ -121,31 +115,26 @@ object BackupManager {
     // --- Restore ---
 
     /**
-     * Parsed and validated file contents. Building this cannot touch any stored
-     * state, so a malformed file fails before anything is overwritten.
+     * Parsed and validated file contents. Building this touches no stored state,
+     * so a malformed file fails before anything has been overwritten.
      */
     private data class ParsedBackup(
         val rules: List<AppRule>,
-        val customDomains: List<String>,
-        val whitelistedDomains: List<String>,
+        val blockedDomains: List<String>,
+        val allowedDomains: List<String>,
         val sourceIds: List<String>,
         val trackerBlockingEnabled: Boolean,
         val dohEnabled: Boolean,
         val dohProvider: String
     )
 
-    /**
-     * Read [uri], validate it, then commit. [onProgress] is invoked on the caller's
-     * dispatcher context with short human-readable status lines; blocklist
-     * re-downloads dominate the runtime and are reported one by one.
-     */
     suspend fun restore(
         context: Context,
         uri: Uri,
         onProgress: suspend (String) -> Unit = {}
     ): Result<RestoreSummary> = withContext(Dispatchers.IO) {
         try {
-            onProgress("Reading backup file...")
+            onProgress("Reading the file")
 
             val text = context.contentResolver.openInputStream(uri)?.use {
                 it.reader().readText()
@@ -153,13 +142,10 @@ object BackupManager {
 
             val parsed = parse(text).getOrElse { return@withContext Result.failure(it) }
 
-            onProgress("Applying settings...")
+            onProgress("Applying settings")
 
-            // Preferences first, so the in-memory reload below sees final values.
             context.getSharedPreferences(BLOCKLIST_PREFS, Context.MODE_PRIVATE).edit()
                 .putBoolean(KEY_BLOCKLIST_ENABLED, parsed.trackerBlockingEnabled)
-                .putString(KEY_CUSTOM_DOMAINS, parsed.customDomains.joinToString("\n"))
-                .putString(KEY_WHITELISTED, parsed.whitelistedDomains.joinToString("\n"))
                 .apply()
 
             context.getSharedPreferences(DOH_PREFS, Context.MODE_PRIVATE).edit()
@@ -167,33 +153,31 @@ object BackupManager {
                 .putString(KEY_DOH_PROVIDER, parsed.dohProvider)
                 .apply()
 
-            // Replace the rule set atomically so a crash mid-restore cannot leave
-            // an empty rules table behind.
+            DomainRules.replaceAll(context, parsed.blockedDomains, parsed.allowedDomains)
+
+            // Replace the rules in one transaction, so a crash part way through
+            // cannot leave an empty table behind.
             val db = RuleDatabase.get(context)
             db.withTransaction {
                 db.ruleDao().deleteAll()
                 if (parsed.rules.isNotEmpty()) db.ruleDao().upsertAll(parsed.rules)
             }
 
-            // BlocklistManager and DohResolver cache their prefs in @Volatile fields
-            // at process start and are shared with the VPN service in this process,
-            // so they have to be re-read explicitly.
+            // These cache their preferences in memory at process start and are
+            // shared with the running service, so they have to be told to re-read.
             BlocklistManager.init(context)
             DohResolver.init(context)
             BlocklistManager.reloadAsync(context)
+            RuleStore.adoptAfterRestore(context)
 
-            // Apply the restored per-app rules to the live tunnel.
-            TunnelControl.requestRebuild(context)
-
-            val sourceResult = restoreSources(context, parsed.sourceIds, onProgress)
+            val sources = restoreSources(context, parsed.sourceIds, onProgress)
 
             Result.success(
                 RestoreSummary(
                     rules = parsed.rules.size,
-                    customDomains = parsed.customDomains.size,
-                    whitelistedDomains = parsed.whitelistedDomains.size,
-                    sourcesDownloaded = sourceResult.first,
-                    sourcesFailed = sourceResult.second
+                    domains = parsed.blockedDomains.size + parsed.allowedDomains.size,
+                    sourcesDownloaded = sources.first,
+                    sourcesFailed = sources.second
                 )
             )
         } catch (e: Exception) {
@@ -210,7 +194,7 @@ object BackupManager {
         val known = BlocklistManager.getSources(context).associateBy { it.id }
         val wanted = wantedIds.filter { known.containsKey(it) }
 
-        // Replace semantics: drop sources the backup did not have.
+        // Replace semantics: drop lists the backup did not have.
         known.keys
             .filter { it !in wanted && BlocklistManager.isSourceDownloaded(context, it) }
             .forEach { BlocklistManager.deleteSource(context, it) }
@@ -221,7 +205,7 @@ object BackupManager {
 
         missing.forEachIndexed { index, id ->
             val source = known[id] ?: return@forEachIndexed
-            onProgress("Downloading ${source.name} (${index + 1} of ${missing.size})...")
+            onProgress("Downloading ${source.name}, ${index + 1} of ${missing.size}")
             if (BlocklistManager.downloadSource(context, source).isSuccess) downloaded++ else failed++
         }
         return downloaded to failed
@@ -231,17 +215,13 @@ object BackupManager {
         val root = try {
             JSONObject(text)
         } catch (_: Exception) {
-            return Result.failure(Exception("Not a valid Firewall backup file"))
+            return Result.failure(Exception("Not a Firewall backup file"))
         }
 
         val schema = root.optInt("schema", -1)
-        if (schema < 1) {
-            return Result.failure(Exception("Not a valid Firewall backup file"))
-        }
+        if (schema < 1) return Result.failure(Exception("Not a Firewall backup file"))
         if (schema > SCHEMA_VERSION) {
-            return Result.failure(
-                Exception("This backup was made by a newer version of Firewall")
-            )
+            return Result.failure(Exception("This backup was made by a newer version of Firewall"))
         }
 
         val rules = mutableListOf<AppRule>()
@@ -250,26 +230,37 @@ object BackupManager {
         for (i in 0 until rulesArray.length()) {
             val obj = rulesArray.optJSONObject(i) ?: continue
             val pkg = obj.optString("packageName").trim()
-            // Skip junk rather than aborting: an uninstalled or malformed entry is
-            // harmless, and the app already purges rules for missing packages.
+            // Skip junk rather than abort: one malformed or uninstalled entry is
+            // harmless, and rules for missing packages are purged anyway.
             if (pkg.isEmpty() || !seen.add(pkg)) continue
-            rules.add(
-                AppRule(
-                    packageName = pkg,
-                    allowWifi = obj.optBoolean("allowWifi", false),
-                    allowMobile = obj.optBoolean("allowMobile", false)
-                )
-            )
+
+            val mode = when {
+                obj.has("mode") -> obj.optInt("mode", AppMode.BLOCKED)
+                // Schema 1: allowed on either network meant the app was let out.
+                obj.optBoolean("allowWifi", false) || obj.optBoolean("allowMobile", false) ->
+                    AppMode.FILTERED
+                else -> AppMode.BLOCKED
+            }
+            if (mode !in AppMode.BLOCKED..AppMode.BYPASS) continue
+            rules.add(AppRule(pkg, mode))
         }
 
         val provider = root.optString("dohProvider", "cloudflare")
             .takeIf { DohResolver.providers.containsKey(it) } ?: "cloudflare"
 
+        // Schema 1 called these custom and whitelisted.
+        val blocked = domainList(
+            root.optJSONArray("blockedDomains") ?: root.optJSONArray("customBlockedDomains")
+        )
+        val allowed = domainList(
+            root.optJSONArray("allowedDomains") ?: root.optJSONArray("whitelistedDomains")
+        )
+
         return Result.success(
             ParsedBackup(
                 rules = rules,
-                customDomains = domainList(root.optJSONArray("customBlockedDomains")),
-                whitelistedDomains = domainList(root.optJSONArray("whitelistedDomains")),
+                blockedDomains = blocked,
+                allowedDomains = allowed,
                 sourceIds = stringList(root.optJSONArray("blocklistSources")),
                 trackerBlockingEnabled = root.optBoolean("trackerBlockingEnabled", false),
                 dohEnabled = root.optBoolean("dohEnabled", false),
@@ -278,15 +269,8 @@ object BackupManager {
         )
     }
 
-    /**
-     * Domains are stored newline-joined, so anything containing whitespace would
-     * corrupt neighbouring entries on the next read. Filter, do not escape.
-     */
     private fun domainList(array: JSONArray?): List<String> =
-        stringList(array)
-            .map { it.lowercase() }
-            .filter { it.contains('.') && it.none { c -> c.isWhitespace() } }
-            .distinct()
+        stringList(array).mapNotNull { DomainRules.normalise(it) }.distinct()
 
     private fun stringList(array: JSONArray?): List<String> {
         if (array == null) return emptyList()

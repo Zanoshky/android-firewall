@@ -36,27 +36,26 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter your PIN to continue"
+        android:text="Enter your passcode to continue"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:layout_marginTop="4dp" />
 
     <EditText
-        android:id="@+id/editLockPin"
+        android:id="@+id/editLockPasscode"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:background="@drawable/bg_search"
-        android:hint="PIN"
+        android:hint="Passcode"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:textSize="18sp"
-        android:letterSpacing="0.3"
-        android:gravity="center"
-        android:inputType="numberPassword"
+                android:gravity="center"
+        android:inputType="textPassword"
         android:imeOptions="actionDone"
-        android:maxLength="12"
+        android:maxLength="64"
         android:importantForAutofill="no"
-        android:contentDescription="App lock PIN"
+        android:contentDescription="App lock passcode"
         android:saveEnabled="false"
         android:layout_marginTop="28dp" />
 

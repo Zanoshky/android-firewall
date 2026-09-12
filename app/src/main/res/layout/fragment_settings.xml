@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Require a PIN before the app can be opened, so your rules cannot be changed by someone holding your phone."
+            android:text="Ask for a passcode before the app opens, so your rules cannot be changed by someone holding your phone. Letters, digits and symbols are all allowed."
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:layout_marginTop="4dp" />
@@ -56,7 +56,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PIN protection"
+                    android:text="Passcode"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium" />
@@ -75,7 +75,7 @@
                 android:id="@+id/switchAppLock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Toggle PIN protection"
+                android:contentDescription="Toggle the passcode"
                 android:saveEnabled="false" />
         </LinearLayout>
 
@@ -84,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center_vertical"
-            android:text="Change PIN"
+            android:text="Change passcode"
             android:textColor="@color/accent"
             android:textSize="15sp"
             android:fontFamily="sans-serif-medium"
@@ -110,7 +110,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Saves your per-app Wi-Fi and mobile rules, custom blocked domains, whitelisted domains, which blocklists you downloaded, and your tracker and DoH settings. Plain JSON, no encryption. Your PIN and your logs and stats are never included."
+            android:text="Saves how each app is handled, your domain rules, which tracker lists you downloaded, and your tracker and encryption settings. Plain JSON, no encryption. Your passcode, your activity and your counters are never included."
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:layout_marginTop="4dp" />
@@ -176,7 +176,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Replaces your current rules and domains"
+                    android:text="Replaces your app modes and domain rules"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:layout_marginTop="2dp" />

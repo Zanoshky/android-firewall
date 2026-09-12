@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg_dark">
+    android:background="@color/bg_dark"
+    android:orientation="vertical">
 
-    <!-- Search bar -->
     <EditText
         android:id="@+id/editSearch"
         android:layout_width="match_parent"
@@ -17,90 +16,123 @@
         android:drawableStart="@android:drawable/ic_menu_search"
         android:drawablePadding="10dp"
         android:drawableTint="@color/text_hint"
-        android:hint="Search apps..."
-        android:textColorHint="@color/text_hint"
-        android:textColor="@color/text_primary"
-        android:textSize="14sp"
+        android:hint="Search apps"
+        android:importantForAutofill="no"
         android:inputType="text"
         android:paddingHorizontal="16dp"
-        android:importantForAutofill="no" />
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        android:textSize="14sp" />
 
-    <!-- Tab filter + bulk actions row -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@android:color/transparent"
+        app:tabGravity="fill"
+        app:tabIndicator="@drawable/bg_tab_indicator"
+        app:tabIndicatorColor="@color/accent"
+        app:tabMode="fixed"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabSelectedTextColor="@color/accent"
+        app:tabTextColor="@color/text_hint">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="System" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- Bulk actions, applied to whatever the filter above is showing -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp">
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabFilter"
+        <TextView
+            android:id="@+id/btnBypassAll"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:tabIndicator="@drawable/bg_tab_indicator"
-            app:tabIndicatorColor="@color/accent_blue"
-            app:tabTextColor="@color/text_hint"
-            app:tabSelectedTextColor="@color/accent_blue"
-            app:tabMode="fixed"
-            app:tabGravity="fill"
-            app:tabRippleColor="@android:color/transparent">
+            android:background="@drawable/bg_segment_off"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Bypass all"
+            android:textColor="@color/mode_bypass"
+            android:textSize="12sp" />
 
-            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" />
-            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="User" />
-            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="System" />
-        </com.google.android.material.tabs.TabLayout>
+        <View
+            android:layout_width="6dp"
+            android:layout_height="1dp" />
+
+        <TextView
+            android:id="@+id/btnFilterAll"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_segment_off"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Filter all"
+            android:textColor="@color/accent"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="6dp"
+            android:layout_height="1dp" />
 
         <TextView
             android:id="@+id/btnBlockAll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="32dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_segment_off"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
             android:text="Block all"
-            android:textColor="@color/accent_pink"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-medium"
-            android:paddingHorizontal="10dp"
-            android:background="@drawable/bg_toggle_off"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_marginEnd="6dp" />
-
-        <TextView
-            android:id="@+id/btnAllowAll"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:gravity="center"
-            android:text="Allow all"
-            android:textColor="@color/accent_cyan"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-medium"
-            android:paddingHorizontal="10dp"
-            android:background="@drawable/bg_toggle_off"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_marginEnd="16dp" />
+            android:textColor="@color/danger"
+            android:textSize="12sp" />
     </LinearLayout>
 
-    <!-- Rule-change hint -->
     <TextView
+        android:id="@+id/txtModeLegend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="6dp"
-        android:text="Rules apply to new connections. Fully close a running app before blocking it, then reopen it - same when you unblock."
+        android:layout_marginTop="8dp"
+        android:lineSpacingExtra="2dp"
+        android:text="Bypass goes straight out, untouched. Filtered sends the app's lookups through the firewall, so encryption, tracker blocking and your domain rules all apply. Blocked gives the app no working addresses. Changes take effect at once, but an app that is already running can hold on to what it opened earlier, so close and reopen it."
         android:textColor="@color/text_hint"
-        android:textSize="11sp"
-        android:lineSpacingExtra="2dp" />
+        android:textSize="11sp" />
 
-    <!-- App list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerApps"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:clipToPadding="false"
         android:paddingBottom="8dp" />
 

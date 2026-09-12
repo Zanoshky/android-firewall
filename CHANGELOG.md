@@ -2,6 +2,50 @@
 
 All notable user-facing changes to Firewall.
 
+## 1.11, September 2026
+
+### Blocking a domain now actually blocks it
+
+This is the reason for the release. Blocking `google.com` used to do nothing in your browser, and the explanation was uncomfortable: an app you allowed was excluded from the tunnel altogether, so the firewall never saw a single thing it looked up. The domain list could only ever act on apps that were already cut off, which is to say it did nothing at all.
+
+The tunnel was rebuilt around that. It no longer carries your traffic; it carries the lookups, which is where the decision actually happens. A blocked name is answered with an address that leads nowhere and the connection is refused at once, so a blocked site fails instantly instead of hanging. Lookups sent straight to a hardcoded public resolver are caught too.
+
+Because ordinary traffic never enters the app, this costs less battery than the old design rather than more. Nothing is copied through the firewall while a video plays.
+
+### Every app is handled one of three ways
+
+The Wi-Fi and mobile toggles are gone. They never said what would happen to the traffic, and one of them silently disabled filtering for that app. Each app is now Bypass, Filtered or Blocked, and the label says which:
+
+- **Bypass**: outside the firewall. Untouched, unfiltered, free.
+- **Filtered**: lookups go through the firewall, so encryption, tracker blocking and your domain rules apply.
+- **Blocked**: no working addresses, so nothing new can be opened.
+
+Changes take effect on the app's next lookup. Nothing has to be toggled or restarted. Apps that were allowed before become Filtered, and everything else stays Blocked.
+
+Blocking an app now works by refusing names, so an app with an address written into its code can still try that one address. Everything it would normally look up is gone.
+
+### New: a Domains tab
+
+Your own block list and allow list for ordinary websites, separate from the tracker lists. A rule covers the domain and everything under it, and the more specific rule wins, so you can block a domain and allow one name inside it. The allow list is also how you undo a tracker list that got a site wrong. Rules apply the moment you add them.
+
+### Logs and stats are one screen
+
+They were two tabs, so the numbers and the entries that produced them were never visible together. The Activity tab now opens on the summary and scrolls straight into the log, with the filter pinned above both.
+
+There is a lot more in the summary than there used to be: how many lookups the firewall has seen, how many it stopped and what share that is, how many were encrypted, which of tracker lists, your own rules or a blocked app did the stopping, an hour by hour bar chart of the last day, where your apps stand, how long protection has been on, and the names blocked most often. Tapping a log entry offers to block that domain, or to always allow it.
+
+### The passcode can be a real password
+
+App Lock accepted four to twelve digits, which is a number small enough to work through by hand. It now takes letters, digits and symbols, up to sixty four characters. Existing numeric PINs keep working.
+
+### Also
+
+- The app warns you when Android's own Private DNS setting is on, because that takes lookups away from the firewall and nothing would be filtered.
+- Lookups fall back to the network's own resolver when the encrypted one cannot be reached, instead of leaving apps with no answer.
+- Counts for each app in the app list, and the app name on every log entry, for lookups as well as connections.
+- The tunnel no longer rebuilds when you switch between Wi-Fi and mobile, because rules no longer depend on which one you are on.
+- Upgrading keeps your rules. Activity history and the old byte counters start fresh, since they no longer have a matching shape.
+
 ## 1.9 — September 2026
 
 ### Fixed
