@@ -1,59 +1,65 @@
-A no-root Android firewall with tracker blocking, DNS-over-HTTPS, and connection logging. You choose which apps get online and which trackers get shut down.
+A firewall for Android that needs no root, with tracker blocking, DNS over HTTPS, and a log of everything your phone looks up. You decide, app by app, what the firewall does with it.
 
 No ads. No tracking. No analytics. No data collection. No external servers. Everything runs locally on your device.
 
 HOW IT WORKS
 
-Firewall creates a local VPN on your device. All network traffic routes through it. Apps you have not whitelisted hit a dead end. Apps you allow bypass the VPN and connect normally. The VPN is entirely local - no traffic leaves through a remote server.
+Firewall runs a local VPN, but it does not carry your traffic. The tunnel claims one small, reserved range of addresses, and what comes through it is every name your phone looks up. That is the point where a firewall can actually decide something, and it is cheap: your photos, your video and your downloads never enter the app at all, so nothing is slowed down and nothing keeps the CPU awake.
+
+A name that is blocked is answered with an address that goes nowhere, and the connection that follows is refused on the spot. A name that is allowed is resolved for real, encrypted if you asked for that.
+
+HOW EACH APP IS HANDLED
+
+Bypass: outside the firewall. Untouched, unfiltered, costs nothing.
+Filtered: its lookups go through the firewall, so encryption, tracker blocking and your domain rules all apply.
+Blocked: no working addresses at all, so it cannot open anything new.
+
+Changes take effect on the app's next lookup. Nothing has to be restarted.
 
 FEATURES
 
-Per-App Firewall
-- All apps blocked by default - whitelist only what you trust
-- Separate Wi-Fi and mobile data toggles for each app
-- Block system apps and OEM bloatware
-- Changes apply within a second, no restart needed
+Domain rules
+- Your own block list and allow list for ordinary websites
+- A rule covers the domain and everything under it
+- The more specific rule wins, so block a domain and allow one name inside it
+- Rules apply the moment you add them, in every filtered app
 
-Tracker and Ad Blocking
-- Intercepts DNS queries and blocks known trackers, ads, and fingerprinting
-- Bundled default blocklist active out of the box
-- Download community blocklists (HaGeZi, OISD, 1Hosts, Steven Black, AdGuard)
-- Add custom blocked domains and whitelist false positives
+Tracker and ad blocking
+- Checks every lookup against known tracker, ad and fingerprinting domains
+- Bundled list active out of the box
+- Optional community lists: HaGeZi, OISD, 1Hosts, Steven Black, AdGuard
 
 DNS over HTTPS
-- Encrypt all DNS queries so your ISP cannot see what you visit
-- Choose from Cloudflare, Google, or Quad9
+- Encrypts your lookups so your network operator cannot read which sites you open
+- Cloudflare, Google or Quad9
+- Falls back to the network's own resolver rather than leaving you with no answer
 
-App Lock
-- Require a PIN to open the app
-- Protects rules from being changed by someone with device access
-- Brute-force lockout after wrong attempts
-
-Backup and Restore
-- Export rules, domains, and settings to JSON
-- Restore on the same or different device
-
-Auto-Start on Boot
-- Restarts automatically after reboot or app update
-- Works before device unlock (direct boot aware)
-
-Quick Settings Tile
-- Toggle from the notification shade
-- Respects App Lock when enabled
-
-Connection Logs
-- Real-time log with app attribution (Android 10+)
-- Filter by status, search by app or domain
+Activity
+- Lookups seen, how many were stopped, and what share were encrypted
+- Which did the stopping: tracker lists, your own rules, or a blocked app
+- An hour by hour chart of the last day, and the names blocked most often
+- The full log, searchable, with the app behind every entry
+- Tap an entry to block that domain, or to always allow it
 - Export to CSV
 
-Traffic Stats
-- Per-app and global download/upload totals
-- Top apps ranked by traffic volume
+App Lock
+- A passcode before the app opens, letters and symbols included
+- Hashed with PBKDF2, locked out after repeated wrong tries
+
+Backup and restore
+- Export how each app is handled, your domain rules and your settings to JSON
+- Restore here or on another phone
+
+Starting on boot
+- Restarts after a reboot or an app update, before you unlock
+
+Quick settings tile
+- Toggle from the notification shade, and it respects App Lock
 
 PRIVACY
 
-Zero data collection. No analytics, no crash reporting, no telemetry. The only outbound connections are DoH queries (when enabled) and blocklist downloads (when you tap download).
+Nothing is collected. No analytics, no crash reporting, no telemetry. The only outbound connections are encrypted lookups to the provider you chose, and tracker list downloads when you tap download.
 
 COMPATIBILITY
 
-Android 6.0 through Android 16. No root required. Works on all devices.
+Android 6.0 through Android 16. No root. Works on all devices.

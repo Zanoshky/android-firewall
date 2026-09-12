@@ -1,0 +1,9 @@
+Blocking a domain now actually blocks it. Apps you allowed used to sit outside the firewall, so the domain list never saw what they looked up.
+
+Every app is now Bypass, Filtered or Blocked, and a change applies at once. The Wi-Fi and mobile toggles are gone.
+
+New Domains tab for your own block and allow lists.
+
+Logs and stats are one Activity screen: what was stopped and why, an hourly chart, and the names blocked most often.
+
+The passcode can be letters and symbols, not only digits.

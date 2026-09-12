@@ -1,1 +1,1 @@
-No-root firewall with tracker blocking and DNS over HTTPS.
+Real domain blocking, tracker blocking and DNS over HTTPS. No root.
