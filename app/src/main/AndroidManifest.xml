@@ -16,7 +16,8 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@drawable/ic_shield"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="Firewall"
         android:supportsRtl="true"
         android:theme="@style/Theme.Firewall">
@@ -65,7 +66,7 @@
         <!-- Quick Settings tile for toggling firewall from notification shade -->
         <service
             android:name="com.zanoshky.firewall.FirewallTileService"
-            android:icon="@drawable/ic_shield"
+            android:icon="@drawable/ic_shield_mono"
             android:label="Firewall"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true"

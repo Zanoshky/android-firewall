@@ -545,7 +545,7 @@ class FirewallVpnService : VpnService() {
         return Notification.Builder(this, CHANNEL_ID)
             .setContentTitle("Firewall active")
             .setContentText(subtitle)
-            .setSmallIcon(R.drawable.ic_shield)
+            .setSmallIcon(R.drawable.ic_shield_mono)
             .setContentIntent(pending)
             .setOngoing(true)
             .build()

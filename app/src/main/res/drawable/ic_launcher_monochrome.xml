@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Themed icon layer, Android 13 and newer.   The channel runs past the shield's right edge on purpose. Even-odd fill
+  counts that overhang as inside one subpath, which would paint it solid, so
+  a third subpath covers exactly the overhang and makes the count even again.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:translateX="24" android:translateY="20"
+           android:scaleX="0.5" android:scaleY="0.5">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M60 8 C60 8 86 17 101 22 C105 23.5 107 27 107 31 L107 62 C107 96 86 118 60 128 C34 118 13 96 13 62 L13 31 C13 27 15 23.5 19 22 C34 17 60 8 60 8 Z M43.5 55 H114.5 A9.5 9.5 0 0 1 114.5 74 H43.5 A9.5 9.5 0 0 1 43.5 55 Z M107 55 H114.5 A9.5 9.5 0 0 1 114.5 74 H107 Z" />
+    </group>
+</vector>
