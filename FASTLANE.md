@@ -63,11 +63,20 @@ bundle exec fastlane release         # Build and upload to production
 ### Metadata
 
 ```bash
-bundle exec fastlane metadata        # Upload title, descriptions, changelogs
-bundle exec fastlane metadata_full   # Upload metadata + screenshots
+bundle exec fastlane metadata        # Upload title and descriptions
+bundle exec fastlane metadata_full   # Upload metadata, icon, feature graphic, screenshots
 bundle exec fastlane screenshots     # Upload screenshots only
-bundle exec fastlane validate        # Dry run - validate metadata
+bundle exec fastlane validate        # Dry run, validate metadata
 ```
+
+None of these upload changelogs, on purpose. A changelog belongs to one version
+code, and a run that uploads no binary has no version code to attach it to.
+Asking for both fails the whole edit with `Cannot find changelog because no
+version code given`, and because a Play edit is all or nothing, the icon and the
+screenshots in that same run do not land either. That is what silently happened
+on 12 September 2026: the new store artwork was uploaded, the run died on the
+changelog, and the listing kept the old images. Changelogs go up with the
+`release` lane, alongside the build they describe.
 
 ### Promote
 

@@ -56,21 +56,28 @@ platform :android do
     )
   end
 
-  desc "Upload metadata only (title, descriptions, changelogs)"
+  # A changelog belongs to one version code, and a run that uploads no binary has
+  # no version code to attach it to. Asking for both fails the whole edit with
+  # "Cannot find changelog because no version code given", which takes the store
+  # listing down with it. So the metadata lanes never touch changelogs; the
+  # release lane carries them up with the build they describe.
+  desc "Upload metadata only (title and descriptions)"
   lane :metadata do
     upload_to_play_store(
       skip_upload_aab: true,
       skip_upload_apk: true,
+      skip_upload_changelogs: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
   end
 
-  desc "Upload metadata and screenshots"
+  desc "Upload metadata, icon, feature graphic and screenshots"
   lane :metadata_full do
     upload_to_play_store(
       skip_upload_aab: true,
-      skip_upload_apk: true
+      skip_upload_apk: true,
+      skip_upload_changelogs: true
     )
   end
 
@@ -89,6 +96,7 @@ platform :android do
     upload_to_play_store(
       skip_upload_aab: true,
       skip_upload_apk: true,
+      skip_upload_changelogs: true,
       validate_only: true
     )
   end

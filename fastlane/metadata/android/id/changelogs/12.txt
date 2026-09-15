@@ -1,0 +1,7 @@
+Ikon baru.
+
+Yang lama adalah perisai bawaan Google, simbol yang sama yang dipakai firewall lain. Tanda yang baru adalah perisai dengan satu saluran: satu unit merah berhenti di ujung yang tertutup, satu unit hijau sudah melewati sisi seberang. Itulah yang aplikasi ini lakukan pada sebuah permintaan nama.
+
+Sekarang ikonnya juga adaptif sepenuhnya, jadi topeng bulat tidak lagi memotongnya, dan ada versi bertema untuk Android 13 ke atas.
+
+Tidak ada perubahan lain.

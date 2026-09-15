@@ -1,0 +1,7 @@
+Un icono nuevo.
+
+El anterior era el escudo estandar de Google, el mismo simbolo que usan otros firewalls. La nueva marca es un escudo con un canal: una unidad roja detenida en el extremo cerrado y una verde que ya ha pasado al otro lado. Eso es lo que la app hace con una consulta de nombre.
+
+Ahora tambien es un icono adaptable de verdad, asi que una mascara redonda ya no lo recorta, y hay una version tematica para Android 13 y posterior.
+
+No ha cambiado nada mas.

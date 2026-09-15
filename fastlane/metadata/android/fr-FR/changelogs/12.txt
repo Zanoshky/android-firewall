@@ -1,0 +1,7 @@
+Une nouvelle icone.
+
+L'ancienne etait le bouclier standard de Google, le meme symbole que d'autres pare-feu utilisent. La nouvelle marque est un bouclier avec un canal : une unite rouge arretee au bout ferme, une verte deja passee de l'autre cote. C'est ce que l'application fait d'une requete de nom.
+
+C'est aussi une vraie icone adaptative, donc un masque rond ne la rogne plus, et il existe une version thematique pour Android 13 et plus.
+
+Rien d'autre n'a change.

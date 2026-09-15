@@ -1,0 +1,7 @@
+A new icon.
+
+The old one was Google's stock shield, the same glyph several other firewalls use. The new mark is a shield with one channel through it: a red unit stopped at the closed end, a green one already past the far edge. That is what the app does to a lookup.
+
+It is a proper adaptive icon now, so a round mask no longer cuts into it, and there is a themed version for Android 13 and later.
+
+Nothing else changed in this release.

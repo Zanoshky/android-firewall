@@ -1,0 +1,7 @@
+Naya app icon.
+
+Purana icon Google ka standard shield tha, wahi symbol jo doosre firewalls bhi istemal karte hain. Naya nishan ek shield hai jisme ek channel hai: laal unit band sire par ruk gayi, hari unit doosri taraf nikal gayi. App ek naam ki query ke saath yahi karta hai.
+
+Ab yeh sahi adaptive icon bhi hai, isliye gol mask ise nahin kaatta, aur Android 13 aur uske baad ke liye themed version hai.
+
+Aur kuch nahin badla.

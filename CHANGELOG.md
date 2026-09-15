@@ -1,6 +1,18 @@
 # Changelog
 
-All notable user-facing changes to Firewall.
+Every change to Firewall that you can see, newest first.
+
+## 1.12, September 2026
+
+### A new icon
+
+The old launcher icon was Google's stock shield glyph, the same one several other firewalls in the store are using. The new mark is drawn for this app: a shield with one channel through it, a red unit halted at the closed end and a green one already past the far edge, which is what the app does to a lookup.
+
+The icon was also simply wrong in a way you could see on your home screen. The image had no safe area, so any round mask cut into it. It is now a real adaptive icon, with a background, a foreground that stays inside the safe area, a themed version for Android 13 and later, and plain images for Android 8 and older. The notification and the quick settings tile get a single colour version, because at that size a tinted surface would flatten the two coloured units into the shield.
+
+The store icon and the feature graphic were purple and teal while the app itself has always been emerald. All three now match.
+
+Nothing else changed. The app's own colours are untouched.
 
 ## 1.11, September 2026
 
@@ -46,7 +58,7 @@ App Lock accepted four to twelve digits, which is a number small enough to work 
 - The tunnel no longer rebuilds when you switch between Wi-Fi and mobile, because rules no longer depend on which one you are on.
 - Upgrading keeps your rules. Activity history and the old byte counters start fresh, since they no longer have a matching shape.
 
-## 1.9 — September 2026
+## 1.9, September 2026
 
 ### Fixed
 
@@ -55,7 +67,7 @@ App Lock accepted four to twelve digits, which is a number small enough to work 
 - **All five community blocklists are listed.** The lists sat in a plain `ScrollView`, which lays out only the first row of a `RecyclerView`, so only the first source was ever shown. The same bug hid every per-app row but one on the Stats tab, and the custom and whitelisted domain lists.
 - **The HaGeZi Light download works again.** Its `hosts/` path no longer exists upstream; the source now points at the maintained `adblock/` list, and its domain count in the description matches what is actually downloaded.
 
-## 1.8 — August 2026
+## 1.8, August 2026
 
 ### Fixed
 
@@ -72,7 +84,7 @@ App Lock accepted four to twelve digits, which is a number small enough to work 
 - **Backup and Restore.** Export your per-app rules, custom domains, whitelist, blocklist sources, and DoH settings to a JSON file. Restore on the same or a different device.
 - **Quick Settings tile** respects App Lock: turning protection off from the shade opens the app for PIN entry when the lock is enabled.
 
-## 1.6 — July 2026
+## 1.6, July 2026
 
 The big one: this release fixes every reported bug, cuts battery use dramatically, and gives the app a new look.
 
@@ -102,14 +114,14 @@ The big one: this release fixes every reported bug, cuts battery use dramaticall
 - Now targets Android 16 (API 36).
 - Note: upgrading resets stored rules and logs due to a database schema change. You will need to re-allow your apps once.
 
-## 1.5 — April 2026
+## 1.5, April 2026
 
 - Firewall automatically starts on boot, even before the device is unlocked.
 - Firewall restarts automatically after an app update.
 - Refreshed interface with a lighter, cleaner layout.
 - Updated bundled tracker blocklist.
 
-## 1.2 — March 2026
+## 1.2, March 2026
 
 - Tracker and ad blocking with downloadable community blocklists (HaGeZi, OISD, 1Hosts, Steven Black, AdGuard).
 - DNS over HTTPS with a choice of Cloudflare, Google, or Quad9.
@@ -118,7 +130,7 @@ The big one: this release fixes every reported bug, cuts battery use dramaticall
 - Quick Settings tile to toggle the firewall from the notification shade.
 - Material redesign.
 
-## 1.0 — March 2026
+## 1.0, March 2026
 
 - First release: no-root, on-device firewall with per-app Wi-Fi and mobile data rules.
 - All apps blocked by default; allow only what you trust.

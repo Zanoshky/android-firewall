@@ -1,0 +1,7 @@
+Ein neues Symbol.
+
+Das alte war Googles Standardschild, dasselbe Zeichen, das auch andere Firewalls verwenden. Das neue Zeichen ist ein Schild mit einem Kanal: eine rote Einheit wird am geschlossenen Ende gestoppt, eine gruene ist schon durch. Genau das macht die App mit einer Namensabfrage.
+
+Es ist jetzt auch ein richtiges adaptives Symbol, eine runde Maske schneidet es nicht mehr an, und fuer Android 13 und neuer gibt es eine passende Version.
+
+Sonst hat sich nichts geaendert.

@@ -1,0 +1,7 @@
+Yeni bir simge.
+
+Eskisi Google'in standart kalkaniydi, baska guvenlik duvarlarinin da kullandigi ayni sembol. Yeni isaret, icinden bir kanal gecen bir kalkan: kirmizi birim kapali ucta durduruldu, yesil birim ise karsi taraftan cikti. Uygulamanin bir ad sorgusuna yaptigi tam olarak budur.
+
+Artik gercek bir uyarlanabilir simge, yuvarlak maske onu kesmiyor ve Android 13 ve sonrasi icin temali bir surum var.
+
+Baska bir sey degismedi.
