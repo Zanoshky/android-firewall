@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Names that stay the same in every language: the app itself, and the
+         resolvers, which are brands rather than words. -->
+    <string name="app_name" translatable="false">Firewall</string>
+    <string name="provider_cloudflare" translatable="false">Cloudflare</string>
+    <string name="provider_google" translatable="false">Google</string>
+    <string name="provider_quad9" translatable="false">Quad9</string>
+    <string name="symbol_remove" translatable="false">X</string>
+
+    <!-- Bottom navigation -->
+    <string name="tab_apps">Apps</string>
+    <string name="tab_activity">Activity</string>
+    <string name="tab_domains">Domains</string>
+    <string name="tab_trackers">Trackers</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Shared actions -->
+    <string name="action_add">Add</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_download">Download</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_restore">Restore</string>
+    <string name="action_save">Save</string>
+    <string name="action_turn_off">Turn off</string>
+
+    <!-- The three ways an app can be handled -->
+    <string name="mode_bypass">Bypass</string>
+    <string name="mode_filtered">Filtered</string>
+    <string name="mode_blocked">Blocked</string>
+    <string name="mode_bypass_description">Bypass, not filtered</string>
+    <string name="mode_filtered_description">Filtered through the firewall</string>
+    <string name="mode_blocked_description">Blocked</string>
+
+    <!-- Hero card -->
+    <string name="hero_shield_description">Firewall shield</string>
+    <string name="hero_toggle_description">Toggle firewall</string>
+    <string name="hero_stopped">Stopped</string>
+    <string name="status_protected">Protected</string>
+    <string name="status_inactive">Inactive</string>
+    <string name="status_tap_to_start">Tap the switch to start</string>
+    <string name="status_filtered">Lookups filtered</string>
+    <string name="status_filtered_encrypted">Lookups filtered and encrypted</string>
+    <plurals name="hero_lookups_seen">
+        <item quantity="one">%s lookup seen</item>
+        <item quantity="other">%s lookups seen</item>
+    </plurals>
+
+    <!-- How a duration is written out -->
+    <string name="duration_days">%1$dd %2$dh</string>
+    <string name="duration_hours">%1$dh %2$dm</string>
+    <string name="duration_minutes">%1$dm %2$ds</string>
+    <string name="duration_minutes_only">%1$dm</string>
+    <string name="duration_seconds">%1$ds</string>
+
+    <!-- How a large count is shortened, and how a share is written -->
+    <string name="count_thousands">%1$sK</string>
+    <string name="count_millions">%1$sM</string>
+    <string name="percent_value">%1$d%%</string>
+
+    <!-- Apps tab -->
+    <string name="apps_search_hint">Search apps</string>
+    <string name="filter_all">All</string>
+    <string name="filter_user">User</string>
+    <string name="filter_system">System</string>
+    <string name="badge_system">SYS</string>
+    <string name="app_icon_description">App icon</string>
+    <string name="bulk_bypass_all">Bypass all</string>
+    <string name="bulk_filter_all">Filter all</string>
+    <string name="bulk_block_all">Block all</string>
+    <string name="apps_mode_help">Bypass goes straight out, untouched. Filtered sends the app\'s lookups through the firewall, so encryption, tracker blocking and your domain rules all apply. Blocked gives the app no working addresses. Changes take effect at once, but an app that is already running can hold on to what it opened earlier, so close and reopen it.</string>
+    <plurals name="app_lookups">
+        <item quantity="one">%d lookup</item>
+        <item quantity="other">%d lookups</item>
+    </plurals>
+    <string name="app_stats_format">%1$s, %2$d blocked</string>
+
+    <!-- Domains tab -->
+    <string name="domains_help">Your own rules for ordinary websites, separate from the tracker lists. A rule covers the domain and everything under it, so blocking google.com also blocks www.google.com and mail.google.com. The more specific rule wins, so you can block a domain and allow one name inside it. Rules take effect at once, for every app set to Filtered.</string>
+    <string name="domains_block_list">Block list</string>
+    <string name="domains_allow_list">Allow list</string>
+    <string name="domains_hint_block">Domain to block</string>
+    <string name="domains_hint_allow">Domain to allow</string>
+    <plurals name="domains_block_hint">
+        <item quantity="one">%d blocked. Nothing on this list can be reached by a filtered app.</item>
+        <item quantity="other">%d blocked. Nothing on this list can be reached by a filtered app.</item>
+    </plurals>
+    <plurals name="domains_allow_hint">
+        <item quantity="one">%d allowed. This is let through even when a tracker list names it.</item>
+        <item quantity="other">%d allowed. These are let through even when a tracker list names them.</item>
+    </plurals>
+    <string name="domains_empty_block">No blocked domains yet.\nAdd one above to stop it everywhere.</string>
+    <string name="domains_empty_allow">No allowed domains yet.\nAdd one here when a tracker list blocks something you need.</string>
+    <string name="toast_not_a_domain">That is not a domain name</string>
+    <string name="toast_domain_added_block">%1$s blocked</string>
+    <string name="toast_domain_added_allow">%1$s allowed</string>
+
+    <!-- Trackers tab -->
+    <string name="trackers_title">Tracker blocking</string>
+    <string name="trackers_toggle_description">Toggle tracker blocking</string>
+    <string name="trackers_status_loading">Loading names</string>
+    <string name="trackers_status_off">Off</string>
+    <plurals name="trackers_status_on">
+        <item quantity="one">On, %d name loaded</item>
+        <item quantity="other">On, %d names loaded</item>
+    </plurals>
+    <string name="doh_title">DNS over HTTPS</string>
+    <string name="doh_toggle_description">Toggle encrypted lookups</string>
+    <string name="doh_status_on">On, through %1$s</string>
+    <string name="doh_status_off">Off, lookups go to the network\'s own resolver</string>
+    <string name="stat_blocked">Blocked</string>
+    <string name="stat_names_loaded">Names loaded</string>
+    <string name="stat_encrypted">Encrypted</string>
+    <string name="blocklist_lists_title">Lists</string>
+    <string name="blocklist_lists_help">Downloaded once and kept on the phone. A bigger list blocks more and uses a little more memory. Anything one of these gets wrong can be undone on the Domains tab with an allow rule.</string>
+    <string name="source_not_downloaded">Not downloaded</string>
+    <plurals name="source_downloaded">
+        <item quantity="one">Downloaded, %d name</item>
+        <item quantity="other">Downloaded, %d names</item>
+    </plurals>
+    <string name="toast_downloading">Downloading %1$s</string>
+    <plurals name="toast_names_added">
+        <item quantity="one">%d name added</item>
+        <item quantity="other">%d names added</item>
+    </plurals>
+    <string name="toast_download_failed">Failed: %1$s</string>
+
+    <!-- The tracker lists on offer. The names are the projects own names. -->
+    <string name="source_desc_hagezi_light">Curated list blocking ads, tracking and metrics. Low false positives. About 35K domains.</string>
+    <string name="source_desc_oisd_small">Block without breaking. Minimal false positives, updated hourly. About 57K domains.</string>
+    <string name="source_desc_1hosts_lite">Lightweight tier of a well maintained multi source blocklist. About 195K domains.</string>
+    <string name="source_desc_steven_black">The classic merged hosts file from several curated sources. About 170K domains.</string>
+    <string name="source_desc_adguard_dns">Used by AdGuard public DNS. Conservative, well tested. About 166K domains.</string>
+
+    <!-- Activity tab -->
+    <string name="activity_export_csv">Export CSV</string>
+    <string name="activity_filter_hint">Filter by app, domain or address</string>
+    <string name="filter_blocked">Blocked</string>
+    <string name="filter_allowed">Allowed</string>
+    <string name="filter_trackers">Trackers</string>
+    <string name="private_dns_warning">Private DNS is on in Android settings, so lookups go straight to that provider and the firewall never sees them. Turn it off under Network and internet to get filtering back.</string>
+    <string name="stat_lookups">Lookups</string>
+    <string name="stat_trackers">Trackers</string>
+    <string name="stat_your_rules">Your rules</string>
+    <string name="stat_blocked_apps">Blocked apps</string>
+    <string name="stat_share_stopped">Share stopped</string>
+    <string name="stat_protected">Protected</string>
+    <string name="chart_last_24_hours">Last 24 hours</string>
+    <string name="chart_legend">Green is let through, red is stopped</string>
+    <string name="stats_your_apps">Your apps</string>
+    <string name="stats_most_blocked">Most blocked</string>
+    <string name="stats_nothing_blocked">Nothing blocked yet.</string>
+    <string name="stats_recent_activity">Recent activity</string>
+    <string name="summary_lists_format">%1$s. %2$s %3$s</string>
+    <string name="summary_lists_on">Tracker lists on, %1$s names loaded</string>
+    <string name="summary_lists_off">Tracker lists off</string>
+    <string name="summary_rules">%1$d blocked and %2$d allowed by your own rules.</string>
+    <string name="summary_doh_on">Lookups encrypted through %1$s.</string>
+    <string name="summary_doh_off">Lookups not encrypted.</string>
+
+    <!-- A single log entry, in the list and in the dialog that opens from it -->
+    <string name="log_dest_domain">%1$s · %2$s</string>
+    <string name="log_dest_address">%1$s:%2$d · %3$s</string>
+    <string name="log_detail_app">App: %1$s</string>
+    <string name="log_detail_package">Package: %1$s</string>
+    <string name="log_detail_domain">Domain: %1$s</string>
+    <string name="log_detail_address">Address: %1$s:%2$d</string>
+    <string name="log_detail_kind">Kind: %1$s</string>
+    <string name="log_detail_result">Result: %1$s</string>
+    <string name="log_detail_when">When: %1$s</string>
+    <string name="action_block_domain">Block this domain</string>
+    <string name="action_always_allow">Always allow</string>
+    <string name="toast_domain_blocked_now">%1$s is blocked from now on</string>
+    <string name="toast_domain_allowed_now">%1$s is allowed from now on</string>
+
+    <!-- Why an entry ended the way it did -->
+    <string name="reason_allowed">ALLOWED</string>
+    <string name="reason_tracker">TRACKER</string>
+    <string name="reason_blocklist">BLOCKED</string>
+    <string name="reason_app_blocked">APP BLOCKED</string>
+    <string name="reason_dropped">DROPPED</string>
+
+    <string name="reset_activity_title">Reset activity?</string>
+    <string name="reset_activity_message">Clears the entries below and sets every counter back to zero. Your app modes, domain rules and blocklists are not touched.</string>
+    <string name="toast_nothing_to_export">Nothing to export</string>
+    <plurals name="export_chooser_title">
+        <item quantity="one">Export %d entry</item>
+        <item quantity="other">Export %d entries</item>
+    </plurals>
+
+    <!-- App Lock -->
+    <string name="lock_title">Firewall is locked</string>
+    <string name="lock_subtitle">Enter your passcode to continue</string>
+    <string name="lock_locked_description">Locked</string>
+    <string name="lock_passcode_hint">Passcode</string>
+    <string name="lock_passcode_description">App lock passcode</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_enter_passcode">Enter your passcode</string>
+    <string name="lock_too_many_tries">Too many tries. Wait %1$ds</string>
+    <plurals name="lock_attempts_left">
+        <item quantity="one">Wrong passcode. %d try left</item>
+        <item quantity="other">Wrong passcode. %d tries left</item>
+    </plurals>
+
+    <string name="pin_current_hint">Current passcode</string>
+    <string name="pin_new_hint">New passcode</string>
+    <string name="pin_repeat_hint">Repeat new passcode</string>
+    <string name="pin_set_title">Set a passcode</string>
+    <string name="pin_remove_title">Turn off App Lock</string>
+    <string name="pin_hint_change">Enter your current passcode, then choose a new one.</string>
+    <string name="pin_hint_new">Letters, digits and symbols, at least %1$d characters. There is no way to recover it: forget it and the app has to be reinstalled, which loses your rules.</string>
+    <string name="pin_hint_remove">Enter your current passcode to turn App Lock off.</string>
+    <string name="pin_error_too_short">Use at least %1$d characters</string>
+    <string name="pin_error_too_long">Use at most %1$d characters</string>
+    <string name="pin_error_spaces">Spaces are not allowed</string>
+    <string name="pin_error_mismatch">The two passcodes do not match</string>
+    <string name="pin_error_wrong_current">That is not your current passcode</string>
+    <string name="pin_error_wrong">That is not your passcode</string>
+    <string name="toast_passcode_changed">Passcode changed</string>
+    <string name="toast_app_lock_on">App Lock is on</string>
+    <string name="toast_app_lock_off">App Lock is off</string>
+
+    <!-- Settings -->
+    <string name="settings_app_lock">App Lock</string>
+    <string name="settings_app_lock_help">Ask for a passcode before the app opens, so your rules cannot be changed by someone holding your phone. Letters, digits and symbols are all allowed.</string>
+    <string name="settings_passcode">Passcode</string>
+    <string name="settings_lock_off">Off</string>
+    <string name="settings_lock_on">On, a passcode is needed to open the app</string>
+    <string name="settings_toggle_passcode_description">Toggle the passcode</string>
+    <string name="settings_change_passcode">Change passcode</string>
+    <string name="settings_backup_title">Backup and Restore</string>
+    <string name="settings_backup_help">Saves how each app is handled, your domain rules, which tracker lists you downloaded, and your tracker and encryption settings. Plain JSON, no encryption. Your passcode, your activity and your counters are never included.</string>
+    <string name="settings_export">Export to file</string>
+    <string name="settings_restore">Restore from file</string>
+    <string name="settings_restore_summary">Replaces your app modes and domain rules</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_body">No ads, no tracking, no analytics, no external servers. Everything runs on your device.</string>
+    <string name="settings_version">Firewall %1$s</string>
+
+    <!-- Backup and restore -->
+    <plurals name="app_rules">
+        <item quantity="one">%d app rule</item>
+        <item quantity="other">%d app rules</item>
+    </plurals>
+    <plurals name="domain_rules">
+        <item quantity="one">%d domain rule</item>
+        <item quantity="other">%d domain rules</item>
+    </plurals>
+    <string name="backup_counts_format">%1$s, %2$s</string>
+    <string name="backup_writing">Writing the backup</string>
+    <string name="backup_reading">Reading the file</string>
+    <string name="backup_applying">Applying settings</string>
+    <string name="backup_restoring">Restoring</string>
+    <string name="backup_downloading_source">Downloading %1$s, %2$d of %3$d</string>
+    <string name="backup_exported">Exported %1$s and %2$s</string>
+    <string name="backup_export_failed">Export failed: %1$s</string>
+    <string name="backup_restored">Restored %1$s and %2$s%3$s</string>
+    <string name="backup_restore_failed">Restore failed: %1$s</string>
+    <plurals name="restore_lists_failed">
+        <item quantity="one">, %d list download failed</item>
+        <item quantity="other">, %d list downloads failed</item>
+    </plurals>
+    <string name="restore_title">Restore from backup?</string>
+    <string name="restore_message">This replaces your app modes and your domain rules with what is in the file. Apps the backup does not mention end up blocked. Tracker lists named in it are downloaded again, which needs a connection.</string>
+    <string name="error_cannot_open_file">Could not open the selected file</string>
+    <string name="error_not_a_backup">Not a Firewall backup file</string>
+    <string name="error_backup_newer">This backup was made by a newer version of Firewall</string>
+
+    <!-- The ongoing notification, and the quick settings tile -->
+    <string name="notification_channel_name">Firewall active</string>
+    <string name="notification_channel_description">Shows while the firewall is running</string>
+    <string name="notification_title">Firewall active</string>
+    <string name="notification_text_filtering">Filtering lookups</string>
+    <string name="notification_text_encrypted">Encrypted lookups</string>
+    <string name="notification_text_trackers">, trackers blocked</string>
+    <string name="owner_system">System</string>
+
+</resources>

@@ -131,6 +131,26 @@ object BlocklistManager {
         } catch (_: Exception) { emptyList() }
     }
 
+    /**
+     * The description shown for a source, in the reader's own language.
+     *
+     * The list itself is described in blocklist_sources.json, which is an asset
+     * and so has no localised variants. The id is the stable part, so it is what
+     * the translated description is keyed on; a source with no string of its own
+     * falls back to the English text in the asset.
+     */
+    fun describe(context: Context, source: BlocklistSource): String {
+        val res = when (source.id) {
+            "hagezi_light" -> R.string.source_desc_hagezi_light
+            "oisd_small" -> R.string.source_desc_oisd_small
+            "1hosts_lite" -> R.string.source_desc_1hosts_lite
+            "steven_black" -> R.string.source_desc_steven_black
+            "adguard_dns" -> R.string.source_desc_adguard_dns
+            else -> return source.description
+        }
+        return context.getString(res)
+    }
+
     fun isSourceDownloaded(context: Context, sourceId: String): Boolean =
         File(context.filesDir, "$DOWNLOADED_DIR/$sourceId.txt").exists()
 

@@ -16,7 +16,7 @@
         android:drawableStart="@android:drawable/ic_menu_search"
         android:drawablePadding="10dp"
         android:drawableTint="@color/text_hint"
-        android:hint="Search apps"
+        android:hint="@string/apps_search_hint"
         android:importantForAutofill="no"
         android:inputType="text"
         android:paddingHorizontal="16dp"
@@ -41,17 +41,17 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All" />
+            android:text="@string/filter_all" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User" />
+            android:text="@string/filter_user" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="System" />
+            android:text="@string/filter_system" />
     </com.google.android.material.tabs.TabLayout>
 
     <!-- Bulk actions, applied to whatever the filter above is showing -->
@@ -73,7 +73,7 @@
             android:fontFamily="sans-serif-medium"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="Bypass all"
+            android:text="@string/bulk_bypass_all"
             android:textColor="@color/mode_bypass"
             android:textSize="12sp" />
 
@@ -92,7 +92,7 @@
             android:fontFamily="sans-serif-medium"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="Filter all"
+            android:text="@string/bulk_filter_all"
             android:textColor="@color/accent"
             android:textSize="12sp" />
 
@@ -111,7 +111,7 @@
             android:fontFamily="sans-serif-medium"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="Block all"
+            android:text="@string/bulk_block_all"
             android:textColor="@color/danger"
             android:textSize="12sp" />
     </LinearLayout>
@@ -123,7 +123,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:lineSpacingExtra="2dp"
-        android:text="Bypass goes straight out, untouched. Filtered sends the app's lookups through the firewall, so encryption, tracker blocking and your domain rules all apply. Blocked gives the app no working addresses. Changes take effect at once, but an app that is already running can hold on to what it opened earlier, so close and reopen it."
+        android:text="@string/apps_mode_help"
         android:textColor="@color/text_hint"
         android:textSize="11sp" />
 

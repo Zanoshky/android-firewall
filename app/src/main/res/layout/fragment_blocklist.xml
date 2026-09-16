@@ -37,7 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Tracker blocking"
+                    android:text="@string/trackers_title"
                     android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
@@ -54,7 +54,7 @@
                 android:id="@+id/switchBlocklist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Toggle tracker blocking"
+                android:contentDescription="@string/trackers_toggle_description"
                 android:saveEnabled="false" />
         </LinearLayout>
 
@@ -78,7 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="DNS over HTTPS"
+                    android:text="@string/doh_title"
                     android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
@@ -95,7 +95,7 @@
                 android:id="@+id/switchDoh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Toggle encrypted lookups"
+                android:contentDescription="@string/doh_toggle_description"
                 android:saveEnabled="false" />
         </LinearLayout>
 
@@ -117,7 +117,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:text="Cloudflare"
+                android:text="@string/provider_cloudflare"
                 android:textColor="@color/text_hint"
                 android:textSize="12sp" />
 
@@ -136,7 +136,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:text="Google"
+                android:text="@string/provider_google"
                 android:textColor="@color/text_hint"
                 android:textSize="12sp" />
 
@@ -155,7 +155,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:text="Quad9"
+                android:text="@string/provider_quad9"
                 android:textColor="@color/text_hint"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -188,7 +188,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Blocked"
+                    android:text="@string/stat_blocked"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -218,7 +218,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Names loaded"
+                    android:text="@string/stat_names_loaded"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -248,7 +248,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Encrypted"
+                    android:text="@string/stat_encrypted"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -259,7 +259,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Lists"
+            android:text="@string/blocklist_lists_title"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
@@ -268,7 +268,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:lineSpacingExtra="2dp"
-            android:text="Downloaded once and kept on the phone. A bigger list blocks more and uses a little more memory. Anything one of these gets wrong can be undone on the Domains tab with an allow rule."
+            android:text="@string/blocklist_lists_help"
             android:textColor="@color/text_hint"
             android:textSize="12sp" />
 

@@ -197,34 +197,44 @@ class ActivityFragment : Fragment() {
 
     private fun showEntry(log: ConnectionLog) {
         val ctx = context ?: return
-        val when_ = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date(log.timestamp))
+        val when_ = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            .format(Date(log.timestamp))
         val body = buildString {
-            appendLine("App: ${log.appName}")
-            if (log.packageName.isNotEmpty()) appendLine("Package: ${log.packageName}")
-            if (log.domain.isNotEmpty()) appendLine("Domain: ${log.domain}")
-            appendLine("Address: ${log.destIp}:${log.destPort}")
-            appendLine("Kind: ${log.protocol}")
-            appendLine("Result: ${BlockReason.label(log.blockReason)}")
-            append("When: $when_")
+            appendLine(getString(R.string.log_detail_app, log.appName))
+            if (log.packageName.isNotEmpty()) {
+                appendLine(getString(R.string.log_detail_package, log.packageName))
+            }
+            if (log.domain.isNotEmpty()) {
+                appendLine(getString(R.string.log_detail_domain, log.domain))
+            }
+            appendLine(getString(R.string.log_detail_address, log.destIp, log.destPort))
+            appendLine(getString(R.string.log_detail_kind, log.protocol))
+            appendLine(
+                getString(
+                    R.string.log_detail_result,
+                    getString(BlockReason.labelRes(log.blockReason))
+                )
+            )
+            append(getString(R.string.log_detail_when, when_))
         }
 
         val builder = MaterialAlertDialogBuilder(ctx)
             .setTitle(if (log.domain.isNotEmpty()) log.domain else log.appName)
             .setMessage(body)
-            .setNegativeButton("Close", null)
+            .setNegativeButton(R.string.action_close, null)
 
         // A log entry is where you notice a domain you want a rule for, so the
         // rule can be made right here instead of retyping it in the Domains tab.
         if (log.domain.isNotEmpty()) {
             if (log.blockReason == BlockReason.ALLOWED) {
-                builder.setPositiveButton("Block this domain") { _, _ ->
+                builder.setPositiveButton(R.string.action_block_domain) { _, _ ->
                     DomainRules.addBlocked(ctx, log.domain)
-                    toast("${log.domain} is blocked from now on")
+                    toast(getString(R.string.toast_domain_blocked_now, log.domain))
                 }
             } else {
-                builder.setPositiveButton("Always allow") { _, _ ->
+                builder.setPositiveButton(R.string.action_always_allow) { _, _ ->
                     DomainRules.addAllowed(ctx, log.domain)
-                    toast("${log.domain} is allowed from now on")
+                    toast(getString(R.string.toast_domain_allowed_now, log.domain))
                 }
             }
         }
@@ -234,10 +244,10 @@ class ActivityFragment : Fragment() {
     private fun confirmReset() {
         val ctx = context ?: return
         MaterialAlertDialogBuilder(ctx)
-            .setTitle("Reset activity?")
-            .setMessage("Clears the entries below and sets every counter back to zero. Your app modes, domain rules and blocklists are not touched.")
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Reset") { _, _ ->
+            .setTitle(R.string.reset_activity_title)
+            .setMessage(R.string.reset_activity_message)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.action_reset) { _, _ ->
                 viewLifecycleOwner.lifecycleScope.launch {
                     withContext(Dispatchers.IO) { logDao.deleteAll() }
                     Stats.reset(ctx)
@@ -255,7 +265,7 @@ class ActivityFragment : Fragment() {
             }
             if (!isAdded) return@launch
             if (logs.isEmpty()) {
-                toast("Nothing to export")
+                toast(getString(R.string.toast_nothing_to_export))
                 return@launch
             }
 
@@ -294,7 +304,14 @@ class ActivityFragment : Fragment() {
             }
             // The share sheet backgrounds the activity; that is not the user leaving.
             AppLock.suppressNextRelock()
-            startActivity(Intent.createChooser(send, "Export ${logs.size} entries"))
+            startActivity(
+                Intent.createChooser(
+                    send,
+                    resources.getQuantityString(
+                        R.plurals.export_chooser_title, logs.size, logs.size
+                    )
+                )
+            )
         }
     }
 
@@ -374,12 +391,12 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
             val t = s.totals
             txtLookups.text = count(t.queries)
             txtBlocked.text = count(t.blocked)
-            txtEncrypted.text = "${t.encryptedShare}%"
+            txtEncrypted.text = ctx.getString(R.string.percent_value, t.encryptedShare)
             txtTrackers.text = count(t.trackers)
             txtRules.text = count(t.domains)
             txtApps.text = count(t.appBlocked)
 
-            txtShare.text = "${t.blockedShare}%"
+            txtShare.text = ctx.getString(R.string.percent_value, t.blockedShare)
             setWeight(meterBlocked, t.blockedShare.toFloat())
             setWeight(meterRest, (100 - t.blockedShare).toFloat())
 
@@ -396,15 +413,18 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
                 containerTop.addView(domainRow(entry))
             }
 
-            txtLists.text = buildString {
-                append(
-                    if (s.trackerBlockingOn) "Tracker lists on, ${count(s.trackerDomains.toLong())} names loaded"
-                    else "Tracker lists off"
-                )
-                append(". ")
-                append("${s.blockedRules} blocked and ${s.allowedRules} allowed by your own rules. ")
-                append(if (s.dohOn) "Lookups encrypted through ${s.dohProvider}." else "Lookups not encrypted.")
+            val lists = if (s.trackerBlockingOn) {
+                ctx.getString(R.string.summary_lists_on, count(s.trackerDomains.toLong()))
+            } else {
+                ctx.getString(R.string.summary_lists_off)
             }
+            val rules = ctx.getString(R.string.summary_rules, s.blockedRules, s.allowedRules)
+            val doh = if (s.dohOn) {
+                ctx.getString(R.string.summary_doh_on, s.dohProvider)
+            } else {
+                ctx.getString(R.string.summary_doh_off)
+            }
+            txtLists.text = ctx.getString(R.string.summary_lists_format, lists, rules, doh)
 
             txtPrivateDns.visibility = if (s.privateDnsActive) View.VISIBLE else View.GONE
         }
@@ -422,11 +442,24 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
             view.layoutParams = params
         }
 
-        private fun count(n: Long): String = when {
-            n >= 1_000_000 -> String.format(Locale.US, "%.1fM", n / 1_000_000.0)
-            n >= 10_000 -> String.format(Locale.US, "%.0fK", n / 1_000.0)
-            n >= 1_000 -> String.format(Locale.US, "%.1fK", n / 1_000.0)
-            else -> n.toString()
+        /**
+         * The number itself follows the reader's own language, so a Russian
+         * phone gets 1,2 rather than 1.2; the K and M suffixes are strings.
+         */
+        private fun count(n: Long): String {
+            val locale = Locale.getDefault()
+            return when {
+                n >= 1_000_000 -> ctx.getString(
+                    R.string.count_millions, String.format(locale, "%.1f", n / 1_000_000.0)
+                )
+                n >= 10_000 -> ctx.getString(
+                    R.string.count_thousands, String.format(locale, "%.0f", n / 1_000.0)
+                )
+                n >= 1_000 -> ctx.getString(
+                    R.string.count_thousands, String.format(locale, "%.1f", n / 1_000.0)
+                )
+                else -> n.toString()
+            }
         }
 
         private fun duration(ms: Long): String {
@@ -435,10 +468,12 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
             val hours = minutes / 60
             val days = hours / 24
             return when {
-                days > 0 -> "${days}d ${hours % 24}h"
-                hours > 0 -> "${hours}h ${minutes % 60}m"
-                minutes > 0 -> "${minutes}m"
-                else -> "${seconds}s"
+                days > 0 ->
+                    ctx.getString(R.string.duration_days, days.toInt(), (hours % 24).toInt())
+                hours > 0 ->
+                    ctx.getString(R.string.duration_hours, hours.toInt(), (minutes % 60).toInt())
+                minutes > 0 -> ctx.getString(R.string.duration_minutes_only, minutes.toInt())
+                else -> ctx.getString(R.string.duration_seconds, seconds.toInt())
             }
         }
     }

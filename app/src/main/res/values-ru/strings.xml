@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Нижняя навигация -->
+    <string name="tab_apps">Программы</string>
+    <string name="tab_activity">Активность</string>
+    <string name="tab_domains">Домены</string>
+    <string name="tab_trackers">Трекеры</string>
+    <string name="tab_settings">Настройки</string>
+
+    <!-- Общие действия -->
+    <string name="action_add">Добавить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_close">Закрыть</string>
+    <string name="action_download">Загрузить</string>
+    <string name="action_remove">Удалить</string>
+    <string name="action_reset">Сбросить</string>
+    <string name="action_restore">Восстановить</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_turn_off">Выключить</string>
+
+    <!-- Три режима для приложения -->
+    <string name="mode_bypass">Обход</string>
+    <string name="mode_filtered">Фильтр</string>
+    <string name="mode_blocked">Блокировка</string>
+    <string name="mode_bypass_description">Обход, без фильтрации</string>
+    <string name="mode_filtered_description">Фильтруется файрволом</string>
+    <string name="mode_blocked_description">Заблокировано</string>
+
+    <!-- Главная карточка -->
+    <string name="hero_shield_description">Щит файрвола</string>
+    <string name="hero_toggle_description">Включить или выключить файрвол</string>
+    <string name="hero_stopped">Остановлено</string>
+    <string name="status_protected">Под защитой</string>
+    <string name="status_inactive">Выключен</string>
+    <string name="status_tap_to_start">Нажмите переключатель, чтобы начать</string>
+    <string name="status_filtered">Запросы фильтруются</string>
+    <string name="status_filtered_encrypted">Запросы фильтруются и шифруются</string>
+    <plurals name="hero_lookups_seen">
+        <item quantity="one">Проверен %s запрос</item>
+        <item quantity="few">Проверено %s запроса</item>
+        <item quantity="many">Проверено %s запросов</item>
+        <item quantity="other">Проверено %s запроса</item>
+    </plurals>
+
+    <!-- Как записывается длительность -->
+    <string name="duration_days">%1$dд %2$dч</string>
+    <string name="duration_hours">%1$dч %2$dм</string>
+    <string name="duration_minutes">%1$dм %2$dс</string>
+    <string name="duration_minutes_only">%1$dм</string>
+    <string name="duration_seconds">%1$dс</string>
+
+    <!-- Плитки со статистикой узкие, поэтому K и M остаются как есть -->
+    <string name="count_thousands">%1$sK</string>
+    <string name="count_millions">%1$sM</string>
+    <string name="percent_value">%1$d%%</string>
+
+    <!-- Вкладка программ -->
+    <string name="apps_search_hint">Поиск программ</string>
+    <string name="filter_all">Все</string>
+    <string name="filter_user">Свои</string>
+    <string name="filter_system">Системные</string>
+    <string name="badge_system">СИС</string>
+    <string name="app_icon_description">Значок программы</string>
+    <string name="bulk_bypass_all">Все в обход</string>
+    <string name="bulk_filter_all">Все через фильтр</string>
+    <string name="bulk_block_all">Блокировать все</string>
+    <string name="apps_mode_help">Обход: трафик идет наружу напрямую, без проверки. Фильтр: запросы программы идут через файрвол, поэтому работают шифрование, блокировка трекеров и ваши правила для доменов. Блокировка: программа не получает ни одного рабочего адреса. Изменения применяются сразу, но уже запущенная программа может держать то, что открыла раньше, поэтому закройте ее и откройте снова.</string>
+    <plurals name="app_lookups">
+        <item quantity="one">%d запрос</item>
+        <item quantity="few">%d запроса</item>
+        <item quantity="many">%d запросов</item>
+        <item quantity="other">%d запроса</item>
+    </plurals>
+    <string name="app_stats_format">%1$s, заблокировано %2$d</string>
+
+    <!-- Вкладка доменов -->
+    <string name="domains_help">Ваши собственные правила для обычных сайтов, отдельно от списков трекеров. Правило охватывает домен и все, что под ним, поэтому блокировка google.com блокирует и www.google.com, и mail.google.com. Побеждает более точное правило, так что можно заблокировать домен и разрешить одно имя внутри него. Правила работают сразу для каждой программы в режиме фильтра.</string>
+    <string name="domains_block_list">Черный список</string>
+    <string name="domains_allow_list">Белый список</string>
+    <string name="domains_hint_block">Домен для блокировки</string>
+    <string name="domains_hint_allow">Домен для разрешения</string>
+    <plurals name="domains_block_hint">
+        <item quantity="one">Заблокировано: %d. Ничего из этого списка не откроется в программе с фильтром.</item>
+        <item quantity="few">Заблокировано: %d. Ничего из этого списка не откроется в программе с фильтром.</item>
+        <item quantity="many">Заблокировано: %d. Ничего из этого списка не откроется в программе с фильтром.</item>
+        <item quantity="other">Заблокировано: %d. Ничего из этого списка не откроется в программе с фильтром.</item>
+    </plurals>
+    <plurals name="domains_allow_hint">
+        <item quantity="one">Разрешено: %d. Он проходит, даже если его называет список трекеров.</item>
+        <item quantity="few">Разрешено: %d. Они проходят, даже если их называет список трекеров.</item>
+        <item quantity="many">Разрешено: %d. Они проходят, даже если их называет список трекеров.</item>
+        <item quantity="other">Разрешено: %d. Они проходят, даже если их называет список трекеров.</item>
+    </plurals>
+    <string name="domains_empty_block">Заблокированных доменов пока нет.\nДобавьте домен выше, чтобы остановить его везде.</string>
+    <string name="domains_empty_allow">Разрешенных доменов пока нет.\nДобавьте домен здесь, если список трекеров блокирует то, что вам нужно.</string>
+    <string name="toast_not_a_domain">Это не имя домена</string>
+    <string name="toast_domain_added_block">%1$s заблокирован</string>
+    <string name="toast_domain_added_allow">%1$s разрешен</string>
+
+    <!-- Вкладка трекеров -->
+    <string name="trackers_title">Блокировка трекеров</string>
+    <string name="trackers_toggle_description">Включить или выключить блокировку трекеров</string>
+    <string name="trackers_status_loading">Загрузка имен</string>
+    <string name="trackers_status_off">Выключено</string>
+    <plurals name="trackers_status_on">
+        <item quantity="one">Включено, загружено %d имя</item>
+        <item quantity="few">Включено, загружено %d имени</item>
+        <item quantity="many">Включено, загружено %d имен</item>
+        <item quantity="other">Включено, загружено %d имени</item>
+    </plurals>
+    <string name="doh_title">DNS через HTTPS</string>
+    <string name="doh_toggle_description">Включить или выключить шифрование запросов</string>
+    <string name="doh_status_on">Включено, через %1$s</string>
+    <string name="doh_status_off">Выключено, запросы идут к резолверу сети</string>
+    <string name="stat_blocked">Заблокировано</string>
+    <string name="stat_names_loaded">Имен загружено</string>
+    <string name="stat_encrypted">Шифруется</string>
+    <string name="blocklist_lists_title">Списки</string>
+    <string name="blocklist_lists_help">Загружаются один раз и хранятся на телефоне. Список побольше блокирует больше и занимает немного больше памяти. Все, в чем такой список ошибся, можно отменить на вкладке доменов правилом разрешения.</string>
+    <string name="source_not_downloaded">Не загружен</string>
+    <plurals name="source_downloaded">
+        <item quantity="one">Загружен, %d имя</item>
+        <item quantity="few">Загружен, %d имени</item>
+        <item quantity="many">Загружен, %d имен</item>
+        <item quantity="other">Загружен, %d имени</item>
+    </plurals>
+    <string name="toast_downloading">Загрузка %1$s</string>
+    <plurals name="toast_names_added">
+        <item quantity="one">Добавлено %d имя</item>
+        <item quantity="few">Добавлено %d имени</item>
+        <item quantity="many">Добавлено %d имен</item>
+        <item quantity="other">Добавлено %d имени</item>
+    </plurals>
+    <string name="toast_download_failed">Не удалось: %1$s</string>
+
+    <!-- Списки трекеров, которые можно загрузить -->
+    <string name="source_desc_hagezi_light">Отобранный список против рекламы, слежки и метрик. Мало ложных срабатываний. Около 35 тысяч доменов.</string>
+    <string name="source_desc_oisd_small">Блокирует, но не ломает сайты. Минимум ложных срабатываний, обновляется каждый час. Около 57 тысяч доменов.</string>
+    <string name="source_desc_1hosts_lite">Легкая версия хорошо поддерживаемого списка из многих источников. Около 195 тысяч доменов.</string>
+    <string name="source_desc_steven_black">Классический сводный файл hosts из нескольких отобранных источников. Около 170 тысяч доменов.</string>
+    <string name="source_desc_adguard_dns">Используется публичным DNS от AdGuard. Осторожный и хорошо проверенный. Около 166 тысяч доменов.</string>
+
+    <!-- Вкладка активности -->
+    <string name="activity_export_csv">Экспорт CSV</string>
+    <string name="activity_filter_hint">Фильтр по программе, домену или адресу</string>
+    <string name="filter_blocked">Заблокировано</string>
+    <string name="filter_allowed">Разрешено</string>
+    <string name="filter_trackers">Трекеры</string>
+    <string name="private_dns_warning">В настройках Android включен частный DNS, поэтому запросы идут прямо к тому провайдеру и файрвол их не видит. Выключите его в разделе «Сеть и интернет», чтобы вернуть фильтрацию.</string>
+    <string name="stat_lookups">Запросы</string>
+    <string name="stat_trackers">Трекеры</string>
+    <string name="stat_your_rules">Ваши правила</string>
+    <string name="stat_blocked_apps">Программы</string>
+    <string name="stat_share_stopped">Доля остановленных</string>
+    <string name="stat_protected">Под защитой</string>
+    <string name="chart_last_24_hours">Последние 24 часа</string>
+    <string name="chart_legend">Зеленое прошло, красное остановлено</string>
+    <string name="stats_your_apps">Ваши программы</string>
+    <string name="stats_most_blocked">Чаще всего блокируется</string>
+    <string name="stats_nothing_blocked">Пока ничего не заблокировано.</string>
+    <string name="stats_recent_activity">Недавняя активность</string>
+    <string name="summary_lists_format">%1$s. %2$s %3$s</string>
+    <string name="summary_lists_on">Списки трекеров включены, загружено имен: %1$s</string>
+    <string name="summary_lists_off">Списки трекеров выключены</string>
+    <string name="summary_rules">Вашими правилами заблокировано %1$d и разрешено %2$d.</string>
+    <string name="summary_doh_on">Запросы шифруются через %1$s.</string>
+    <string name="summary_doh_off">Запросы не шифруются.</string>
+
+    <!-- Одна запись журнала, в списке и в окне, которое из нее открывается -->
+    <string name="log_dest_domain">%1$s · %2$s</string>
+    <string name="log_dest_address">%1$s:%2$d · %3$s</string>
+    <string name="log_detail_app">Программа: %1$s</string>
+    <string name="log_detail_package">Пакет: %1$s</string>
+    <string name="log_detail_domain">Домен: %1$s</string>
+    <string name="log_detail_address">Адрес: %1$s:%2$d</string>
+    <string name="log_detail_kind">Вид: %1$s</string>
+    <string name="log_detail_result">Результат: %1$s</string>
+    <string name="log_detail_when">Когда: %1$s</string>
+    <string name="action_block_domain">Заблокировать этот домен</string>
+    <string name="action_always_allow">Всегда разрешать</string>
+    <string name="toast_domain_blocked_now">%1$s теперь заблокирован</string>
+    <string name="toast_domain_allowed_now">%1$s теперь разрешен</string>
+
+    <!-- Чем закончилась запись -->
+    <string name="reason_allowed">РАЗРЕШЕНО</string>
+    <string name="reason_tracker">ТРЕКЕР</string>
+    <string name="reason_blocklist">БЛОКИРОВКА</string>
+    <string name="reason_app_blocked">ПРОГРАММА</string>
+    <string name="reason_dropped">ОТБРОШЕНО</string>
+
+    <string name="reset_activity_title">Сбросить активность?</string>
+    <string name="reset_activity_message">Очищает записи ниже и обнуляет все счетчики. Режимы программ, правила для доменов и списки блокировки не затрагиваются.</string>
+    <string name="toast_nothing_to_export">Нечего экспортировать</string>
+    <plurals name="export_chooser_title">
+        <item quantity="one">Экспорт: %d запись</item>
+        <item quantity="few">Экспорт: %d записи</item>
+        <item quantity="many">Экспорт: %d записей</item>
+        <item quantity="other">Экспорт: %d записи</item>
+    </plurals>
+
+    <!-- Блокировка приложения -->
+    <string name="lock_title">Firewall заблокирован</string>
+    <string name="lock_subtitle">Введите код доступа, чтобы продолжить</string>
+    <string name="lock_locked_description">Заблокировано</string>
+    <string name="lock_passcode_hint">Код доступа</string>
+    <string name="lock_passcode_description">Код доступа к приложению</string>
+    <string name="lock_unlock">Разблокировать</string>
+    <string name="lock_enter_passcode">Введите код доступа</string>
+    <string name="lock_too_many_tries">Слишком много попыток. Подождите %1$dс</string>
+    <plurals name="lock_attempts_left">
+        <item quantity="one">Неверный код. Осталась %d попытка</item>
+        <item quantity="few">Неверный код. Осталось %d попытки</item>
+        <item quantity="many">Неверный код. Осталось %d попыток</item>
+        <item quantity="other">Неверный код. Осталось %d попытки</item>
+    </plurals>
+
+    <string name="pin_current_hint">Текущий код</string>
+    <string name="pin_new_hint">Новый код</string>
+    <string name="pin_repeat_hint">Повторите новый код</string>
+    <string name="pin_set_title">Задать код доступа</string>
+    <string name="pin_remove_title">Выключить блокировку</string>
+    <string name="pin_hint_change">Введите текущий код, затем выберите новый.</string>
+    <string name="pin_hint_new">Буквы, цифры и символы, не меньше %1$d знаков. Восстановить его нельзя: если забудете, приложение придется переустановить, а это потеряет ваши правила.</string>
+    <string name="pin_hint_remove">Введите текущий код, чтобы выключить блокировку приложения.</string>
+    <string name="pin_error_too_short">Нужно не меньше %1$d знаков</string>
+    <string name="pin_error_too_long">Нужно не больше %1$d знаков</string>
+    <string name="pin_error_spaces">Пробелы не разрешены</string>
+    <string name="pin_error_mismatch">Два кода не совпадают</string>
+    <string name="pin_error_wrong_current">Это не ваш текущий код</string>
+    <string name="pin_error_wrong">Это не ваш код</string>
+    <string name="toast_passcode_changed">Код доступа изменен</string>
+    <string name="toast_app_lock_on">Блокировка приложения включена</string>
+    <string name="toast_app_lock_off">Блокировка приложения выключена</string>
+
+    <!-- Настройки -->
+    <string name="settings_app_lock">Блокировка приложения</string>
+    <string name="settings_app_lock_help">Спрашивать код доступа перед открытием приложения, чтобы ваши правила не смог изменить тот, у кого в руках оказался телефон. Разрешены буквы, цифры и символы.</string>
+    <string name="settings_passcode">Код доступа</string>
+    <string name="settings_lock_off">Выключено</string>
+    <string name="settings_lock_on">Включено, для открытия приложения нужен код</string>
+    <string name="settings_toggle_passcode_description">Включить или выключить код доступа</string>
+    <string name="settings_change_passcode">Изменить код доступа</string>
+    <string name="settings_backup_title">Копия и восстановление</string>
+    <string name="settings_backup_help">Сохраняет режим каждой программы, ваши правила для доменов, загруженные списки трекеров и настройки трекеров и шифрования. Обычный JSON, без шифрования. Ваш код доступа, активность и счетчики в копию не попадают.</string>
+    <string name="settings_export">Сохранить в файл</string>
+    <string name="settings_restore">Восстановить из файла</string>
+    <string name="settings_restore_summary">Заменяет режимы программ и правила для доменов</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_about_body">Без рекламы, без слежки, без аналитики, без внешних серверов. Все работает на вашем устройстве.</string>
+    <string name="settings_version">Firewall %1$s</string>
+
+    <!-- Копия и восстановление -->
+    <plurals name="app_rules">
+        <item quantity="one">%d правило программ</item>
+        <item quantity="few">%d правила программ</item>
+        <item quantity="many">%d правил программ</item>
+        <item quantity="other">%d правила программ</item>
+    </plurals>
+    <plurals name="domain_rules">
+        <item quantity="one">%d доменное правило</item>
+        <item quantity="few">%d доменных правила</item>
+        <item quantity="many">%d доменных правил</item>
+        <item quantity="other">%d доменных правила</item>
+    </plurals>
+    <string name="backup_counts_format">%1$s, %2$s</string>
+    <string name="backup_writing">Запись копии</string>
+    <string name="backup_reading">Чтение файла</string>
+    <string name="backup_applying">Применение настроек</string>
+    <string name="backup_restoring">Восстановление</string>
+    <string name="backup_downloading_source">Загрузка %1$s, %2$d из %3$d</string>
+    <string name="backup_exported">Сохранено: %1$s и %2$s</string>
+    <string name="backup_export_failed">Не удалось сохранить: %1$s</string>
+    <string name="backup_restored">Восстановлено: %1$s и %2$s%3$s</string>
+    <string name="backup_restore_failed">Не удалось восстановить: %1$s</string>
+    <plurals name="restore_lists_failed">
+        <item quantity="one">, не удалось загрузить %d список</item>
+        <item quantity="few">, не удалось загрузить %d списка</item>
+        <item quantity="many">, не удалось загрузить %d списков</item>
+        <item quantity="other">, не удалось загрузить %d списка</item>
+    </plurals>
+    <string name="restore_title">Восстановить из копии?</string>
+    <string name="restore_message">Это заменит режимы программ и правила для доменов тем, что лежит в файле. Программы, которых в копии нет, окажутся заблокированы. Списки трекеров, названные в ней, будут загружены заново, а для этого нужна сеть.</string>
+    <string name="error_cannot_open_file">Не удалось открыть выбранный файл</string>
+    <string name="error_not_a_backup">Это не файл копии Firewall</string>
+    <string name="error_backup_newer">Эта копия сделана более новой версией Firewall</string>
+
+    <!-- Постоянное уведомление и плитка быстрых настроек -->
+    <string name="notification_channel_name">Firewall работает</string>
+    <string name="notification_channel_description">Показывается, пока файрвол работает</string>
+    <string name="notification_title">Firewall работает</string>
+    <string name="notification_text_filtering">Запросы фильтруются</string>
+    <string name="notification_text_encrypted">Запросы шифруются</string>
+    <string name="notification_text_trackers">, трекеры блокируются</string>
+    <string name="owner_system">Система</string>
+
+</resources>

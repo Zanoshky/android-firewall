@@ -40,7 +40,7 @@
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:src="@drawable/ic_shield"
-                    android:contentDescription="Firewall shield"
+                    android:contentDescription="@string/hero_shield_description"
                     app:tint="@color/hero_text" />
 
                 <LinearLayout
@@ -54,7 +54,7 @@
                         android:id="@+id/txtStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Inactive"
+                        android:text="@string/status_inactive"
                         android:textColor="@color/hero_text"
                         android:textSize="24sp"
                         android:letterSpacing="-0.02"
@@ -64,7 +64,7 @@
                         android:id="@+id/txtSubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tap toggle to start"
+                        android:text="@string/status_tap_to_start"
                         android:textColor="@color/hero_text_secondary"
                         android:textSize="13sp"
                         android:layout_marginTop="1dp" />
@@ -74,7 +74,7 @@
                     android:id="@+id/switchFirewall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="Toggle firewall"
+                    android:contentDescription="@string/hero_toggle_description"
                     android:saveEnabled="false"
                     app:thumbTint="@color/hero_text"
                     app:trackTint="#40FFFFFF" />
@@ -105,7 +105,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Filtered"
+                        android:text="@string/mode_filtered"
                         android:textColor="@color/hero_text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -134,7 +134,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bypass"
+                        android:text="@string/mode_bypass"
                         android:textColor="@color/hero_text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -163,7 +163,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Blocked"
+                        android:text="@string/mode_blocked"
                         android:textColor="@color/hero_text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Stopped"
+                        android:text="@string/hero_stopped"
                         android:textColor="@color/hero_text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>

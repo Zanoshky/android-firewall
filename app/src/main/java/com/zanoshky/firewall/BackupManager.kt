@@ -101,7 +101,7 @@ object BackupManager {
                 }
 
                 val stream = context.contentResolver.openOutputStream(uri, "wt")
-                    ?: return@withContext Result.failure(Exception("Could not open the selected file"))
+                    ?: return@withContext Result.failure(Exception(context.getString(R.string.error_cannot_open_file)))
                 stream.use { it.write(root.toString(2).toByteArray()) }
 
                 Result.success(
@@ -134,15 +134,15 @@ object BackupManager {
         onProgress: suspend (String) -> Unit = {}
     ): Result<RestoreSummary> = withContext(Dispatchers.IO) {
         try {
-            onProgress("Reading the file")
+            onProgress(context.getString(R.string.backup_reading))
 
             val text = context.contentResolver.openInputStream(uri)?.use {
                 it.reader().readText()
-            } ?: return@withContext Result.failure(Exception("Could not open the selected file"))
+            } ?: return@withContext Result.failure(Exception(context.getString(R.string.error_cannot_open_file)))
 
-            val parsed = parse(text).getOrElse { return@withContext Result.failure(it) }
+            val parsed = parse(context, text).getOrElse { return@withContext Result.failure(it) }
 
-            onProgress("Applying settings")
+            onProgress(context.getString(R.string.backup_applying))
 
             context.getSharedPreferences(BLOCKLIST_PREFS, Context.MODE_PRIVATE).edit()
                 .putBoolean(KEY_BLOCKLIST_ENABLED, parsed.trackerBlockingEnabled)
@@ -205,23 +205,30 @@ object BackupManager {
 
         missing.forEachIndexed { index, id ->
             val source = known[id] ?: return@forEachIndexed
-            onProgress("Downloading ${source.name}, ${index + 1} of ${missing.size}")
+            onProgress(
+                context.getString(
+                    R.string.backup_downloading_source,
+                    source.name, index + 1, missing.size
+                )
+            )
             if (BlocklistManager.downloadSource(context, source).isSuccess) downloaded++ else failed++
         }
         return downloaded to failed
     }
 
-    private fun parse(text: String): Result<ParsedBackup> {
+    private fun parse(context: Context, text: String): Result<ParsedBackup> {
         val root = try {
             JSONObject(text)
         } catch (_: Exception) {
-            return Result.failure(Exception("Not a Firewall backup file"))
+            return Result.failure(Exception(context.getString(R.string.error_not_a_backup)))
         }
 
         val schema = root.optInt("schema", -1)
-        if (schema < 1) return Result.failure(Exception("Not a Firewall backup file"))
+        if (schema < 1) {
+            return Result.failure(Exception(context.getString(R.string.error_not_a_backup)))
+        }
         if (schema > SCHEMA_VERSION) {
-            return Result.failure(Exception("This backup was made by a newer version of Firewall"))
+            return Result.failure(Exception(context.getString(R.string.error_backup_newer)))
         }
 
         val rules = mutableListOf<AppRule>()

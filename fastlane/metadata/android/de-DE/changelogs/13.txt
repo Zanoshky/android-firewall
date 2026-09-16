@@ -1,0 +1,7 @@
+Russisch und Spanisch.
+
+Jeder Bildschirm, jede Schaltflaeche, jeder Dialog und die Benachrichtigung sind uebersetzt. Die Sprache des Telefons waehlt eine davon, und ab Android 13 koennen Sie eine Sprache nur fuer diese App festlegen, ohne das restliche Telefon zu aendern.
+
+Zahlen passen zu ihren Substantiven, und auch die Zahlen selbst folgen der Sprache: ein russisches Telefon schreibt 1,2K, ein englisches 1.2K.
+
+Sonst hat sich nichts geaendert. Die Firewall verhaelt sich genau wie vorher.

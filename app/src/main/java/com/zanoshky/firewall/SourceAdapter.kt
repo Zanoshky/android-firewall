@@ -34,20 +34,23 @@ class SourceAdapter(
 
         fun bind(item: Pair<BlocklistSource, Boolean>) {
             val (source, downloaded) = item
+            val ctx = itemView.context
             txtName.text = source.name
-            txtDesc.text = source.description
+            txtDesc.text = BlocklistManager.describe(ctx, source)
 
             if (downloaded) {
                 val count = domainCounts[source.id] ?: 0
-                txtStatus.text = "Downloaded, $count names"
-                txtStatus.setTextColor(itemView.context.getColor(R.color.status_active))
-                btnAction.text = "Remove"
-                btnAction.setTextColor(itemView.context.getColor(R.color.accent_pink))
+                txtStatus.text = ctx.resources.getQuantityString(
+                    R.plurals.source_downloaded, count, count
+                )
+                txtStatus.setTextColor(ctx.getColor(R.color.status_active))
+                btnAction.text = ctx.getString(R.string.action_remove)
+                btnAction.setTextColor(ctx.getColor(R.color.accent_pink))
             } else {
-                txtStatus.text = "Not downloaded"
-                txtStatus.setTextColor(itemView.context.getColor(R.color.text_hint))
-                btnAction.text = "Download"
-                btnAction.setTextColor(itemView.context.getColor(R.color.accent_blue))
+                txtStatus.text = ctx.getString(R.string.source_not_downloaded)
+                txtStatus.setTextColor(ctx.getColor(R.color.text_hint))
+                btnAction.text = ctx.getString(R.string.action_download)
+                btnAction.setTextColor(ctx.getColor(R.color.accent_blue))
             }
 
             btnAction.setOnClickListener { onAction(source, downloaded) }

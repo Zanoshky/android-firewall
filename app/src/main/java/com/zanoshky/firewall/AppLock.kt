@@ -147,10 +147,13 @@ object AppLock {
      * with a space in it is easy to mistype and impossible to see, and a leading
      * or trailing one would be invisible in the field.
      */
-    fun validateFormat(passcode: String): String? = when {
-        passcode.length < MIN_LENGTH -> "Use at least $MIN_LENGTH characters"
-        passcode.length > MAX_LENGTH -> "Use at most $MAX_LENGTH characters"
-        passcode.any { it.isWhitespace() } -> "Spaces are not allowed"
+    fun validateFormat(context: Context, passcode: String): String? = when {
+        passcode.length < MIN_LENGTH ->
+            context.getString(R.string.pin_error_too_short, MIN_LENGTH)
+        passcode.length > MAX_LENGTH ->
+            context.getString(R.string.pin_error_too_long, MAX_LENGTH)
+        passcode.any { it.isWhitespace() } ->
+            context.getString(R.string.pin_error_spaces)
         else -> null
     }
 

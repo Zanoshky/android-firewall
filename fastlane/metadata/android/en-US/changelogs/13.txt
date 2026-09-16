@@ -1,0 +1,7 @@
+Russian and Spanish.
+
+Every screen, every button, every dialog and the notification are translated. Your phone's own language picks one, and on Android 13 and newer you can set a language for this app alone without changing the rest of the phone.
+
+Counts agree with their nouns, and numbers follow the language, so a Russian phone writes 1,2K where an English one writes 1.2K.
+
+Nothing else changed. The firewall behaves exactly as it did before.

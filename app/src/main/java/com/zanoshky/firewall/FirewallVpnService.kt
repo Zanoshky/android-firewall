@@ -53,7 +53,7 @@ class FirewallVpnService : VpnService() {
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var flushJob: Job? = null
 
-    private val owners = OwnerLookup()
+    private lateinit var owners: OwnerLookup
     private val logBuffer = LogBuffer()
     private val tunnelLock = kotlinx.coroutines.sync.Mutex()
 
@@ -102,6 +102,9 @@ class FirewallVpnService : VpnService() {
 
     override fun onCreate() {
         super.onCreate()
+        // Built here rather than in a property initialiser: it needs a string,
+        // and a service has no resources until the base context is attached.
+        owners = OwnerLookup(getString(R.string.owner_system))
         createNotificationChannel()
         BlocklistManager.init(this)
         DohResolver.init(this)
@@ -187,7 +190,7 @@ class FirewallVpnService : VpnService() {
 
     private fun establish(): ParcelFileDescriptor? {
         val builder = Builder()
-            .setSession("Firewall")
+            .setSession(getString(R.string.app_name))
             .setMtu(1500)
             .setBlocking(true)
             .addAddress(TUN_ADDRESS, 32)
@@ -526,8 +529,10 @@ class FirewallVpnService : VpnService() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID, "Firewall Active", NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "Shows while the firewall is running" }
+                CHANNEL_ID,
+                getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_LOW
+            ).apply { description = getString(R.string.notification_channel_description) }
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
                 .createNotificationChannel(channel)
         }
@@ -539,11 +544,18 @@ class FirewallVpnService : VpnService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val subtitle = buildString {
-            if (DohResolver.isEnabled) append("Encrypted lookups") else append("Filtering lookups")
-            if (BlocklistManager.isEnabled) append(", trackers blocked")
+            append(
+                getString(
+                    if (DohResolver.isEnabled) R.string.notification_text_encrypted
+                    else R.string.notification_text_filtering
+                )
+            )
+            if (BlocklistManager.isEnabled) {
+                append(getString(R.string.notification_text_trackers))
+            }
         }
         return Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("Firewall active")
+            .setContentTitle(getString(R.string.notification_title))
             .setContentText(subtitle)
             .setSmallIcon(R.drawable.ic_shield_mono)
             .setContentIntent(pending)
@@ -561,11 +573,11 @@ class FirewallVpnService : VpnService() {
  * port for a short while, because a lookup costs a system call and a burst of
  * queries from one app all share a port.
  */
-private class OwnerLookup {
+private class OwnerLookup(systemLabel: String) {
 
     data class Owner(val packageName: String, val label: String, val mode: Int)
 
-    private val unknown = Owner("system", "System", AppMode.FILTERED)
+    private val unknown = Owner("system", systemLabel, AppMode.FILTERED)
 
     private val portCache = HashMap<Int, Pair<Int, Long>>()   // port to uid and when
     private val uidCache = HashMap<Int, Owner>()

@@ -1,0 +1,7 @@
+Bahasa Rusia dan Spanyol.
+
+Setiap layar, setiap tombol, setiap dialog dan notifikasinya sudah diterjemahkan. Bahasa ponsel Anda yang memilih salah satunya, dan pada Android 13 ke atas Anda bisa menyetel bahasa khusus untuk aplikasi ini saja.
+
+Jumlah kini sesuai dengan kata bendanya, dan angka mengikuti bahasanya: ponsel berbahasa Rusia menulis 1,2K sementara yang berbahasa Inggris menulis 1.2K.
+
+Tidak ada perubahan lain. Firewall bekerja persis seperti sebelumnya.

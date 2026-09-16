@@ -70,7 +70,10 @@ class AppAdapter(
 
             if (app.lookups > 0) {
                 txtAppStats.visibility = View.VISIBLE
-                txtAppStats.text = "${app.lookups} lookups, ${app.blocked} blocked"
+                val lookups = ctx.resources.getQuantityString(
+                    R.plurals.app_lookups, app.lookups, app.lookups
+                )
+                txtAppStats.text = ctx.getString(R.string.app_stats_format, lookups, app.blocked)
             } else {
                 txtAppStats.visibility = View.GONE
             }
@@ -94,11 +97,13 @@ class AppAdapter(
             style(btnFiltered, mode == AppMode.FILTERED, R.drawable.bg_segment_filtered, R.color.accent)
             style(btnBlocked, mode == AppMode.BLOCKED, R.drawable.bg_segment_blocked, R.color.danger)
 
-            itemView.contentDescription = when (mode) {
-                AppMode.BYPASS -> "Bypass, not filtered"
-                AppMode.FILTERED -> "Filtered through the firewall"
-                else -> "Blocked"
-            }
+            itemView.contentDescription = ctx.getString(
+                when (mode) {
+                    AppMode.BYPASS -> R.string.mode_bypass_description
+                    AppMode.FILTERED -> R.string.mode_filtered_description
+                    else -> R.string.mode_blocked_description
+                }
+            )
         }
 
         private fun style(button: TextView, active: Boolean, background: Int, colour: Int) {

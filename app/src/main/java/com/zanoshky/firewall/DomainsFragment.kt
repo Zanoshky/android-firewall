@@ -80,7 +80,9 @@ class DomainsFragment : Fragment() {
             chipBlock.setTextColor(ctx.getColor(if (blockList) R.color.danger else R.color.text_hint))
             chipAllow.setTextColor(ctx.getColor(if (blockList) R.color.text_hint else R.color.accent))
         }
-        editDomain.hint = if (blockList) "Domain to block" else "Domain to allow"
+        editDomain.hint = getString(
+            if (blockList) R.string.domains_hint_block else R.string.domains_hint_allow
+        )
         refresh()
     }
 
@@ -93,14 +95,18 @@ class DomainsFragment : Fragment() {
         else DomainRules.addAllowed(ctx, input)
 
         if (stored == null) {
-            Toast.makeText(ctx, "That is not a domain name", Toast.LENGTH_SHORT).show()
+            Toast.makeText(ctx, R.string.toast_not_a_domain, Toast.LENGTH_SHORT).show()
             return
         }
         editDomain.text.clear()
         refresh()
         Toast.makeText(
             ctx,
-            if (showingBlockList) "$stored blocked" else "$stored allowed",
+            getString(
+                if (showingBlockList) R.string.toast_domain_added_block
+                else R.string.toast_domain_added_allow,
+                stored
+            ),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -120,19 +126,17 @@ class DomainsFragment : Fragment() {
 
         adapter.submitList(domains)
 
-        txtHint.text = if (showingBlockList) {
-            "${domains.size} blocked. Nothing on this list can be reached by a filtered app."
-        } else {
-            "${domains.size} allowed. These are let through even when a tracker list names them."
-        }
+        txtHint.text = resources.getQuantityString(
+            if (showingBlockList) R.plurals.domains_block_hint else R.plurals.domains_allow_hint,
+            domains.size,
+            domains.size
+        )
 
         val empty = domains.isEmpty()
         txtEmpty.visibility = if (empty) View.VISIBLE else View.GONE
         recycler.visibility = if (empty) View.GONE else View.VISIBLE
-        txtEmpty.text = if (showingBlockList) {
-            "No blocked domains yet.\nAdd one above to stop it everywhere."
-        } else {
-            "No allowed domains yet.\nAdd one here when a tracker list blocks something you need."
-        }
+        txtEmpty.text = getString(
+            if (showingBlockList) R.string.domains_empty_block else R.string.domains_empty_allow
+        )
     }
 }

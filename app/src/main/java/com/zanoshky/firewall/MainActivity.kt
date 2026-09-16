@@ -237,7 +237,7 @@ class MainActivity : AppCompatActivity() {
         }
         editPasscode.isEnabled = false
         val seconds = (remaining + 999) / 1000
-        txtLockError.text = "Too many tries. Wait ${seconds}s"
+        txtLockError.text = getString(R.string.lock_too_many_tries, seconds.toInt())
         lockoutRunnable = Runnable { refreshLockout() }
         handler.postDelayed(lockoutRunnable!!, 1000)
     }
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         }
         val passcode = editPasscode.text.toString()
         if (passcode.isEmpty()) {
-            txtLockError.text = "Enter your passcode"
+            txtLockError.text = getString(R.string.lock_enter_passcode)
             return
         }
         lifecycleScope.launch {
@@ -263,7 +263,8 @@ class MainActivity : AppCompatActivity() {
                     refreshLockout()
                 } else {
                     val left = AppLock.attemptsRemaining()
-                    txtLockError.text = "Wrong passcode. $left ${if (left == 1) "try" else "tries"} left"
+                    txtLockError.text =
+                        resources.getQuantityString(R.plurals.lock_attempts_left, left, left)
                 }
             }
         }
@@ -296,7 +297,13 @@ class MainActivity : AppCompatActivity() {
 
         if (active && Stats.sessionStart > 0) {
             txtUptime.text = formatDuration(System.currentTimeMillis() - Stats.sessionStart)
-            txtHeroSummary.text = "${formatCount(totals.queries)} lookups seen"
+            // The count picks the plural form; the formatted, shortened count is
+            // what actually goes in the sentence.
+            txtHeroSummary.text = resources.getQuantityString(
+                R.plurals.hero_lookups_seen,
+                totals.queries.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                formatCount(totals.queries)
+            )
         } else {
             txtUptime.text = ""
             txtHeroSummary.text = ""
@@ -329,16 +336,15 @@ class MainActivity : AppCompatActivity() {
     private fun updateStatusUI(active: Boolean) {
         if (active) {
             heroCard.setBackgroundResource(R.drawable.bg_hero_card)
-            txtStatus.text = "Protected"
-            txtSubtitle.text = if (DohResolver.isEnabled) {
-                "Lookups filtered and encrypted"
-            } else {
-                "Lookups filtered"
-            }
+            txtStatus.text = getString(R.string.status_protected)
+            txtSubtitle.text = getString(
+                if (DohResolver.isEnabled) R.string.status_filtered_encrypted
+                else R.string.status_filtered
+            )
         } else {
             heroCard.setBackgroundResource(R.drawable.bg_hero_card_inactive)
-            txtStatus.text = "Inactive"
-            txtSubtitle.text = "Tap the switch to start"
+            txtStatus.text = getString(R.string.status_inactive)
+            txtSubtitle.text = getString(R.string.status_tap_to_start)
         }
     }
 
@@ -391,16 +397,28 @@ class MainActivity : AppCompatActivity() {
         val hours = minutes / 60
         val days = hours / 24
         return when {
-            days > 0 -> "${days}d ${hours % 24}h"
-            hours > 0 -> "${hours}h ${minutes % 60}m"
-            minutes > 0 -> "${minutes}m ${seconds % 60}s"
-            else -> "${seconds}s"
+            days > 0 -> getString(R.string.duration_days, days.toInt(), (hours % 24).toInt())
+            hours > 0 -> getString(R.string.duration_hours, hours.toInt(), (minutes % 60).toInt())
+            minutes > 0 ->
+                getString(R.string.duration_minutes, minutes.toInt(), (seconds % 60).toInt())
+            else -> getString(R.string.duration_seconds, seconds.toInt())
         }
     }
 
-    private fun formatCount(n: Long): String = when {
-        n >= 1_000_000 -> String.format(java.util.Locale.US, "%.1fM", n / 1_000_000.0)
-        n >= 1_000 -> String.format(java.util.Locale.US, "%.1fK", n / 1_000.0)
-        else -> n.toString()
+    /**
+     * The number is formatted in the reader's own language, so a Russian phone
+     * gets 1,2 rather than 1.2; the K and M suffixes come from the strings.
+     */
+    private fun formatCount(n: Long): String {
+        val locale = java.util.Locale.getDefault()
+        return when {
+            n >= 1_000_000 -> getString(
+                R.string.count_millions, String.format(locale, "%.1f", n / 1_000_000.0)
+            )
+            n >= 1_000 -> getString(
+                R.string.count_thousands, String.format(locale, "%.1f", n / 1_000.0)
+            )
+            else -> n.toString()
+        }
     }
 }

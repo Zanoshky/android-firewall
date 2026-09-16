@@ -115,9 +115,9 @@ class BlocklistFragment : Fragment() {
         val ctx = context ?: return
         val totals = Stats.totals(ctx)
         txtDohStatus.text = if (DohResolver.isEnabled) {
-            "On, through ${DohResolver.providerLabel()}"
+            getString(R.string.doh_status_on, DohResolver.providerLabel())
         } else {
-            "Off, lookups go to the network's own resolver"
+            getString(R.string.doh_status_off)
         }
         txtDohQueries.text = totals.doh.toString()
     }
@@ -127,9 +127,10 @@ class BlocklistFragment : Fragment() {
         val ctx = context ?: return
         val count = BlocklistManager.getActiveCount()
         txtStatus.text = when {
-            BlocklistManager.isLoading -> "Loading names"
-            BlocklistManager.isEnabled -> "On, $count names loaded"
-            else -> "Off"
+            BlocklistManager.isLoading -> getString(R.string.trackers_status_loading)
+            BlocklistManager.isEnabled ->
+                resources.getQuantityString(R.plurals.trackers_status_on, count, count)
+            else -> getString(R.string.trackers_status_off)
         }
         txtDomainsLoaded.text = count.toString()
         txtTrackersBlocked.text = Stats.totals(ctx).trackers.toString()
@@ -153,17 +154,27 @@ class BlocklistFragment : Fragment() {
 
     private fun downloadSource(source: BlocklistSource) {
         val ctx = context ?: return
-        Toast.makeText(ctx, "Downloading ${source.name}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            ctx, getString(R.string.toast_downloading, source.name), Toast.LENGTH_SHORT
+        ).show()
         viewLifecycleOwner.lifecycleScope.launch {
             val result = BlocklistManager.downloadSource(ctx, source)
             if (!isAdded) return@launch
             result.onSuccess { count ->
-                Toast.makeText(context, "$count names added", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    resources.getQuantityString(R.plurals.toast_names_added, count, count),
+                    Toast.LENGTH_SHORT
+                ).show()
                 refreshSources()
                 updateStatus()
             }
             result.onFailure { error ->
-                Toast.makeText(context, "Failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.toast_download_failed, error.message ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }

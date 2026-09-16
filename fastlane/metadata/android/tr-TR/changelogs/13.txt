@@ -1,0 +1,7 @@
+Rusca ve Ispanyolca.
+
+Her ekran, her dugme, her iletisim kutusu ve bildirim cevrildi. Dili telefonunuzun kendi dili secer, Android 13 ve sonrasinda ise telefonun geri kalanini degistirmeden yalnizca bu uygulama icin bir dil belirleyebilirsiniz.
+
+Sayilar adlarla uyumlu, sayilarin kendisi de dili izliyor: Rusca bir telefon 1,2K yazarken Ingilizce bir telefon 1.2K yaziyor.
+
+Baska bir sey degismedi. Guvenlik duvari tam olarak eskisi gibi calisiyor.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The languages the app ships strings for. Android 13 and newer reads this to
+    offer a per app language picker in system settings; older releases ignore it
+    and follow the phone's own language as before.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="es" />
+    <locale android:name="ru" />
+</locale-config>

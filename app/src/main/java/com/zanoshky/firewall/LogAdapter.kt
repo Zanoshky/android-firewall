@@ -52,9 +52,9 @@ class LogAdapter(
         fun bind(log: ConnectionLog) {
             txtApp.text = log.appName
             txtDest.text = if (log.domain.isNotEmpty()) {
-                "${log.domain} · ${log.protocol}"
+                ctx.getString(R.string.log_dest_domain, log.domain, log.protocol)
             } else {
-                "${log.destIp}:${log.destPort} · ${log.protocol}"
+                ctx.getString(R.string.log_dest_address, log.destIp, log.destPort, log.protocol)
             }
 
             val age = System.currentTimeMillis() - log.timestamp
@@ -68,7 +68,7 @@ class LogAdapter(
                 BlockReason.DROPPED -> R.color.danger
                 else -> R.color.accent
             }
-            txtStatus.text = BlockReason.label(log.blockReason)
+            txtStatus.text = ctx.getString(BlockReason.labelRes(log.blockReason))
             txtStatus.setTextColor(ContextCompat.getColor(ctx, colour))
             (viewDot.background as? GradientDrawable)?.setColor(
                 ContextCompat.getColor(ctx, colour)

@@ -78,7 +78,7 @@ class FirewallTileService : TileService() {
         tile.state = if (enabled && FirewallVpnService.isRunning) Tile.STATE_ACTIVE
                      else if (enabled) Tile.STATE_ACTIVE // starting up
                      else Tile.STATE_INACTIVE
-        tile.label = "Firewall"
+        tile.label = getString(R.string.app_name)
         tile.updateTile()
     }
 }

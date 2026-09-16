@@ -12,7 +12,7 @@
         android:letterSpacing="-0.01"
         android:paddingHorizontal="16dp"
         android:paddingTop="14dp"
-        android:text="Domains"
+        android:text="@string/tab_domains"
         android:textColor="@color/text_primary"
         android:textSize="18sp" />
 
@@ -22,7 +22,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="6dp"
         android:lineSpacingExtra="2dp"
-        android:text="Your own rules for ordinary websites, separate from the tracker lists. A rule covers the domain and everything under it, so blocking google.com also blocks www.google.com and mail.google.com. The more specific rule wins, so you can block a domain and allow one name inside it. Rules take effect at once, for every app set to Filtered."
+        android:text="@string/domains_help"
         android:textColor="@color/text_hint"
         android:textSize="12sp" />
 
@@ -39,7 +39,7 @@
             android:layout_height="44dp"
             android:layout_weight="1"
             android:background="@drawable/bg_search"
-            android:hint="example.com"
+            android:hint="@string/domains_hint_block"
             android:importantForAutofill="no"
             android:inputType="textUri"
             android:imeOptions="actionDone"
@@ -61,7 +61,7 @@
             android:gravity="center"
             android:layout_marginStart="8dp"
             android:paddingHorizontal="18dp"
-            android:text="Add"
+            android:text="@string/action_add"
             android:textColor="@color/accent"
             android:textSize="14sp" />
     </LinearLayout>
@@ -84,7 +84,7 @@
             android:fontFamily="sans-serif-medium"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="Block list"
+            android:text="@string/domains_block_list"
             android:textColor="@color/danger"
             android:textSize="13sp" />
 
@@ -103,7 +103,7 @@
             android:fontFamily="sans-serif-medium"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="Allow list"
+            android:text="@string/domains_allow_list"
             android:textColor="@color/text_hint"
             android:textSize="13sp" />
     </LinearLayout>

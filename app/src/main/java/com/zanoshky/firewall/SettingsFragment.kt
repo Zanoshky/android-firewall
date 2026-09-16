@@ -62,7 +62,7 @@ class SettingsFragment : Fragment() {
         rowRestore = view.findViewById(R.id.rowRestore)
 
         view.findViewById<TextView>(R.id.txtVersion).text =
-            "Firewall ${BackupManager.appVersion(requireContext())}"
+            getString(R.string.settings_version, BackupManager.appVersion(requireContext()))
 
         switchAppLock.setOnCheckedChangeListener { _, isChecked ->
             val enabled = context?.let { AppLock.isEnabled(it) } ?: return@setOnCheckedChangeListener
@@ -104,7 +104,8 @@ class SettingsFragment : Fragment() {
         // Assign without firing the listener's user-change branch: the listener
         // compares against the stored value, which is already up to date here.
         switchAppLock.isChecked = enabled
-        txtLockStatus.text = if (enabled) "On, a passcode is needed to open the app" else "Off"
+        txtLockStatus.text =
+            getString(if (enabled) R.string.settings_lock_on else R.string.settings_lock_off)
         btnChangePasscode.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
@@ -119,18 +120,18 @@ class SettingsFragment : Fragment() {
 
         editCurrent.visibility = if (requireCurrent) View.VISIBLE else View.GONE
         txtHint.text = if (requireCurrent) {
-            "Enter your current passcode, then choose a new one."
+            getString(R.string.pin_hint_change)
         } else {
-            "Letters, digits and symbols, at least ${AppLock.MIN_LENGTH} characters. " +
-                "There is no way to recover it: forget it and the app has to be reinstalled, " +
-                "which loses your rules."
+            getString(R.string.pin_hint_new, AppLock.MIN_LENGTH)
         }
 
         val dialog = MaterialAlertDialogBuilder(ctx)
-            .setTitle(if (requireCurrent) "Change passcode" else "Set a passcode")
+            .setTitle(
+                if (requireCurrent) R.string.settings_change_passcode else R.string.pin_set_title
+            )
             .setView(body)
-            .setNegativeButton("Cancel") { _, _ -> refreshLockUi() }
-            .setPositiveButton("Save", null)
+            .setNegativeButton(R.string.action_cancel) { _, _ -> refreshLockUi() }
+            .setPositiveButton(R.string.action_save, null)
             .setOnCancelListener { refreshLockUi() }
             .create()
 
@@ -140,24 +141,30 @@ class SettingsFragment : Fragment() {
             val newPasscode = editNew.text.toString()
             val confirm = editConfirm.text.toString()
 
-            val formatError = AppLock.validateFormat(newPasscode)
+            val formatError = AppLock.validateFormat(ctx, newPasscode)
             when {
                 formatError != null -> showError(txtError, formatError)
-                newPasscode != confirm -> showError(txtError, "The two passcodes do not match")
+                newPasscode != confirm ->
+                    showError(txtError, getString(R.string.pin_error_mismatch))
                 else -> viewLifecycleOwner.lifecycleScope.launch {
                     val c = context ?: return@launch
                     // PBKDF2 - keep it off the main thread.
                     if (requireCurrent) {
                         val ok = withContext(Dispatchers.Default) { AppLock.verify(c, current) }
                         if (!ok) {
-                            showError(txtError, "That is not your current passcode")
+                            showError(txtError, getString(R.string.pin_error_wrong_current))
                             return@launch
                         }
                     }
                     withContext(Dispatchers.Default) { AppLock.setPasscode(c, newPasscode) }
                     dialog.dismiss()
                     refreshLockUi()
-                    toast(if (requireCurrent) "Passcode changed" else "App Lock is on")
+                    toast(
+                        getString(
+                            if (requireCurrent) R.string.toast_passcode_changed
+                            else R.string.toast_app_lock_on
+                        )
+                    )
                 }
             }
         }
@@ -173,13 +180,13 @@ class SettingsFragment : Fragment() {
         body.findViewById<View>(R.id.editPinNew).visibility = View.GONE
         body.findViewById<View>(R.id.editPinConfirm).visibility = View.GONE
         editCurrent.visibility = View.VISIBLE
-        txtHint.text = "Enter your current passcode to turn App Lock off."
+        txtHint.text = getString(R.string.pin_hint_remove)
 
         val dialog = MaterialAlertDialogBuilder(ctx)
-            .setTitle("Turn off App Lock")
+            .setTitle(R.string.pin_remove_title)
             .setView(body)
-            .setNegativeButton("Cancel") { _, _ -> refreshLockUi() }
-            .setPositiveButton("Turn off", null)
+            .setNegativeButton(R.string.action_cancel) { _, _ -> refreshLockUi() }
+            .setPositiveButton(R.string.action_turn_off, null)
             .setOnCancelListener { refreshLockUi() }
             .create()
 
@@ -191,13 +198,13 @@ class SettingsFragment : Fragment() {
                     AppLock.verify(c, editCurrent.text.toString())
                 }
                 if (!ok) {
-                    showError(txtError, "That is not your passcode")
+                    showError(txtError, getString(R.string.pin_error_wrong))
                     return@launch
                 }
                 AppLock.clearPasscode(c)
                 dialog.dismiss()
                 refreshLockUi()
-                toast("App Lock is off")
+                toast(getString(R.string.toast_app_lock_off))
             }
         }
     }
@@ -218,22 +225,36 @@ class SettingsFragment : Fragment() {
             }
             val domainCount = DomainRules.blockedCount() + DomainRules.allowedCount()
             if (!isAdded) return@launch
-            txtExportSummary.text = "$ruleCount app rules, $domainCount domain rules"
+            txtExportSummary.text = getString(
+                R.string.backup_counts_format,
+                resources.getQuantityString(R.plurals.app_rules, ruleCount, ruleCount),
+                resources.getQuantityString(R.plurals.domain_rules, domainCount, domainCount)
+            )
         }
     }
 
     private fun runExport(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
             val ctx = context?.applicationContext ?: return@launch
-            setBusy(true, "Writing backup...")
+            setBusy(true, getString(R.string.backup_writing))
             val result = BackupManager.export(ctx, uri)
             setBusy(false, null)
             if (!isAdded) return@launch
             result.onSuccess { summary ->
-                toast("Exported ${summary.rules} app rules and ${summary.domains} domain rules")
+                toast(
+                    getString(
+                        R.string.backup_exported,
+                        resources.getQuantityString(
+                            R.plurals.app_rules, summary.rules, summary.rules
+                        ),
+                        resources.getQuantityString(
+                            R.plurals.domain_rules, summary.domains, summary.domains
+                        )
+                    )
+                )
             }
             result.onFailure { e ->
-                toast("Export failed: ${e.message}")
+                toast(getString(R.string.backup_export_failed, e.message ?: ""))
             }
         }
     }
@@ -241,14 +262,10 @@ class SettingsFragment : Fragment() {
     private fun confirmRestore(uri: Uri) {
         val ctx = context ?: return
         MaterialAlertDialogBuilder(ctx)
-            .setTitle("Restore from backup?")
-            .setMessage(
-                "This replaces your app modes and your domain rules with what is in the file. " +
-                    "Apps the backup does not mention end up blocked. Tracker lists named in it are " +
-                    "downloaded again, which needs a connection."
-            )
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Restore") { _, _ -> runRestore(uri) }
+            .setTitle(R.string.restore_title)
+            .setMessage(R.string.restore_message)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.action_restore) { _, _ -> runRestore(uri) }
             .show()
     }
 
@@ -256,7 +273,7 @@ class SettingsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             // Application context: a restore must finish even if this view goes away.
             val appCtx = context?.applicationContext ?: return@launch
-            setBusy(true, "Restoring...")
+            setBusy(true, getString(R.string.backup_restoring))
 
             val result = BackupManager.restore(appCtx, uri) { status ->
                 withContext(Dispatchers.Main) {
@@ -269,9 +286,24 @@ class SettingsFragment : Fragment() {
 
             result.onSuccess { summary ->
                 val failed = if (summary.sourcesFailed > 0) {
-                    ", ${summary.sourcesFailed} list downloads failed"
+                    resources.getQuantityString(
+                        R.plurals.restore_lists_failed,
+                        summary.sourcesFailed,
+                        summary.sourcesFailed
+                    )
                 } else ""
-                toast("Restored ${summary.rules} app rules and ${summary.domains} domain rules$failed")
+                toast(
+                    getString(
+                        R.string.backup_restored,
+                        resources.getQuantityString(
+                            R.plurals.app_rules, summary.rules, summary.rules
+                        ),
+                        resources.getQuantityString(
+                            R.plurals.domain_rules, summary.domains, summary.domains
+                        ),
+                        failed
+                    )
+                )
                 // No shared observable state exists between fragments, so recreate the
                 // activity to pull every tab back in sync with the restored data.
                 // The toggles carry android:saveEnabled="false" precisely so this
@@ -282,7 +314,7 @@ class SettingsFragment : Fragment() {
                 activity?.recreate()
             }
             result.onFailure { e ->
-                toast("Restore failed: ${e.message}")
+                toast(getString(R.string.backup_restore_failed, e.message ?: ""))
             }
         }
     }

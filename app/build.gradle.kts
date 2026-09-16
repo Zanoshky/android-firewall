@@ -11,8 +11,8 @@ android {
         applicationId = "com.zanoshky.firewall"
         minSdk = 23
         targetSdk = 36
-        versionCode = 12
-        versionName = "1.12"
+        versionCode = 13
+        versionName = "1.13"
     }
 
     signingConfigs {
@@ -36,6 +36,16 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    bundle {
+        // Ship every language in the base install rather than only the one the
+        // phone is set to. The per app language picker on Android 13 and newer
+        // can then switch to any of them offline, which is the whole point of
+        // declaring them in locales_config.xml.
+        language {
+            enableSplit = false
+        }
     }
 }
 

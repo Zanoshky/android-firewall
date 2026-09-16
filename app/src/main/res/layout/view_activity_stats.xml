@@ -18,7 +18,7 @@
         android:background="@drawable/bg_stat_card"
         android:lineSpacingExtra="2dp"
         android:padding="12dp"
-        android:text="Private DNS is on in Android settings, so lookups go straight to that provider and the firewall never sees them. Turn it off under Network and internet to get filtering back."
+        android:text="@string/private_dns_warning"
         android:textColor="@color/accent_orange"
         android:textSize="12sp"
         android:visibility="gone" />
@@ -51,7 +51,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lookups"
+                android:text="@string/stat_lookups"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -81,7 +81,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Blocked"
+                android:text="@string/stat_blocked"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -111,7 +111,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Encrypted"
+                android:text="@string/stat_encrypted"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -145,7 +145,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trackers"
+                android:text="@string/stat_trackers"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -175,7 +175,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Your rules"
+                android:text="@string/stat_your_rules"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -205,7 +205,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Blocked apps"
+                android:text="@string/stat_blocked_apps"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -223,7 +223,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
-            android:text="Share stopped"
+            android:text="@string/stat_share_stopped"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
@@ -266,7 +266,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Last 24 hours"
+        android:text="@string/chart_last_24_hours"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -281,7 +281,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="Green is let through, red is stopped"
+        android:text="@string/chart_legend"
         android:textColor="@color/text_hint"
         android:textSize="11sp" />
 
@@ -291,7 +291,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Your apps"
+        android:text="@string/stats_your_apps"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -319,7 +319,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Filtered"
+                android:text="@string/mode_filtered"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -342,7 +342,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bypass"
+                android:text="@string/mode_bypass"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -365,7 +365,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Blocked"
+                android:text="@string/mode_blocked"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -388,7 +388,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Protected"
+                android:text="@string/stat_protected"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -400,7 +400,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Most blocked"
+        android:text="@string/stats_most_blocked"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -416,7 +416,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="Nothing blocked yet."
+        android:text="@string/stats_nothing_blocked"
         android:textColor="@color/text_hint"
         android:textSize="12sp" />
 
@@ -434,7 +434,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Recent activity"
+        android:text="@string/stats_recent_activity"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 </LinearLayout>

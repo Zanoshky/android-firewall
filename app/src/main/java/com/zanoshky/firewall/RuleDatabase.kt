@@ -44,6 +44,20 @@ object BlockReason {
     const val APP_BLOCKED = 3
     const val DROPPED = 4
 
+    /** The label shown on screen, in the reader's own language. */
+    fun labelRes(reason: Int): Int = when (reason) {
+        TRACKER -> R.string.reason_tracker
+        BLOCKLIST -> R.string.reason_blocklist
+        APP_BLOCKED -> R.string.reason_app_blocked
+        DROPPED -> R.string.reason_dropped
+        else -> R.string.reason_allowed
+    }
+
+    /**
+     * The label written into the CSV export. Deliberately English and fixed:
+     * the file is read by other software, so its values must not move with the
+     * phone's language. [labelRes] is the one people see.
+     */
     fun label(reason: Int): String = when (reason) {
         TRACKER -> "TRACKER"
         BLOCKLIST -> "BLOCKED"

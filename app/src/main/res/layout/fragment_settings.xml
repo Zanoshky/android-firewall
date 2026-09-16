@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App Lock"
+            android:text="@string/settings_app_lock"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:fontFamily="sans-serif-medium" />
@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ask for a passcode before the app opens, so your rules cannot be changed by someone holding your phone. Letters, digits and symbols are all allowed."
+            android:text="@string/settings_app_lock_help"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:layout_marginTop="4dp" />
@@ -42,7 +42,7 @@
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/ic_lock"
-                android:contentDescription="App lock"
+                android:contentDescription="@string/settings_app_lock"
                 app:tint="@color/accent" />
 
             <LinearLayout
@@ -56,7 +56,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Passcode"
+                    android:text="@string/settings_passcode"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium" />
@@ -65,7 +65,7 @@
                     android:id="@+id/txtLockStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Off"
+                    android:text="@string/settings_lock_off"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:layout_marginTop="2dp" />
@@ -75,7 +75,7 @@
                 android:id="@+id/switchAppLock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Toggle the passcode"
+                android:contentDescription="@string/settings_toggle_passcode_description"
                 android:saveEnabled="false" />
         </LinearLayout>
 
@@ -84,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center_vertical"
-            android:text="Change passcode"
+            android:text="@string/settings_change_passcode"
             android:textColor="@color/accent"
             android:textSize="15sp"
             android:fontFamily="sans-serif-medium"
@@ -101,7 +101,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Backup and Restore"
+            android:text="@string/settings_backup_title"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
@@ -110,7 +110,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Saves how each app is handled, your domain rules, which tracker lists you downloaded, and your tracker and encryption settings. Plain JSON, no encryption. Your passcode, your activity and your counters are never included."
+            android:text="@string/settings_backup_help"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:layout_marginTop="4dp" />
@@ -135,7 +135,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Export to file"
+                    android:text="@string/settings_export"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium" />
@@ -168,7 +168,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Restore from file"
+                    android:text="@string/settings_restore"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium" />
@@ -176,7 +176,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Replaces your app modes and domain rules"
+                    android:text="@string/settings_restore_summary"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:layout_marginTop="2dp" />
@@ -199,7 +199,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="About"
+            android:text="@string/settings_about"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:fontFamily="sans-serif-medium"
@@ -218,7 +218,7 @@
                 android:id="@+id/txtVersion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Firewall"
+                android:text="@string/app_name"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium" />
@@ -226,7 +226,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No ads, no tracking, no analytics, no external servers. Everything runs on your device."
+                android:text="@string/settings_about_body"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:layout_marginTop="2dp" />

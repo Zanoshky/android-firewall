@@ -2,6 +2,18 @@
 
 Every change to Firewall that you can see, newest first.
 
+## 1.13, September 2026
+
+### Russian and Spanish
+
+The app speaks two more languages. Every screen, every button, every dialog and the notification are translated, and the phone's own language is what picks one. On Android 13 and newer you can also set a language for this app alone, in system settings, without changing the rest of the phone.
+
+Nothing was half done. Counts agree with their nouns, so Russian says one попытка, two попытки and five попыток rather than picking one ending and hoping. Numbers follow the language too: a Russian phone writes 1,2K where an English one writes 1.2K. The tracker list descriptions, the backup messages and the text on the lock screen are all translated, not only the labels you see first.
+
+Two things stay in English on purpose. The CSV export keeps fixed English column values, because that file is read by other software and its meaning must not move with the phone's language. The K and M on the headline numbers stay as they are, because the tiles they sit in are too narrow for a spelled out word.
+
+Nothing else changed. The firewall behaves exactly as it did in 1.12.
+
 ## 1.12, September 2026
 
 ### A new icon

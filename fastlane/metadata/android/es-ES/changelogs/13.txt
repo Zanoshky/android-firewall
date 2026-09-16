@@ -1,0 +1,7 @@
+Ruso y español.
+
+Se han traducido todas las pantallas, todos los botones, todos los cuadros de diálogo y la notificación. El idioma del teléfono elige uno, y en Android 13 y posterior puedes poner un idioma solo para esta app sin cambiar el resto del teléfono.
+
+Las cantidades concuerdan con sus sustantivos, y los números siguen al idioma, así que un teléfono ruso escribe 1,2K donde uno inglés escribe 1.2K.
+
+No ha cambiado nada más. El firewall se comporta igual que antes.

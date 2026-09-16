@@ -19,7 +19,7 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="-0.01"
-            android:text="Activity"
+            android:text="@string/tab_activity"
             android:textColor="@color/text_primary"
             android:textSize="18sp" />
 
@@ -35,7 +35,7 @@
             android:gravity="center"
             android:layout_marginEnd="8dp"
             android:paddingHorizontal="12dp"
-            android:text="Export CSV"
+            android:text="@string/activity_export_csv"
             android:textColor="@color/accent"
             android:textSize="13sp" />
 
@@ -50,7 +50,7 @@
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
             android:paddingHorizontal="12dp"
-            android:text="Reset"
+            android:text="@string/action_reset"
             android:textColor="@color/danger"
             android:textSize="13sp" />
     </LinearLayout>
@@ -64,7 +64,7 @@
         android:drawableStart="@android:drawable/ic_menu_search"
         android:drawablePadding="10dp"
         android:drawableTint="@color/text_hint"
-        android:hint="Filter by app, domain or address"
+        android:hint="@string/activity_filter_hint"
         android:importantForAutofill="no"
         android:inputType="text"
         android:paddingHorizontal="14dp"
@@ -87,23 +87,23 @@
             <TextView
                 android:id="@+id/chipAll"
                 style="@style/Widget.Firewall.Chip"
-                android:text="All" />
+                android:text="@string/filter_all" />
 
             <TextView
                 android:id="@+id/chipBlocked"
                 style="@style/Widget.Firewall.Chip"
-                android:text="Blocked" />
+                android:text="@string/filter_blocked" />
 
             <TextView
                 android:id="@+id/chipAllowed"
                 style="@style/Widget.Firewall.Chip"
-                android:text="Allowed" />
+                android:text="@string/filter_allowed" />
 
             <TextView
                 android:id="@+id/chipTrackers"
                 style="@style/Widget.Firewall.Chip"
                 android:layout_marginEnd="0dp"
-                android:text="Trackers" />
+                android:text="@string/filter_trackers" />
         </LinearLayout>
     </HorizontalScrollView>
 

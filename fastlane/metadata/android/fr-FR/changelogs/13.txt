@@ -1,0 +1,7 @@
+Russe et espagnol.
+
+Chaque ecran, chaque bouton, chaque boite de dialogue et la notification sont traduits. La langue du telephone en choisit une, et a partir d'Android 13 vous pouvez definir une langue pour cette application seule, sans toucher au reste du telephone.
+
+Les nombres s'accordent avec leurs noms, et les chiffres suivent la langue : un telephone russe ecrit 1,2K la ou un telephone anglais ecrit 1.2K.
+
+Rien d'autre n'a change. Le pare-feu se comporte exactement comme avant.
