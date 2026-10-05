@@ -101,23 +101,33 @@ platform :android do
     )
   end
 
+  # A promotion moves a build that is already on Play, so it needs that build's
+  # version code: without one the changelogs have nothing to attach to and the
+  # whole edit fails with "Cannot find changelog because no version code given".
+  # It also leaves the store listing alone; that is what the metadata lanes are for.
   desc "Promote internal to beta"
-  lane :promote_to_beta do
-    upload_to_play_store(
-      track: "internal",
-      track_promote_to: "beta",
-      skip_upload_aab: true,
-      skip_upload_apk: true
-    )
+  lane :promote_to_beta do |options|
+    promote(from: "internal", to: "beta", version_code: options[:version_code])
   end
 
   desc "Promote beta to production"
-  lane :promote_to_production do
+  lane :promote_to_production do |options|
+    promote(from: "beta", to: "production", version_code: options[:version_code])
+  end
+
+  private_lane :promote do |options|
+    code = options[:version_code] ||
+      google_play_track_version_codes(track: options[:from]).max
+    UI.user_error!("No build on the #{options[:from]} track to promote") unless code
     upload_to_play_store(
-      track: "beta",
-      track_promote_to: "production",
+      track: options[:from],
+      track_promote_to: options[:to],
+      version_code: code.to_i,
       skip_upload_aab: true,
-      skip_upload_apk: true
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
     )
   end
 
