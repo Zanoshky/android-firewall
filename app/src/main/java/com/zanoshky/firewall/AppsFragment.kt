@@ -40,7 +40,9 @@ class AppsFragment : Fragment() {
     ): View = inflater.inflate(R.layout.fragment_apps, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = AppAdapter { app, mode ->
+        adapter = AppAdapter(
+            onOpen = { app -> AppDetailSheet.show(childFragmentManager, app.packageName, app.name) }
+        ) { app, mode ->
             // Lands in memory here and applies to the app's very next lookup; the
             // database write and, if the app moved in or out of Bypass, the tunnel
             // rebuild both follow on a scope that outlives this screen.

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 class AppAdapter(
+    private val onOpen: (AppInfo) -> Unit,
     private val onModeChanged: (AppInfo, Int) -> Unit
 ) : RecyclerView.Adapter<AppAdapter.ViewHolder>() {
 
@@ -59,6 +60,7 @@ class AppAdapter(
         private val btnBypass: TextView = view.findViewById(R.id.btnBypass)
         private val btnFiltered: TextView = view.findViewById(R.id.btnFiltered)
         private val btnBlocked: TextView = view.findViewById(R.id.btnBlocked)
+        private val rowHeader: View = view.findViewById(R.id.rowAppHeader)
 
         private val ctx = view.context
 
@@ -83,6 +85,7 @@ class AppAdapter(
             btnBypass.setOnClickListener { choose(app, AppMode.BYPASS) }
             btnFiltered.setOnClickListener { choose(app, AppMode.FILTERED) }
             btnBlocked.setOnClickListener { choose(app, AppMode.BLOCKED) }
+            rowHeader.setOnClickListener { onOpen(app) }
         }
 
         private fun choose(app: AppInfo, mode: Int) {

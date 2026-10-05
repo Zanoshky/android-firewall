@@ -25,6 +25,9 @@ class BootReceiver : BroadcastReceiver() {
         if (action !in bootActions) return
 
         Log.i(TAG, "Boot event received: $action")
+        // Before the first unlock the app's storage is still sealed; the summary
+        // job is persisted anyway, and BOOT_COMPLETED will get here again.
+        try { WeeklySummary.ensureScheduled(context) } catch (_: Exception) {}
 
         val prefs = context.getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         if (!prefs.getBoolean("enabled", false)) {

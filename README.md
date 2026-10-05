@@ -84,6 +84,24 @@ Stats and log in one place, because the numbers and the entries behind them belo
 - Tap an entry to block that domain, or to always allow it
 - Export to CSV
 
+### App insights
+
+Tap an app on the Apps tab to see what it did over the last week.
+
+- Lookups, how many were stopped, and how many tracker companies it reached
+- Each company with how often the app went for it and whether the firewall stopped it, got through, or partly stopped it
+- Around 45 companies are recognised, from Google, Meta and Amazon to ByteDance, Tencent, Alibaba, Baidu, Xiaomi and Huawei, plus SDKs such as AppsFlyer, Adjust, Umeng, Getui and JPush. Only names used for ads, analytics or telemetry count, and an app's own maker is never counted against it
+- The names it looked up most; tap one to block or allow it
+- Share a one-line summary
+
+### Weekly summary
+
+Once a week, a notification with what the firewall stopped, how many tracker companies your apps went for, and which app went for the most. It is worked out on the phone from the activity kept here. Turn it off, or show it on demand, in Settings. Activity is now kept for seven days, up to 50,000 entries.
+
+### Home screen widget
+
+Shows whether protection is on, what was stopped today, and a switch. With App Lock on, turning protection off from the widget opens the app for the passcode, as the tile does.
+
 ### Starting on boot
 
 The firewall restarts when your phone reboots, before you unlock it, and after an app update. For this to be reliable, exclude Firewall from battery optimisation in your device settings.

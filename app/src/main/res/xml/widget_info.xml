@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Two cells by one, stretchable. Refreshed by the firewall itself while it
+     runs; the half hour period only catches the day rolling over. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/widget_firewall"
+    android:minWidth="180dp"
+    android:minHeight="56dp"
+    android:minResizeWidth="140dp"
+    android:minResizeHeight="48dp"
+    android:previewImage="@mipmap/ic_launcher"
+    android:previewLayout="@layout/widget_firewall"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="3"
+    android:targetCellHeight="1"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen" />

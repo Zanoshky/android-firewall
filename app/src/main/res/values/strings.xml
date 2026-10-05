@@ -26,6 +26,7 @@
     <string name="action_restore">Restore</string>
     <string name="action_save">Save</string>
     <string name="action_turn_off">Turn off</string>
+    <string name="action_turn_on">Turn on</string>
 
     <!-- The three ways an app can be handled -->
     <string name="mode_bypass">Bypass</string>
@@ -250,6 +251,11 @@
     <string name="settings_about">About</string>
     <string name="settings_about_body">No ads, no tracking, no analytics, no external servers. Everything runs on your device.</string>
     <string name="settings_version">Firewall %1$s</string>
+    <string name="settings_support">Support the developer</string>
+    <string name="settings_support_summary">Firewall is free and stays that way. If it helps you, you can buy me a coffee.</string>
+    <string name="settings_support_link" translatable="false">☕ buymeacoffee.com/zanoshky</string>
+    <string name="settings_support_url" translatable="false">https://buymeacoffee.com/zanoshky</string>
+    <string name="settings_support_no_browser">No browser found to open the link</string>
 
     <!-- Backup and restore -->
     <plurals name="app_rules">
@@ -279,6 +285,91 @@
     <string name="error_cannot_open_file">Could not open the selected file</string>
     <string name="error_not_a_backup">Not a Firewall backup file</string>
     <string name="error_backup_newer">This backup was made by a newer version of Firewall</string>
+
+    <!-- One app, opened from the Apps tab -->
+    <plurals name="period_days">
+        <item quantity="one">in the last day</item>
+        <item quantity="other">in the last %d days</item>
+    </plurals>
+    <string name="detail_stat_companies">Companies</string>
+    <string name="detail_headline_bypass">This app is set to Bypass, so its lookups never pass through the firewall and nothing about it can be seen here.</string>
+    <string name="detail_headline_quiet">No lookups from this app %1$s.</string>
+    <string name="detail_headline_clean">No known tracker companies %1$s.</string>
+    <plurals name="detail_headline_reached">
+        <item quantity="one">Reached %1$d tracker company %2$s.</item>
+        <item quantity="other">Reached %1$d tracker companies %2$s.</item>
+    </plurals>
+    <string name="detail_headline_all_stopped">The firewall stopped every one of those lookups.</string>
+    <string name="detail_headline_none_stopped">None of those lookups were stopped. Tap a name below to block it, or turn on tracker blocking.</string>
+    <string name="detail_headline_some_stopped">The firewall stopped %1$d%% of those lookups.</string>
+    <string name="detail_companies_title">Tracker companies</string>
+    <plurals name="detail_company_domains">
+        <item quantity="one">%d name</item>
+        <item quantity="other">%d names</item>
+    </plurals>
+    <string name="detail_status_stopped">stopped</string>
+    <string name="detail_status_reached">got through</string>
+    <string name="detail_status_partly">partly stopped</string>
+    <plurals name="detail_other_trackers">
+        <item quantity="one">Plus %d tracker name from a company not on the list.</item>
+        <item quantity="other">Plus %d tracker names from companies not on the list.</item>
+    </plurals>
+    <string name="detail_domains_title">Most looked up</string>
+    <string name="detail_domains_hint">Red was stopped, amber partly. Tap a name to block or allow it.</string>
+    <string name="detail_footer">From the activity kept on this phone, %1$s. Companies count only names used for ads, analytics or telemetry, and an app\'s own maker is never counted against it.</string>
+    <string name="detail_share">Share</string>
+    <plurals name="detail_share_text">
+        <item quantity="one">%1$s reached %2$d tracker company %3$s: %4$s. Seen by Firewall, on my phone.</item>
+        <item quantity="other">%1$s reached %2$d tracker companies %3$s: %4$s. Seen by Firewall, on my phone.</item>
+    </plurals>
+    <plurals name="detail_domain_body">
+        <item quantity="one">%1$d lookup, %2$d stopped.</item>
+        <item quantity="other">%1$d lookups, %2$d stopped.</item>
+    </plurals>
+    <string name="detail_domain_company">Tracker company: %1$s</string>
+
+    <!-- Weekly summary -->
+    <string name="settings_weekly_title">Weekly summary</string>
+    <string name="settings_weekly_help">Once a week, a notification with what the firewall stopped and which tracker companies your apps went for. Worked out on the phone, from the activity kept here.</string>
+    <string name="settings_weekly_switch">Send a weekly summary</string>
+    <string name="settings_weekly_now">Show this week\'s summary now</string>
+    <string name="weekly_nothing_yet">Nothing to sum up yet</string>
+    <string name="weekly_notifications_off">Notifications are off for Firewall. Turn them on in system settings to see the summary.</string>
+    <string name="weekly_channel_name">Weekly summary</string>
+    <string name="weekly_channel_description">What the firewall did in the last seven days</string>
+    <plurals name="weekly_title">
+        <item quantity="one">This week the firewall stopped %s lookup</item>
+        <item quantity="other">This week the firewall stopped %s lookups</item>
+    </plurals>
+    <plurals name="weekly_title_none">
+        <item quantity="one">This week: %s lookup seen, nothing needed stopping</item>
+        <item quantity="other">This week: %s lookups seen, nothing needed stopping</item>
+    </plurals>
+    <plurals name="weekly_companies">
+        <item quantity="one">Your apps went for %1$d tracker company: %2$s.</item>
+        <item quantity="other">Your apps went for %1$d tracker companies, most often %2$s.</item>
+    </plurals>
+    <plurals name="weekly_top_app">
+        <item quantity="one">%2$s reached the most, %1$d company.</item>
+        <item quantity="other">%2$s reached the most, %1$d companies.</item>
+    </plurals>
+    <plurals name="weekly_trackers_stopped">
+        <item quantity="one">%s tracker lookup was stopped.</item>
+        <item quantity="other">%s tracker lookups were stopped.</item>
+    </plurals>
+    <string name="weekly_no_trackers">No known tracker companies were seen.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_label">Firewall status</string>
+    <string name="widget_description">Whether protection is on, what was stopped today, and a switch</string>
+    <plurals name="widget_stopped_today">
+        <item quantity="one">%s stopped today</item>
+        <item quantity="other">%s stopped today</item>
+    </plurals>
+    <plurals name="widget_trackers_today">
+        <item quantity="one">%s tracker</item>
+        <item quantity="other">%s trackers</item>
+    </plurals>
 
     <!-- The ongoing notification, and the quick settings tile -->
     <string name="notification_channel_name">Firewall active</string>

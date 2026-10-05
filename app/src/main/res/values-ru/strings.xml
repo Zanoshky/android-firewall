@@ -18,6 +18,7 @@
     <string name="action_restore">Восстановить</string>
     <string name="action_save">Сохранить</string>
     <string name="action_turn_off">Выключить</string>
+    <string name="action_turn_on">Включить</string>
 
     <!-- Три режима для приложения -->
     <string name="mode_bypass">Обход</string>
@@ -260,6 +261,9 @@
     <string name="settings_about">О приложении</string>
     <string name="settings_about_body">Без рекламы, без слежки, без аналитики, без внешних серверов. Все работает на вашем устройстве.</string>
     <string name="settings_version">Firewall %1$s</string>
+    <string name="settings_support">Поддержать разработчика</string>
+    <string name="settings_support_summary">Firewall бесплатный и таким останется. Если он вам полезен, можете угостить меня кофе.</string>
+    <string name="settings_support_no_browser">Не найден браузер, чтобы открыть ссылку</string>
 
     <!-- Копия и восстановление -->
     <plurals name="app_rules">
@@ -295,6 +299,117 @@
     <string name="error_cannot_open_file">Не удалось открыть выбранный файл</string>
     <string name="error_not_a_backup">Это не файл копии Firewall</string>
     <string name="error_backup_newer">Эта копия сделана более новой версией Firewall</string>
+
+    <!-- Одно приложение, открытое со вкладки «Приложения» -->
+    <plurals name="period_days">
+        <item quantity="one">за последний %d день</item>
+        <item quantity="few">за последние %d дня</item>
+        <item quantity="many">за последние %d дней</item>
+        <item quantity="other">за последние %d дня</item>
+    </plurals>
+    <string name="detail_stat_companies">Компании</string>
+    <string name="detail_headline_bypass">Это приложение в режиме «Обход», поэтому его запросы не проходят через firewall и здесь о нём ничего не видно.</string>
+    <string name="detail_headline_quiet">Ни одного запроса от этого приложения %1$s.</string>
+    <string name="detail_headline_clean">Ни одной известной компании слежки %1$s.</string>
+    <plurals name="detail_headline_reached">
+        <item quantity="one">Обращалось к %1$d компании слежки %2$s.</item>
+        <item quantity="few">Обращалось к %1$d компаниям слежки %2$s.</item>
+        <item quantity="many">Обращалось к %1$d компаниям слежки %2$s.</item>
+        <item quantity="other">Обращалось к %1$d компании слежки %2$s.</item>
+    </plurals>
+    <string name="detail_headline_all_stopped">Firewall остановил все эти запросы.</string>
+    <string name="detail_headline_none_stopped">Ни один из этих запросов не остановлен. Нажмите на имя ниже, чтобы заблокировать его, или включите блокировку трекеров.</string>
+    <string name="detail_headline_some_stopped">Firewall остановил %1$d%% этих запросов.</string>
+    <string name="detail_companies_title">Компании слежки</string>
+    <plurals name="detail_company_domains">
+        <item quantity="one">%d имя</item>
+        <item quantity="few">%d имени</item>
+        <item quantity="many">%d имён</item>
+        <item quantity="other">%d имени</item>
+    </plurals>
+    <string name="detail_status_stopped">остановлено</string>
+    <string name="detail_status_reached">прошло</string>
+    <string name="detail_status_partly">остановлено частично</string>
+    <plurals name="detail_other_trackers">
+        <item quantity="one">И ещё %d имя трекера от компании, которой нет в списке.</item>
+        <item quantity="few">И ещё %d имени трекеров от компаний, которых нет в списке.</item>
+        <item quantity="many">И ещё %d имён трекеров от компаний, которых нет в списке.</item>
+        <item quantity="other">И ещё %d имени трекеров от компаний, которых нет в списке.</item>
+    </plurals>
+    <string name="detail_domains_title">Чаще всего</string>
+    <string name="detail_domains_hint">Красным отмечено остановленное, жёлтым остановленное частично. Нажмите на имя, чтобы заблокировать или разрешить его.</string>
+    <string name="detail_footer">По активности, сохранённой на этом телефоне, %1$s. Компании учитываются только по именам для рекламы, аналитики или телеметрии, а собственный разработчик приложения никогда не засчитывается против него.</string>
+    <string name="detail_share">Поделиться</string>
+    <plurals name="detail_share_text">
+        <item quantity="one">%1$s обращалось к %2$d компании слежки %3$s: %4$s. Замечено Firewall на моём телефоне.</item>
+        <item quantity="few">%1$s обращалось к %2$d компаниям слежки %3$s: %4$s. Замечено Firewall на моём телефоне.</item>
+        <item quantity="many">%1$s обращалось к %2$d компаниям слежки %3$s: %4$s. Замечено Firewall на моём телефоне.</item>
+        <item quantity="other">%1$s обращалось к %2$d компании слежки %3$s: %4$s. Замечено Firewall на моём телефоне.</item>
+    </plurals>
+    <plurals name="detail_domain_body">
+        <item quantity="one">%1$d запрос, остановлено %2$d.</item>
+        <item quantity="few">%1$d запроса, остановлено %2$d.</item>
+        <item quantity="many">%1$d запросов, остановлено %2$d.</item>
+        <item quantity="other">%1$d запроса, остановлено %2$d.</item>
+    </plurals>
+    <string name="detail_domain_company">Компания слежки: %1$s</string>
+
+    <!-- Недельная сводка -->
+    <string name="settings_weekly_title">Недельная сводка</string>
+    <string name="settings_weekly_help">Раз в неделю уведомление о том, что остановил firewall и к каким компаниям слежки обращались ваши приложения. Считается на телефоне, по сохранённой здесь активности.</string>
+    <string name="settings_weekly_switch">Присылать недельную сводку</string>
+    <string name="settings_weekly_now">Показать сводку за эту неделю сейчас</string>
+    <string name="weekly_nothing_yet">Пока нечего подводить</string>
+    <string name="weekly_notifications_off">Уведомления Firewall выключены. Включите их в настройках системы, чтобы увидеть сводку.</string>
+    <string name="weekly_channel_name">Недельная сводка</string>
+    <string name="weekly_channel_description">Что firewall сделал за последние семь дней</string>
+    <plurals name="weekly_title">
+        <item quantity="one">За неделю firewall остановил %s запрос</item>
+        <item quantity="few">За неделю firewall остановил %s запроса</item>
+        <item quantity="many">За неделю firewall остановил %s запросов</item>
+        <item quantity="other">За неделю firewall остановил %s запроса</item>
+    </plurals>
+    <plurals name="weekly_title_none">
+        <item quantity="one">За неделю: проверен %s запрос, останавливать было нечего</item>
+        <item quantity="few">За неделю: проверено %s запроса, останавливать было нечего</item>
+        <item quantity="many">За неделю: проверено %s запросов, останавливать было нечего</item>
+        <item quantity="other">За неделю: проверено %s запроса, останавливать было нечего</item>
+    </plurals>
+    <plurals name="weekly_companies">
+        <item quantity="one">Ваши приложения обращались к %1$d компании слежки: %2$s.</item>
+        <item quantity="few">Ваши приложения обращались к %1$d компаниям слежки, чаще всего к %2$s.</item>
+        <item quantity="many">Ваши приложения обращались к %1$d компаниям слежки, чаще всего к %2$s.</item>
+        <item quantity="other">Ваши приложения обращались к %1$d компании слежки, чаще всего к %2$s.</item>
+    </plurals>
+    <plurals name="weekly_top_app">
+        <item quantity="one">Больше всех %2$s: %1$d компания.</item>
+        <item quantity="few">Больше всех %2$s: %1$d компании.</item>
+        <item quantity="many">Больше всех %2$s: %1$d компаний.</item>
+        <item quantity="other">Больше всех %2$s: %1$d компании.</item>
+    </plurals>
+    <plurals name="weekly_trackers_stopped">
+        <item quantity="one">Остановлен %s запрос к трекерам.</item>
+        <item quantity="few">Остановлено %s запроса к трекерам.</item>
+        <item quantity="many">Остановлено %s запросов к трекерам.</item>
+        <item quantity="other">Остановлено %s запроса к трекерам.</item>
+    </plurals>
+    <string name="weekly_no_trackers">Известных компаний слежки не замечено.</string>
+
+    <!-- Виджет на главном экране -->
+    <string name="widget_label">Состояние Firewall</string>
+    <string name="widget_description">Включена ли защита, что остановлено сегодня, и переключатель</string>
+    <plurals name="widget_stopped_today">
+        <item quantity="one">Сегодня остановлен %s</item>
+        <item quantity="few">Сегодня остановлено %s</item>
+        <item quantity="many">Сегодня остановлено %s</item>
+        <item quantity="other">Сегодня остановлено %s</item>
+    </plurals>
+    <plurals name="widget_trackers_today">
+        <item quantity="one">%s трекер</item>
+        <item quantity="few">%s трекера</item>
+        <item quantity="many">%s трекеров</item>
+        <item quantity="other">%s трекера</item>
+    </plurals>
 
     <!-- Постоянное уведомление и плитка быстрых настроек -->
     <string name="notification_channel_name">Firewall работает</string>

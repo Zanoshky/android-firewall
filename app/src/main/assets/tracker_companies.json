@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Google",
+    "packages": ["com.google."],
+    "domains": [
+      "doubleclick.net", "googlesyndication.com", "googleadservices.com",
+      "google-analytics.com", "googletagmanager.com", "googletagservices.com",
+      "app-measurement.com", "app-analytics-services.com", "crashlytics.com",
+      "admob.com", "adservice.google.com", "ads.google.com", "analytics.google.com",
+      "tagmanager.google.com", "firebaselogging-pa.googleapis.com"
+    ]
+  },
+  {
+    "name": "Meta",
+    "packages": ["com.facebook.", "com.instagram.", "com.whatsapp", "com.oculus."],
+    "domains": [
+      "facebook.net", "graph.facebook.com", "an.facebook.com", "pixel.facebook.com",
+      "ads.facebook.com"
+    ]
+  },
+  {
+    "name": "Amazon",
+    "packages": ["com.amazon.", "in.amazon."],
+    "domains": ["amazon-adsystem.com", "assoc-amazon.com", "serving-sys.com"]
+  },
+  {
+    "name": "Microsoft",
+    "packages": ["com.microsoft.", "com.skype.", "com.linkedin."],
+    "domains": [
+      "clarity.ms", "bat.bing.com", "c.bing.com", "adnxs.com",
+      "vortex.data.microsoft.com", "settings-win.data.microsoft.com",
+      "telemetry.microsoft.com", "watson.microsoft.com",
+      "mobile.events.data.microsoft.com", "in.appcenter.ms"
+    ]
+  },
+  {
+    "name": "ByteDance",
+    "packages": ["com.zhiliaoapp.", "com.ss.android.", "com.bytedance.", "com.lemon."],
+    "domains": [
+      "analytics.tiktok.com", "ads.tiktok.com", "log.tiktokv.com", "mon.tiktokv.com",
+      "pangle.io", "pangleglobal.com"
+    ]
+  },
+  {
+    "name": "X",
+    "packages": ["com.twitter."],
+    "domains": ["analytics.twitter.com", "ads-twitter.com", "ads-api.twitter.com", "t.co"]
+  },
+  {
+    "name": "Snap",
+    "packages": ["com.snapchat."],
+    "domains": ["app-analytics.snapchat.com", "sc-analytics.appspot.com", "tr.snapchat.com"]
+  },
+  {
+    "name": "Yandex",
+    "packages": ["ru.yandex.", "com.yandex."],
+    "domains": ["appmetrica.yandex.net", "appmetrica.yandex.com", "mc.yandex.ru", "an.yandex.ru", "adfox.ru"]
+  },
+  {
+    "name": "Yahoo",
+    "packages": ["com.yahoo."],
+    "domains": ["ads.yahoo.com", "analytics.yahoo.com", "advertising.com"]
+  },
+  {
+    "name": "Tencent",
+    "packages": ["com.tencent."],
+    "domains": [
+      "gdt.qq.com", "pgdt.gtimg.cn", "bugly.qq.com", "mta.qq.com", "pingma.qq.com"
+    ]
+  },
+  {
+    "name": "Alibaba",
+    "packages": ["com.taobao.", "com.alibaba.", "com.eg.android.AlipayGphone"],
+    "domains": ["umeng.com", "umeng.co", "umengcloud.com", "mmstat.com", "tanx.com"]
+  },
+  {
+    "name": "Baidu",
+    "packages": ["com.baidu."],
+    "domains": [
+      "mobads.baidu.com", "mobads-logs.baidu.com", "hm.baidu.com", "pos.baidu.com",
+      "cpro.baidu.com", "mtj.baidu.com"
+    ]
+  },
+  {
+    "name": "Xiaomi",
+    "packages": ["com.xiaomi.", "com.miui.", "com.mi."],
+    "domains": ["data.mistat.xiaomi.com", "tracking.miui.com", "ad.xiaomi.com", "ad.intl.xiaomi.com"]
+  },
+  {
+    "name": "Huawei",
+    "packages": ["com.huawei."],
+    "domains": [
+      "metrics.data.hicloud.com", "metrics1.data.hicloud.com", "metrics2.data.hicloud.com",
+      "logservice.hicloud.com", "logservice1.hicloud.com", "events.op.hicloud.com"
+    ]
+  },
+  { "name": "Getui", "packages": [], "domains": ["getui.com", "getui.net", "igexin.com"] },
+  { "name": "Aurora Mobile (JPush)", "packages": [], "domains": ["jpush.cn", "jpush.io", "jiguang.cn"] },
+  { "name": "AppsFlyer", "packages": [], "domains": ["appsflyer.com", "appsflyersdk.com", "onelink.me"] },
+  { "name": "Adjust", "packages": [], "domains": ["adjust.com", "adjust.io", "adj.st"] },
+  { "name": "Branch", "packages": [], "domains": ["branch.io", "app.link", "bnc.lt"] },
+  { "name": "Braze", "packages": [], "domains": ["braze.com", "braze.eu", "appboy.com"] },
+  { "name": "Airship", "packages": [], "domains": ["urbanairship.com", "asnapieu.com"] },
+  { "name": "OneSignal", "packages": [], "domains": ["onesignal.com"] },
+  { "name": "Mixpanel", "packages": [], "domains": ["mixpanel.com", "mxpnl.com"] },
+  { "name": "Segment", "packages": [], "domains": ["segment.io", "segment.com"] },
+  { "name": "Amplitude", "packages": [], "domains": ["amplitude.com"] },
+  { "name": "Heap", "packages": [], "domains": ["heapanalytics.com", "heap.io"] },
+  { "name": "Sentry", "packages": [], "domains": ["sentry.io", "sentry-cdn.com"] },
+  { "name": "New Relic", "packages": [], "domains": ["newrelic.com", "nr-data.net"] },
+  { "name": "Hotjar", "packages": [], "domains": ["hotjar.com", "hotjar.io"] },
+  { "name": "Comscore", "packages": [], "domains": ["scorecardresearch.com", "comscore.com"] },
+  { "name": "Quantcast", "packages": [], "domains": ["quantserve.com", "quantcount.com"] },
+  { "name": "Salesforce", "packages": [], "domains": ["krxd.net"] },
+  { "name": "Unity Ads", "packages": [], "domains": ["unityads.unity3d.com", "cdp.cloud.unity3d.com"] },
+  { "name": "AppLovin", "packages": [], "domains": ["applovin.com", "applvn.com"] },
+  { "name": "ironSource", "packages": [], "domains": ["supersonicads.com", "ironsrc.com", "ironsrc.mobi"] },
+  { "name": "Liftoff", "packages": [], "domains": ["vungle.com", "liftoff.io"] },
+  { "name": "Chartboost", "packages": [], "domains": ["chartboost.com"] },
+  { "name": "InMobi", "packages": [], "domains": ["inmobi.com"] },
+  { "name": "Mintegral", "packages": [], "domains": ["rayjump.com", "mintegral.com"] },
+  { "name": "Criteo", "packages": [], "domains": ["criteo.com", "criteo.net"] },
+  { "name": "Taboola", "packages": [], "domains": ["taboola.com"] },
+  { "name": "Outbrain", "packages": [], "domains": ["outbrain.com"] },
+  { "name": "Adform", "packages": [], "domains": ["adform.net"] },
+  { "name": "Media.net", "packages": [], "domains": ["media.net"] },
+  { "name": "Fingerprint", "packages": [], "domains": ["fpjs.io", "fingerprint.com", "fpnpmcdn.net"] }
+]

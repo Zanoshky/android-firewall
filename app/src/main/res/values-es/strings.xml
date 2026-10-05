@@ -18,6 +18,7 @@
     <string name="action_restore">Restaurar</string>
     <string name="action_save">Guardar</string>
     <string name="action_turn_off">Desactivar</string>
+    <string name="action_turn_on">Activar</string>
 
     <!-- Las tres formas de tratar una app -->
     <string name="mode_bypass">Directo</string>
@@ -251,6 +252,9 @@
     <string name="settings_about">Acerca de</string>
     <string name="settings_about_body">Sin anuncios, sin seguimiento, sin analíticas, sin servidores externos. Todo funciona en tu dispositivo.</string>
     <string name="settings_version">Firewall %1$s</string>
+    <string name="settings_support">Apoya al desarrollador</string>
+    <string name="settings_support_summary">Firewall es gratis y seguirá siéndolo. Si te resulta útil, puedes invitarme a un café.</string>
+    <string name="settings_support_no_browser">No hay ningún navegador para abrir el enlace</string>
 
     <!-- Copia y restauración -->
     <plurals name="app_rules">
@@ -283,6 +287,104 @@
     <string name="error_cannot_open_file">No se pudo abrir el archivo elegido</string>
     <string name="error_not_a_backup">No es un archivo de copia de Firewall</string>
     <string name="error_backup_newer">Esta copia se hizo con una versión más nueva de Firewall</string>
+
+    <!-- Una app, abierta desde la pestaña Apps -->
+    <plurals name="period_days">
+        <item quantity="one">en el último día</item>
+        <item quantity="many">en los últimos %d días</item>
+        <item quantity="other">en los últimos %d días</item>
+    </plurals>
+    <string name="detail_stat_companies">Empresas</string>
+    <string name="detail_headline_bypass">Esta app está en Directo, así que sus consultas nunca pasan por el firewall y aquí no se puede ver nada de ella.</string>
+    <string name="detail_headline_quiet">Ninguna consulta de esta app %1$s.</string>
+    <string name="detail_headline_clean">Ninguna empresa de rastreo conocida %1$s.</string>
+    <plurals name="detail_headline_reached">
+        <item quantity="one">Contactó con %1$d empresa de rastreo %2$s.</item>
+        <item quantity="many">Contactó con %1$d empresas de rastreo %2$s.</item>
+        <item quantity="other">Contactó con %1$d empresas de rastreo %2$s.</item>
+    </plurals>
+    <string name="detail_headline_all_stopped">El firewall detuvo todas esas consultas.</string>
+    <string name="detail_headline_none_stopped">No se detuvo ninguna de esas consultas. Toca un nombre de abajo para bloquearlo, o activa el bloqueo de rastreadores.</string>
+    <string name="detail_headline_some_stopped">El firewall detuvo el %1$d%% de esas consultas.</string>
+    <string name="detail_companies_title">Empresas de rastreo</string>
+    <plurals name="detail_company_domains">
+        <item quantity="one">%d nombre</item>
+        <item quantity="many">%d nombres</item>
+        <item quantity="other">%d nombres</item>
+    </plurals>
+    <string name="detail_status_stopped">detenido</string>
+    <string name="detail_status_reached">pasó</string>
+    <string name="detail_status_partly">detenido en parte</string>
+    <plurals name="detail_other_trackers">
+        <item quantity="one">Además, %d nombre de rastreo de una empresa que no está en la lista.</item>
+        <item quantity="many">Además, %d nombres de rastreo de empresas que no están en la lista.</item>
+        <item quantity="other">Además, %d nombres de rastreo de empresas que no están en la lista.</item>
+    </plurals>
+    <string name="detail_domains_title">Lo más consultado</string>
+    <string name="detail_domains_hint">En rojo lo detenido, en ámbar lo detenido en parte. Toca un nombre para bloquearlo o permitirlo.</string>
+    <string name="detail_footer">Según la actividad guardada en este teléfono, %1$s. Las empresas solo cuentan nombres usados para anuncios, analíticas o telemetría, y el propio fabricante de una app nunca cuenta en su contra.</string>
+    <string name="detail_share">Compartir</string>
+    <plurals name="detail_share_text">
+        <item quantity="one">%1$s contactó con %2$d empresa de rastreo %3$s: %4$s. Visto por Firewall, en mi teléfono.</item>
+        <item quantity="many">%1$s contactó con %2$d empresas de rastreo %3$s: %4$s. Visto por Firewall, en mi teléfono.</item>
+        <item quantity="other">%1$s contactó con %2$d empresas de rastreo %3$s: %4$s. Visto por Firewall, en mi teléfono.</item>
+    </plurals>
+    <plurals name="detail_domain_body">
+        <item quantity="one">%1$d consulta, %2$d detenidas.</item>
+        <item quantity="many">%1$d consultas, %2$d detenidas.</item>
+        <item quantity="other">%1$d consultas, %2$d detenidas.</item>
+    </plurals>
+    <string name="detail_domain_company">Empresa de rastreo: %1$s</string>
+
+    <!-- Resumen semanal -->
+    <string name="settings_weekly_title">Resumen semanal</string>
+    <string name="settings_weekly_help">Una vez a la semana, una notificación con lo que detuvo el firewall y a qué empresas de rastreo acudieron tus apps. Se calcula en el teléfono, con la actividad guardada aquí.</string>
+    <string name="settings_weekly_switch">Enviar un resumen semanal</string>
+    <string name="settings_weekly_now">Ver ahora el resumen de esta semana</string>
+    <string name="weekly_nothing_yet">Aún no hay nada que resumir</string>
+    <string name="weekly_notifications_off">Las notificaciones de Firewall están desactivadas. Actívalas en los ajustes del sistema para ver el resumen.</string>
+    <string name="weekly_channel_name">Resumen semanal</string>
+    <string name="weekly_channel_description">Lo que hizo el firewall en los últimos siete días</string>
+    <plurals name="weekly_title">
+        <item quantity="one">Esta semana el firewall detuvo %s consulta</item>
+        <item quantity="many">Esta semana el firewall detuvo %s consultas</item>
+        <item quantity="other">Esta semana el firewall detuvo %s consultas</item>
+    </plurals>
+    <plurals name="weekly_title_none">
+        <item quantity="one">Esta semana: %s consulta vista, nada que detener</item>
+        <item quantity="many">Esta semana: %s consultas vistas, nada que detener</item>
+        <item quantity="other">Esta semana: %s consultas vistas, nada que detener</item>
+    </plurals>
+    <plurals name="weekly_companies">
+        <item quantity="one">Tus apps acudieron a %1$d empresa de rastreo: %2$s.</item>
+        <item quantity="many">Tus apps acudieron a %1$d empresas de rastreo, sobre todo %2$s.</item>
+        <item quantity="other">Tus apps acudieron a %1$d empresas de rastreo, sobre todo %2$s.</item>
+    </plurals>
+    <plurals name="weekly_top_app">
+        <item quantity="one">%2$s fue la que más contactó: %1$d empresa.</item>
+        <item quantity="many">%2$s fue la que más contactó: %1$d empresas.</item>
+        <item quantity="other">%2$s fue la que más contactó: %1$d empresas.</item>
+    </plurals>
+    <plurals name="weekly_trackers_stopped">
+        <item quantity="one">Se detuvo %s consulta de rastreo.</item>
+        <item quantity="many">Se detuvieron %s consultas de rastreo.</item>
+        <item quantity="other">Se detuvieron %s consultas de rastreo.</item>
+    </plurals>
+    <string name="weekly_no_trackers">No se vio ninguna empresa de rastreo conocida.</string>
+
+    <!-- Widget de la pantalla de inicio -->
+    <string name="widget_label">Estado de Firewall</string>
+    <string name="widget_description">Si la protección está activa, lo detenido hoy y un interruptor</string>
+    <plurals name="widget_stopped_today">
+        <item quantity="one">%s detenida hoy</item>
+        <item quantity="many">%s detenidas hoy</item>
+        <item quantity="other">%s detenidas hoy</item>
+    </plurals>
+    <plurals name="widget_trackers_today">
+        <item quantity="one">%s rastreador</item>
+        <item quantity="many">%s rastreadores</item>
+        <item quantity="other">%s rastreadores</item>
+    </plurals>
 
     <!-- La notificación fija y el botón de ajustes rápidos -->
     <string name="notification_channel_name">Firewall activo</string>

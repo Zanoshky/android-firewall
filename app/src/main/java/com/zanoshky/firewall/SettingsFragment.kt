@@ -1,6 +1,8 @@
 package com.zanoshky.firewall
 
+import android.content.ActivityNotFoundException
 import android.content.DialogInterface
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -85,8 +87,48 @@ class SettingsFragment : Fragment() {
             importLauncher.launch(arrayOf("*/*"))
         }
 
+        view.findViewById<View>(R.id.rowSupport).setOnClickListener { openSupportLink() }
+
+        val switchSummary = view.findViewById<MaterialSwitch>(R.id.switchWeeklySummary)
+        switchSummary.isChecked = WeeklySummary.isEnabled(requireContext())
+        switchSummary.setOnCheckedChangeListener { _, isChecked ->
+            context?.let { WeeklySummary.setEnabled(it, isChecked) }
+        }
+        view.findViewById<View>(R.id.btnSummaryNow).setOnClickListener { showSummaryNow() }
+
         refreshLockUi()
         refreshExportSummary()
+    }
+
+    /** The summary for the last seven days, on demand, without waiting for the job. */
+    private fun showSummaryNow() {
+        val appCtx = context?.applicationContext ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val content = withContext(Dispatchers.IO) {
+                WeeklySummary.compute(appCtx, System.currentTimeMillis() - 7 * 86_400_000L)
+            }
+            if (!isAdded) return@launch
+            if (content == null) {
+                Toast.makeText(appCtx, R.string.weekly_nothing_yet, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            if (!androidx.core.app.NotificationManagerCompat.from(appCtx).areNotificationsEnabled()) {
+                Toast.makeText(appCtx, R.string.weekly_notifications_off, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            WeeklySummary.post(appCtx, content)
+        }
+    }
+
+    /** Opens the Buy Me a Coffee page in the browser, which backgrounds the app on purpose. */
+    private fun openSupportLink() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.settings_support_url)))
+        try {
+            AppLock.suppressNextRelock()
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), R.string.settings_support_no_browser, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onResume() {
@@ -107,6 +149,8 @@ class SettingsFragment : Fragment() {
         txtLockStatus.text =
             getString(if (enabled) R.string.settings_lock_on else R.string.settings_lock_off)
         btnChangePasscode.visibility = if (enabled) View.VISIBLE else View.GONE
+        // The widget's switch opens the app instead while a passcode is set.
+        FirewallWidget.requestUpdate(ctx)
     }
 
     private fun showSetPasscodeDialog(requireCurrent: Boolean) {

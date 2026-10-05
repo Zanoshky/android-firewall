@@ -21,6 +21,16 @@
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:textColorHint">@color/text_hint</item>
         <item name="bottomNavigationStyle">@style/Widget.Firewall.BottomNav</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Firewall.BottomSheet</item>
+    </style>
+
+    <!-- The app insights sheet: the app's own surface, not Material's default tint -->
+    <style name="ThemeOverlay.Firewall.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Firewall.BottomSheet</item>
+    </style>
+
+    <style name="Widget.Firewall.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">@color/surface</item>
     </style>
 
     <style name="Widget.Firewall.BottomNav" parent="Widget.Material3.BottomNavigationView">

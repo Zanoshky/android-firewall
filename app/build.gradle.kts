@@ -61,4 +61,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("androidx.activity:activity-ktx:1.8.0")
+
+    testImplementation("junit:junit:4.13.2")
+    // The real org.json, because android.jar only carries stubs on the JVM.
+    testImplementation("org.json:json:20240303")
 }

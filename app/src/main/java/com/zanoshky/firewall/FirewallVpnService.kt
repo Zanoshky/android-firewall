@@ -140,9 +140,7 @@ class FirewallVpnService : VpnService() {
         DomainRules.init(this)
         BlocklistManager.reloadSync(this)
 
-        val logDao = RuleDatabase.get(this).connectionLogDao()
-        logDao.deleteOlderThan(System.currentTimeMillis() - 3 * 86400_000L)
-        logDao.trimTo(20_000)
+        RuleDatabase.trim(this)
 
         refreshUpstreamDns()
 
@@ -160,6 +158,7 @@ class FirewallVpnService : VpnService() {
 
         registerNetworkCallback()
         startFlushLoop()
+        FirewallWidget.requestUpdate(this)
 
         val input = FileInputStream(fd.fileDescriptor)
         val out = FileOutputStream(fd.fileDescriptor)
@@ -482,6 +481,7 @@ class FirewallVpnService : VpnService() {
                 delay(30_000)
                 logBuffer.flush(this@FirewallVpnService, scope)
                 Stats.flush(this@FirewallVpnService)
+                FirewallWidget.requestUpdate(this@FirewallVpnService)
             }
         }
     }
@@ -504,6 +504,7 @@ class FirewallVpnService : VpnService() {
         PrivateDns.restore(this)
         logBuffer.flush(this, scope)
         Stats.flush(this, closingSession = true)
+        FirewallWidget.requestUpdate(this)
     }
 
     override fun onDestroy() {

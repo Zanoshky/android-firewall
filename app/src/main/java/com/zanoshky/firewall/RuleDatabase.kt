@@ -129,10 +129,83 @@ data class HourBucket(
     val blocked: Int
 )
 
+/**
+ * One domain one app looked up, folded over a time window. [blocked] counts
+ * every reason something was stopped; [trackerHits] only the tracker lists.
+ */
+data class DomainActivity(
+    val packageName: String,
+    val appName: String,
+    val domain: String,
+    val hits: Int,
+    val blocked: Int,
+    val trackerHits: Int,
+    val lastSeen: Long
+)
+
+/** Headline numbers for a window: lookups, how many were stopped, how many by tracker lists. */
+data class PeriodTotals(
+    val total: Int,
+    val blocked: Int,
+    val trackers: Int,
+    /** Oldest row in the window, or 0 when there are none. */
+    val since: Long
+)
+
 @Dao
 interface ConnectionLogDao {
     @Insert
     suspend fun insertAll(logs: List<ConnectionLog>)
+
+    /** Every domain [pkg] looked up since [since], most frequent first. */
+    @Query(
+        """
+        SELECT packageName, MAX(appName) AS appName, domain, COUNT(*) AS hits,
+               SUM(CASE WHEN blockReason != 0 THEN 1 ELSE 0 END) AS blocked,
+               SUM(CASE WHEN blockReason = 1 THEN 1 ELSE 0 END) AS trackerHits,
+               MAX(timestamp) AS lastSeen
+        FROM connection_logs
+        WHERE packageName = :pkg AND domain != '' AND timestamp >= :since
+        GROUP BY domain ORDER BY hits DESC LIMIT :limit
+    """
+    )
+    suspend fun getDomainsForApp(pkg: String, since: Long, limit: Int): List<DomainActivity>
+
+    /** Every app and domain pair since [since], for the weekly summary. */
+    @Query(
+        """
+        SELECT packageName, MAX(appName) AS appName, domain, COUNT(*) AS hits,
+               SUM(CASE WHEN blockReason != 0 THEN 1 ELSE 0 END) AS blocked,
+               SUM(CASE WHEN blockReason = 1 THEN 1 ELSE 0 END) AS trackerHits,
+               MAX(timestamp) AS lastSeen
+        FROM connection_logs
+        WHERE domain != '' AND timestamp >= :since
+        GROUP BY packageName, domain
+    """
+    )
+    suspend fun getDomainActivity(since: Long): List<DomainActivity>
+
+    @Query(
+        """
+        SELECT COUNT(*) AS total,
+               COALESCE(SUM(CASE WHEN blockReason != 0 THEN 1 ELSE 0 END), 0) AS blocked,
+               COALESCE(SUM(CASE WHEN blockReason = 1 THEN 1 ELSE 0 END), 0) AS trackers,
+               COALESCE(MIN(timestamp), 0) AS since
+        FROM connection_logs WHERE timestamp >= :since
+    """
+    )
+    suspend fun getTotalsSince(since: Long): PeriodTotals
+
+    @Query(
+        """
+        SELECT COUNT(*) AS total,
+               COALESCE(SUM(CASE WHEN blockReason != 0 THEN 1 ELSE 0 END), 0) AS blocked,
+               COALESCE(SUM(CASE WHEN blockReason = 1 THEN 1 ELSE 0 END), 0) AS trackers,
+               COALESCE(MIN(timestamp), 0) AS since
+        FROM connection_logs WHERE packageName = :pkg AND timestamp >= :since
+    """
+    )
+    suspend fun getTotalsForApp(pkg: String, since: Long): PeriodTotals
 
     /**
      * Filtered log query. [status]: 0 = all, 1 = blocked (any reason), 2 = allowed,
@@ -234,6 +307,21 @@ abstract class RuleDatabase : RoomDatabase() {
     abstract fun connectionLogDao(): ConnectionLogDao
 
     companion object {
+        /**
+         * How much activity is kept. A week, because the weekly summary has to
+         * be able to look back that far; capped by rows so a phone that looks
+         * up a lot cannot grow the file without end.
+         */
+        const val KEEP_MS = 7 * 86_400_000L
+        const val KEEP_ROWS = 50_000
+
+        /** Drop what is older than [KEEP_MS] and beyond [KEEP_ROWS]. */
+        suspend fun trim(context: Context) {
+            val dao = get(context).connectionLogDao()
+            dao.deleteOlderThan(System.currentTimeMillis() - KEEP_MS)
+            dao.trimTo(KEEP_ROWS)
+        }
+
         @Volatile private var INSTANCE: RuleDatabase? = null
 
         /**

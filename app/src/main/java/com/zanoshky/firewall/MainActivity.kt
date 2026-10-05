@@ -30,6 +30,14 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        /** Open on a given tab, for the weekly summary and the widget. */
+        const val EXTRA_TAB = "com.zanoshky.firewall.TAB"
+        const val TAB_ACTIVITY = 1
+    }
+
+    private lateinit var viewPager: ViewPager2
+
     private lateinit var heroCard: LinearLayout
     private lateinit var txtStatus: TextView
     private lateinit var txtSubtitle: TextView
@@ -80,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         setupLockOverlay()
         onBackPressedDispatcher.addCallback(this, lockedBackCallback)
 
-        val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        viewPager = findViewById(R.id.viewPager)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         viewPager.adapter = MainPagerAdapter(this)
         viewPager.isUserInputEnabled = false
@@ -142,6 +150,8 @@ class MainActivity : AppCompatActivity() {
         DohResolver.init(this)
         DomainRules.init(this)
         RuleStore.ensureLoaded(this)
+        WeeklySummary.ensureScheduled(this)
+        if (savedInstanceState == null) openRequestedTab(intent)
         lifecycleScope.launch {
             installedApps = withContext(Dispatchers.IO) {
                 try {
@@ -164,6 +174,16 @@ class MainActivity : AppCompatActivity() {
         // straight away. That is not the user leaving the app, so it must not relock.
         if (!isChangingConfigurations) AppLock.onActivityStopped()
         super.onStop()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        openRequestedTab(intent)
+    }
+
+    private fun openRequestedTab(intent: Intent?) {
+        val tab = intent?.getIntExtra(EXTRA_TAB, -1) ?: -1
+        if (tab in 0..4) viewPager.setCurrentItem(tab, false)
     }
 
     override fun onResume() {

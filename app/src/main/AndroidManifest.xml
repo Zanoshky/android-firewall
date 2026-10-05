@@ -68,6 +68,23 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <service
+            android:name="com.zanoshky.firewall.SummaryJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.zanoshky.firewall.FirewallWidget"
+            android:label="@string/widget_label"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+
         <!-- Quick Settings tile for toggling firewall from notification shade -->
         <service
             android:name="com.zanoshky.firewall.FirewallTileService"
