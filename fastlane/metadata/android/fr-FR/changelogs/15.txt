@@ -1,0 +1,7 @@
+Voyez ce que le pare-feu a fait pour vous.
+
+Touchez une app dans l'onglet Apps pour voir sa dernière semaine : requêtes, combien ont été bloquées et quelles sociétés de pistage elle a contactées. Bloquez ou autorisez ses noms les plus fréquents, ou partagez un résumé.
+
+Une notification hebdomadaire résume ce qui a été bloqué et quelle app a le plus insisté. Désactivable dans les Paramètres.
+
+Nouveau widget : état de la protection, total du jour et un interrupteur.

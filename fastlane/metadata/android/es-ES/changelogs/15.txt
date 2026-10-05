@@ -1,0 +1,7 @@
+Mira lo que el cortafuegos hizo por ti.
+
+Toca una app en la pestaña Apps para ver su última semana: consultas, cuántas se detuvieron y a qué empresas de rastreo intentó llegar. Desde ahí puedes bloquear o permitir sus nombres más usados, o compartir un resumen.
+
+Una notificación semanal resume lo que se detuvo y qué app lo intentó más. Puedes desactivarla en Ajustes.
+
+Nuevo widget: estado de la protección, el total de hoy y un interruptor.

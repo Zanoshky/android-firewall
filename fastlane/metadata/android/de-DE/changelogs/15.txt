@@ -1,0 +1,7 @@
+Sehen Sie, was die Firewall fuer Sie getan hat.
+
+Tippen Sie im Tab Apps auf eine App, um ihre letzte Woche zu sehen: Anfragen, wie viele gestoppt wurden und welche Tracker-Firmen sie angesteuert hat. Haeufige Namen lassen sich dort sperren oder erlauben, und eine Zusammenfassung teilen.
+
+Eine woechentliche Benachrichtigung fasst zusammen, was gestoppt wurde und welche App es am oeftesten versucht hat. Abschaltbar in den Einstellungen.
+
+Neues Widget: Schutzstatus, heutige Zahl und ein Schalter.

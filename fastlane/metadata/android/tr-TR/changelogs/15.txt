@@ -1,0 +1,7 @@
+Güvenlik duvarının sizin için ne yaptığını görün.
+
+Uygulamalar sekmesinde bir uygulamaya dokunun ve son haftasını görün: sorgular, kaçının durdurulduğu ve hangi izleyici şirketlere ulaşmaya çalıştığı. Sık kullanılan adları engelleyin veya izin verin, ya da bir özet paylaşın.
+
+Haftalık bildirim neyin durdurulduğunu ve en çok hangi uygulamanın denediğini özetler. Ayarlar'dan kapatılabilir.
+
+Yeni widget: koruma durumu, bugünkü sayı ve bir açma/kapama düğmesi.

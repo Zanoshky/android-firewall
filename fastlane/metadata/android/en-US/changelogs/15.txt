@@ -1,0 +1,7 @@
+See what the firewall did for you.
+
+Tap an app on the Apps tab to see its last week: lookups, how many were stopped, and which tracker companies it went for. Block or allow its top names from there, or share a summary.
+
+A weekly notification sums up what was stopped and which app tried the most. Turn it off in Settings.
+
+New home screen widget: protection status, today's count and an on/off switch.

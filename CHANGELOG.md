@@ -2,6 +2,18 @@
 
 Every change to Firewall that you can see, newest first.
 
+## 1.15, October 2026
+
+### See what the firewall did for you
+
+Tap an app on the Apps tab and a sheet shows its last week: how many lookups it made, how many were stopped, and which tracker companies it went for. Each company is marked stopped, got through, or partly stopped. Around 45 companies are recognised, from Google, Meta and Amazon to ByteDance, Tencent and Xiaomi, plus SDKs such as AppsFlyer and Adjust. Only their ads, analytics and telemetry names count, and an app's own maker is never held against it. The names an app looked up most are listed too, and a tap blocks or allows one. A one-line summary can be shared.
+
+Once a week a notification sums it up: what was stopped, how many tracker companies your apps went for, and which app went for the most. It is worked out on the phone. Turn it off, or show it now, in Settings.
+
+A home screen widget shows whether protection is on, what was stopped today, and a switch. With App Lock on, switching off from the widget asks for the passcode, as the tile does.
+
+Activity is now kept for seven days, up to 50,000 entries, so the week has something to show.
+
 ## 1.14, October 2026
 
 ### Private DNS no longer switches filtering off

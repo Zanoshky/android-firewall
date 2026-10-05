@@ -1,0 +1,7 @@
+Lihat apa yang dilakukan firewall untuk Anda.
+
+Ketuk aplikasi di tab Apps untuk melihat seminggu terakhirnya: jumlah pencarian, berapa yang dihentikan, dan perusahaan pelacak mana yang dihubunginya. Blokir atau izinkan nama yang paling sering, atau bagikan ringkasan.
+
+Notifikasi mingguan merangkum apa yang dihentikan dan aplikasi mana yang paling sering mencoba. Matikan di Pengaturan.
+
+Widget baru: status perlindungan, jumlah hari ini, dan sakelar.

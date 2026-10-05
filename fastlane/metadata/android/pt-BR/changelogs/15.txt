@@ -1,0 +1,7 @@
+Veja o que o firewall fez por você.
+
+Toque em um app na aba Apps para ver a última semana dele: consultas, quantas foram bloqueadas e quais empresas de rastreamento ele procurou. Bloqueie ou permita os nomes mais usados, ou compartilhe um resumo.
+
+Uma notificação semanal resume o que foi bloqueado e qual app mais tentou. Desative em Configurações.
+
+Novo widget: status da proteção, total de hoje e um botão liga/desliga.
