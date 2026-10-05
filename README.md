@@ -55,7 +55,21 @@ With this on, lookups are encrypted and sent to a provider of your choice instea
 - Falls back to the network's own resolver if the encrypted path fails, rather than leaving you with no answer
 - Works alongside tracker blocking: a blocked name is stopped before any query is sent
 
-Apps that do their own DNS over HTTPS, and Android's own Private DNS setting, both take lookups away from the firewall. Turn Private DNS off under Network and internet if you want filtering to cover everything; the app tells you on the Activity tab when it is on.
+Apps that do their own DNS over HTTPS take lookups away from the firewall, and there is nothing a firewall without root can do about that.
+
+### Private DNS
+
+Android's Private DNS setting only gets in the way when it names a provider, such as `dns.google`. Then Android sends every lookup straight to that provider and the firewall never sees them. Automatic and Off are both fine.
+
+When a provider is set, the Activity tab says so, and a tap on the notice offers a fix:
+
+- **With one-time permission**: the firewall switches Private DNS to Automatic while it runs and puts your setting back the moment you turn it off. If you change the setting yourself in the meantime, your change stands. Your lookups stay encrypted, because DNS over HTTPS is turned on in its place, with the same provider for Google, Cloudflare and Quad9. Grant the permission once from a computer with USB debugging on:
+
+  ```
+  adb shell pm grant com.zanoshky.firewall android.permission.WRITE_SECURE_SETTINGS
+  ```
+
+- **Without it**: the app explains what to change, copies the command above for you, and opens Network and internet, where the setting lives.
 
 ### Activity
 

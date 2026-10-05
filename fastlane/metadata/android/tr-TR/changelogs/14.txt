@@ -1,0 +1,5 @@
+Özel DNS artık filtrelemeyi kapatmıyor.
+
+Özel DNS'te bir sağlayıcı ayarlıyken Android her sorguyu güvenlik duvarının yanından gönderiyordu. adb ile bir kez izin verin; güvenlik duvarı çalıştığı sürece Özel DNS'i Otomatik yapar, sonra ayarınızı geri koyar. Sorgular DNS over HTTPS ile şifreli kalır.
+
+İzin olmadan, Etkinlik sekmesindeki uyarıya dokunun, çözümü gösterir.

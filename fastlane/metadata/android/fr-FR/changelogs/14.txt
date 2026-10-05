@@ -1,0 +1,5 @@
+Le DNS privé ne coupe plus le filtrage.
+
+Quand le DNS privé désignait un fournisseur, Android envoyait chaque requête hors du pare-feu. Accordez une autorisation une seule fois via adb : le pare-feu passe le DNS privé en Automatique pendant qu'il tourne, puis remet votre réglage. Les requêtes restent chiffrées par DNS over HTTPS.
+
+Sans l'autorisation, touchez l'avis de l'onglet Activité pour voir la solution.

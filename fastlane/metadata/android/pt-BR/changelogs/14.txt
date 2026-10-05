@@ -1,0 +1,5 @@
+O DNS privado não desliga mais a filtragem.
+
+Quando o DNS privado indicava um provedor, o Android mandava cada consulta por fora do firewall. Conceda uma permissão uma vez via adb e o firewall coloca o DNS privado em Automático enquanto roda, depois devolve sua configuração. As consultas continuam criptografadas por DNS over HTTPS.
+
+Sem a permissão, toque no aviso da aba Atividade para ver a solução.

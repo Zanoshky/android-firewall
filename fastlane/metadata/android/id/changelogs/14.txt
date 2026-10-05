@@ -1,0 +1,5 @@
+DNS Pribadi tidak lagi mematikan penyaringan.
+
+Saat DNS Pribadi diisi nama penyedia, Android mengirim setiap pencarian langsung melewati firewall. Berikan satu izin sekali lewat adb, lalu firewall mengubah DNS Pribadi ke Otomatis selama berjalan dan mengembalikan setelan Anda sesudahnya. Pencarian tetap terenkripsi lewat DNS over HTTPS.
+
+Tanpa izin itu, ketuk pemberitahuan di tab Aktivitas untuk melihat caranya.

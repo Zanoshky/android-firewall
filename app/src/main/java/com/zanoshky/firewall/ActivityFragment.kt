@@ -1,10 +1,13 @@
 package com.zanoshky.firewall
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -61,7 +64,7 @@ class ActivityFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         logDao = RuleDatabase.get(requireContext()).connectionLogDao()
         logAdapter = LogAdapter { log -> showEntry(log) }
-        headerAdapter = StatsHeaderAdapter()
+        headerAdapter = StatsHeaderAdapter { showPrivateDns() }
 
         view.findViewById<RecyclerView>(R.id.recyclerActivity).apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -166,6 +169,13 @@ class ActivityFragment : Fragment() {
                 logDao.getHourly(System.currentTimeMillis() - 24 * 3_600_000L)
             }
             val topBlocked = withContext(Dispatchers.IO) { logDao.getTopBlockedDomains(5) }
+            val (strictHost, managedHost) = withContext(Dispatchers.IO) {
+                if (FirewallVpnService.isRunning) {
+                    PrivateDns.strictHost(ctx) to PrivateDns.takenOverHost(ctx)
+                } else {
+                    null to null
+                }
+            }
 
             if (!isAdded) return@launch
 
@@ -188,10 +198,54 @@ class ActivityFragment : Fragment() {
                     allowedRules = DomainRules.allowedCount(),
                     dohOn = DohResolver.isEnabled,
                     dohProvider = DohResolver.providerLabel(),
-                    privateDnsActive = FirewallVpnService.privateDnsActive
+                    privateDnsHost = strictHost,
+                    privateDnsManagedHost = managedHost
                 )
             )
             logAdapter.submitList(logs)
+        }
+    }
+
+    /**
+     * Strict Private DNS is the one setting that takes every lookup away from
+     * the firewall. Fix it in place when we are allowed to write the setting,
+     * otherwise say how, and open the screen where it lives.
+     */
+    private fun showPrivateDns() {
+        val ctx = context ?: return
+        val host = PrivateDns.strictHost(ctx) ?: run { load(); return }
+        val name = PrivateDnsText.host(ctx, host)
+        val builder = MaterialAlertDialogBuilder(ctx)
+            .setTitle(R.string.private_dns_title)
+            .setNegativeButton(R.string.action_close, null)
+
+        if (PrivateDns.canManage(ctx)) {
+            builder.setMessage(getString(R.string.private_dns_fix_body, name))
+                .setPositiveButton(R.string.private_dns_fix) { _, _ ->
+                    val fixed = PrivateDns.takeOver(ctx)
+                    toast(getString(if (fixed) R.string.toast_private_dns_fixed else R.string.toast_private_dns_failed))
+                    load()
+                }
+        } else {
+            val command = PrivateDns.grantCommand(ctx)
+            builder.setMessage(getString(R.string.private_dns_manual_body, name, command))
+                .setPositiveButton(R.string.private_dns_open_settings) { _, _ -> openNetworkSettings() }
+                .setNeutralButton(R.string.private_dns_copy_command) { _, _ ->
+                    val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("adb", command))
+                    toast(getString(R.string.toast_command_copied))
+                }
+        }
+        builder.show()
+    }
+
+    /** Private DNS lives under Network and internet; there is no public intent for the dialog itself. */
+    private fun openNetworkSettings() {
+        for (action in listOf(Settings.ACTION_WIRELESS_SETTINGS, Settings.ACTION_SETTINGS)) {
+            try {
+                startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return
+            } catch (_: Exception) {}
         }
     }
 
@@ -338,14 +392,19 @@ data class ActivitySummary(
     val allowedRules: Int,
     val dohOn: Boolean,
     val dohProvider: String,
-    val privateDnsActive: Boolean
+    /** Strict Private DNS that is taking lookups away from the tunnel, or null. */
+    val privateDnsHost: String?,
+    /** The strict provider the firewall has paused while it runs, or null. */
+    val privateDnsManagedHost: String?
 )
 
 /**
  * The summary, as the single first row of the activity list. Being an adapter
  * rather than a view above the list is what lets the log rows keep recycling.
  */
-class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>() {
+class StatsHeaderAdapter(
+    private val onPrivateDnsClick: () -> Unit
+) : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>() {
 
     private var summary: ActivitySummary? = null
 
@@ -359,7 +418,9 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.view_activity_stats, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view).also { holder ->
+            holder.txtPrivateDns.setOnClickListener { onPrivateDnsClick() }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -385,7 +446,7 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
         private val containerTop: LinearLayout = view.findViewById(R.id.containerTopBlocked)
         private val txtNoBlocked: TextView = view.findViewById(R.id.txtNoBlockedYet)
         private val txtLists: TextView = view.findViewById(R.id.txtListsSummary)
-        private val txtPrivateDns: TextView = view.findViewById(R.id.txtPrivateDnsWarning)
+        val txtPrivateDns: TextView = view.findViewById(R.id.txtPrivateDnsWarning)
 
         fun bind(s: ActivitySummary) {
             val t = s.totals
@@ -426,7 +487,31 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
             }
             txtLists.text = ctx.getString(R.string.summary_lists_format, lists, rules, doh)
 
-            txtPrivateDns.visibility = if (s.privateDnsActive) View.VISIBLE else View.GONE
+            bindPrivateDns(s)
+        }
+
+        private fun bindPrivateDns(s: ActivitySummary) {
+            val strict = s.privateDnsHost
+            val managed = s.privateDnsManagedHost
+            when {
+                strict != null -> {
+                    txtPrivateDns.text = ctx.getString(
+                        R.string.private_dns_warning, PrivateDnsText.host(ctx, strict)
+                    )
+                    txtPrivateDns.setTextColor(ctx.getColor(R.color.accent_orange))
+                    txtPrivateDns.isClickable = true
+                    txtPrivateDns.visibility = View.VISIBLE
+                }
+                managed != null -> {
+                    txtPrivateDns.text = ctx.getString(
+                        R.string.private_dns_managed, PrivateDnsText.host(ctx, managed)
+                    )
+                    txtPrivateDns.setTextColor(ctx.getColor(R.color.text_secondary))
+                    txtPrivateDns.isClickable = false
+                    txtPrivateDns.visibility = View.VISIBLE
+                }
+                else -> txtPrivateDns.visibility = View.GONE
+            }
         }
 
         private fun domainRow(entry: DomainCount): View {
@@ -477,4 +562,10 @@ class StatsHeaderAdapter : RecyclerView.Adapter<StatsHeaderAdapter.ViewHolder>()
             }
         }
     }
+}
+
+/** How a Private DNS provider is named on screen. */
+private object PrivateDnsText {
+    fun host(context: Context, host: String): String =
+        host.ifEmpty { context.getString(R.string.private_dns_unknown_host) }
 }

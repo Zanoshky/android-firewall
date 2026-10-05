@@ -2,6 +2,16 @@
 
 Every change to Firewall that you can see, newest first.
 
+## 1.14, October 2026
+
+### Private DNS no longer switches filtering off
+
+When Private DNS named a provider, Android sent every lookup straight to it, and the firewall could only warn you. Now it can fix it. Grant one permission once over adb and the firewall moves Private DNS to Automatic while it runs, then puts your setting back when you turn it off. Lookups stay encrypted: DNS over HTTPS takes over, with the same provider where it can.
+
+Without the permission, a tap on the notice explains what to change, copies the grant command, and opens the right settings screen.
+
+The notice was also wrong in one case. It showed whenever the network itself spoke encrypted DNS, even with Private DNS on Automatic, which never takes lookups away from the firewall. It now shows only when a provider is set.
+
 ## 1.13, September 2026
 
 ### Russian and Spanish

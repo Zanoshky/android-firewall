@@ -1,0 +1,5 @@
+Private DNS no longer switches filtering off.
+
+When Private DNS named a provider, Android sent every lookup straight past the firewall. Grant one permission once over adb and the firewall now moves Private DNS to Automatic while it runs, then puts your setting back. Lookups stay encrypted through DNS over HTTPS.
+
+Without the permission, tap the notice on the Activity tab and it shows you the fix.

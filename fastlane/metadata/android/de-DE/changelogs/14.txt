@@ -1,0 +1,5 @@
+Privates DNS schaltet die Filterung nicht mehr ab.
+
+War im privaten DNS ein Anbieter eingetragen, schickte Android jede Anfrage an der Firewall vorbei. Erteilen Sie einmal per adb eine Berechtigung, dann stellt die Firewall privates DNS waehrend des Betriebs auf Automatisch und danach Ihre Einstellung wieder her. Anfragen bleiben ueber DNS over HTTPS verschluesselt.
+
+Ohne Berechtigung zeigt der Hinweis im Tab Aktivitaet, was zu tun ist.

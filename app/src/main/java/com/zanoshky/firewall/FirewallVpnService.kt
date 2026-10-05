@@ -91,9 +91,6 @@ class FirewallVpnService : VpnService() {
         /** True while the tunnel is established and reading packets. */
         @Volatile var isRunning: Boolean = false
 
-        /** Set when the system's own Private DNS would take lookups away from us. */
-        @Volatile var privateDnsActive: Boolean = false
-
         /** Apps currently inside the tunnel, for the notification and the hero card. */
         @Volatile var appsFiltered: Int = 0
         @Volatile var appsBlocked: Int = 0
@@ -155,6 +152,10 @@ class FirewallVpnService : VpnService() {
         }
         vpnInterface = fd
         isRunning = true
+
+        // Strict Private DNS would send every lookup past the tunnel. When the
+        // user has let us, move it out of the way for as long as we run.
+        PrivateDns.takeOver(this)
         if (Stats.sessionStart == 0L) Stats.startSession(this)
 
         registerNetworkCallback()
@@ -452,7 +453,6 @@ class FirewallVpnService : VpnService() {
      */
     private fun refreshUpstreamDns() {
         val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var privateDns = false
         val servers = mutableListOf<String>()
         try {
             @Suppress("DEPRECATION")
@@ -461,9 +461,6 @@ class FirewallVpnService : VpnService() {
                 if (caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) continue
                 if (!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) continue
                 val link = cm.getLinkProperties(network) ?: continue
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && link.isPrivateDnsActive) {
-                    privateDns = true
-                }
                 for (server in link.dnsServers) {
                     val address = server.hostAddress ?: continue
                     if (server !is Inet4Address) continue
@@ -473,7 +470,6 @@ class FirewallVpnService : VpnService() {
             }
         } catch (_: Exception) {}
         upstreamDns = servers
-        privateDnsActive = privateDns
         try { setUnderlyingNetworks(null) } catch (_: Exception) {}
     }
 
@@ -505,6 +501,7 @@ class FirewallVpnService : VpnService() {
         readJob = null
         closeInterface()
         Sinkhole.clear()
+        PrivateDns.restore(this)
         logBuffer.flush(this, scope)
         Stats.flush(this, closingSession = true)
     }

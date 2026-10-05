@@ -16,9 +16,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_stat_card"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:lineSpacingExtra="2dp"
         android:padding="12dp"
-        android:text="@string/private_dns_warning"
         android:textColor="@color/accent_orange"
         android:textSize="12sp"
         android:visibility="gone" />
