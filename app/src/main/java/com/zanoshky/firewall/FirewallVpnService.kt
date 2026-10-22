@@ -116,7 +116,15 @@ class FirewallVpnService : VpnService() {
                 START_NOT_STICKY
             }
             else -> {
-                startForeground(NOTIFICATION_ID, buildNotification())
+                // A sticky restart while the app is in the background can be refused
+                // the foreground; stop cleanly rather than crash, the switch shows it.
+                try {
+                    startForeground(NOTIFICATION_ID, buildNotification())
+                } catch (e: IllegalStateException) {
+                    Log.w(TAG, "Not allowed to run in the foreground", e)
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
                 rebuildTunnel()
                 START_STICKY
             }

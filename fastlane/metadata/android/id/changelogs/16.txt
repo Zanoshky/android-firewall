@@ -1,0 +1,3 @@
+Memperbaiki crash di beberapa ponsel tepat setelah restart, sebelum buka kunci pertama. Firewall tetap menyala sendiri lagi setelah Anda membuka kunci.
+
+Aplikasi kini tampil di belakang bilah status dan navigasi di semua versi Android, bukan hanya Android 15.

@@ -1,0 +1,3 @@
+Corrige un cierre inesperado en algunos teléfonos justo después de reiniciar, antes del primer desbloqueo. El firewall se vuelve a activar solo al desbloquear.
+
+La app ahora se dibuja detrás de las barras de estado y navegación en todas las versiones de Android, no solo en Android 15.

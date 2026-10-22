@@ -1,0 +1,3 @@
+Corrige um travamento em alguns celulares logo após reiniciar, antes do primeiro desbloqueio. O firewall continua religando sozinho assim que você desbloqueia.
+
+O app agora aparece por trás das barras de status e de navegação em todas as versões do Android, não só no Android 15.

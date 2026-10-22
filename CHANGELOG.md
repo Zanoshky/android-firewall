@@ -2,6 +2,18 @@
 
 Every change to Firewall that you can see, newest first.
 
+## 1.16, October 2026
+
+### No more crash after a restart
+
+On some phones the firewall crashed right after a restart, before the first unlock. It tried to read its settings while Android still kept them sealed. It now waits for the unlock, then turns itself back on as before. Play counted this crash on 1.4% of users.
+
+If Android refuses to let the firewall run in the foreground, it now stops cleanly instead of crashing.
+
+### Edge to edge on every Android version
+
+The app now draws behind the status and navigation bars on every Android version, as it already did on Android 15, and no longer sets the bar colours Android has retired.
+
 ## 1.15, October 2026
 
 ### See what the firewall did for you

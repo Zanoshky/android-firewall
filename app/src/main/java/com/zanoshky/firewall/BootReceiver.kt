@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
+import androidx.core.os.UserManagerCompat
 
 class BootReceiver : BroadcastReceiver() {
 
@@ -28,6 +29,14 @@ class BootReceiver : BroadcastReceiver() {
         // Before the first unlock the app's storage is still sealed; the summary
         // job is persisted anyway, and BOOT_COMPLETED will get here again.
         try { WeeklySummary.ensureScheduled(context) } catch (_: Exception) {}
+
+        // Reading the prefs before then throws, which Play counted as a crash on
+        // every locked boot. Nothing is lost by waiting: BOOT_COMPLETED follows
+        // the first unlock and starts the firewall from here.
+        if (!UserManagerCompat.isUserUnlocked(context)) {
+            Log.i(TAG, "Storage still locked, waiting for BOOT_COMPLETED")
+            return
+        }
 
         val prefs = context.getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         if (!prefs.getBoolean("enabled", false)) {

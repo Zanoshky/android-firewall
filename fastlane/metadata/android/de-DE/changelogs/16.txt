@@ -1,0 +1,3 @@
+Behebt einen Absturz auf manchen Telefonen direkt nach dem Neustart, vor dem ersten Entsperren. Die Firewall schaltet sich nach dem Entsperren weiterhin selbst wieder ein.
+
+Die App zeichnet jetzt auf jeder Android Version hinter Status und Navigationsleiste, nicht nur unter Android 15.

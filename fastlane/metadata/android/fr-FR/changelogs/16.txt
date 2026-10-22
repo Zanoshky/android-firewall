@@ -1,0 +1,3 @@
+Corrige un plantage sur certains téléphones juste après un redémarrage, avant le premier déverrouillage. Le pare-feu se réactive toujours tout seul une fois le téléphone déverrouillé.
+
+L'app s'affiche désormais sous les barres d'état et de navigation sur toutes les versions d'Android, pas seulement Android 15.

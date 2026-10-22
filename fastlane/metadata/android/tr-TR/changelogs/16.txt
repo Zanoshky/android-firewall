@@ -1,0 +1,3 @@
+Bazı telefonlarda yeniden başlatmanın hemen ardından, ilk kilit açmadan önce yaşanan çökme giderildi. Güvenlik duvarı kilidi açtığınızda yine kendiliğinden açılır.
+
+Uygulama artık yalnızca Android 15'te değil, her Android sürümünde durum ve gezinme çubuklarının arkasına kadar çizilir.

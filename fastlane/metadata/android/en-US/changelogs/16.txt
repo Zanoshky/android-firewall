@@ -1,0 +1,3 @@
+Fixes a crash on some phones right after a restart, before the first unlock. The firewall still turns itself back on once you unlock.
+
+The app now draws behind the status and navigation bars on every Android version, not only Android 15.
