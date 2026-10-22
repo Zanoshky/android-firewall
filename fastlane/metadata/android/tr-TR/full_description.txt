@@ -54,7 +54,7 @@ GIZLILIK VE GUVEN
 - Acik kaynak - her satiri kendiniz denetleyin
 
 UYUMLULUK
-- Android 6.0 ile Android 15 arasi
+- Android 7.0 ile Android 15 arasi
 - Root gerektirmez
 - Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
 

@@ -159,7 +159,7 @@ Your rules and your activity are stored on the device and never leave it.
 
 ## Compatibility
 
-- Android 6.0 through Android 16
+- Android 7.0 through Android 16
 - No root
 - Works on Samsung, Xiaomi, Huawei, Pixel, OnePlus and the rest
 

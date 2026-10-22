@@ -54,7 +54,7 @@ PRIVASI DAN KEPERCAYAAN
 - Open source - audit setiap baris kode
 
 KOMPATIBILITAS
-- Android 6.0 hingga Android 15
+- Android 7.0 hingga Android 15
 - Tanpa root
 - Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
 

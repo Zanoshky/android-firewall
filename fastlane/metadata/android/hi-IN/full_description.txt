@@ -54,7 +54,7 @@ PRIVACY AUR TRUST
 - Open source - har line audit karein
 
 COMPATIBILITY
-- Android 6.0 se Android 15 tak
+- Android 7.0 se Android 15 tak
 - Root ki zaroorat nahi
 - Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
 

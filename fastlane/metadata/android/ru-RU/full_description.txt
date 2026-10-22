@@ -53,7 +53,7 @@ DNS ЧЕРЕЗ HTTPS
 - Открытый код
 
 СОВМЕСТИМОСТЬ
-- Android 6.0 - 15
+- Android 7.0 - 15
 - Без root
 - Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
 

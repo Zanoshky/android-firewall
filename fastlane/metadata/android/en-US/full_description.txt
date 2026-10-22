@@ -62,4 +62,4 @@ Nothing is collected. No analytics, no crash reporting, no telemetry. The only o
 
 COMPATIBILITY
 
-Android 6.0 through Android 16. No root. Works on all devices.
+Android 7.0 through Android 16. No root. Works on all devices.

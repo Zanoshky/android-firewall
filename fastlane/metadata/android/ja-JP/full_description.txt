@@ -54,7 +54,7 @@ ISPは訪問する全ドメインを見ることができます。DoHはクエ�
 - オープンソース - 全コードを監査可能
 
 互換性
-- Android 6.0からAndroid 15
+- Android 7.0からAndroid 15
 - Root不要
 - Samsung、Xiaomi、Huawei、Pixel、OnePlus、Motorola
 

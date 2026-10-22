@@ -54,7 +54,7 @@ PRIVACIDADE E CONFIANCA
 - Codigo aberto - audite cada linha voce mesmo
 
 COMPATIBILIDADE
-- Android 6.0 ate Android 15
+- Android 7.0 ate Android 15
 - Sem root necessario
 - Samsung, Xiaomi, Huawei, Pixel, OnePlus, Motorola
 

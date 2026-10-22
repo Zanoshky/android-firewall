@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.zanoshky.firewall"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         versionCode = 16
         versionName = "1.16"

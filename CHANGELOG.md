@@ -10,6 +10,10 @@ On some phones the firewall crashed right after a restart, before the first unlo
 
 If Android refuses to let the firewall run in the foreground, it now stops cleanly instead of crashing.
 
+### Android 7.0 or newer
+
+Google Play's automatic protection needs Android 7.0 at least, so new installs need it too. Phones on Android 6 keep 1.15.
+
 ### Edge to edge on every Android version
 
 The app now draws behind the status and navigation bars on every Android version, as it already did on Android 15, and no longer sets the bar colours Android has retired.
